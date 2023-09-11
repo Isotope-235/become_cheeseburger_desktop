@@ -200,8 +200,8 @@ impl State {
 
             for _ in 0..times {
                 let side = rrange(4);
-                let snake_ch = diffscale * 0.225;
-                if chance(dbg!(snake_ch / (1.00 + snake_ch))) {
+                let snake_ch = diffscale * 0.40;
+                if chance(snake_ch / (1.00 + snake_ch)) {
                     let direction = num_to_side(side);
                     let shift = get_shift(direction, 4.00);
                     for i in 0..((diffscale * 3.00) as i32) {
@@ -214,7 +214,7 @@ impl State {
                         };
                         let bullet = Bullet::new(
                             pos,
-                            vel,
+                            vel * 1.25,
                             delay
                         );
                         self.bullets.push(bullet);
@@ -225,7 +225,7 @@ impl State {
                         let (pos, vel) = spawn_posvel_from(side, 4.00 + delay, 4.00);
                         let bullet = Bullet::new(
                             pos,
-                            vel,
+                            vel * 1.25,
                             delay
                         );
                         self.bullets.push(bullet);
@@ -237,7 +237,7 @@ impl State {
             // cheeses
 
             // slugs
-            let times = self.slug_counter.revolve(0.20);
+            let times = self.slug_counter.revolve(0.20 * diffscale);
 
             for _ in 0..times {
                 let (pos, vel) = spawn_posvel(10.00, 10.00);
@@ -249,9 +249,9 @@ impl State {
             }
 
             // warnings
-            let times = self.warning_counter.revolve(0.175 * diffscale);
+            let times = self.warning_counter.revolve(0.15);
 
-            for _ in 0..times {
+            for i in 0..(times * diffscale as i32) {
                 let (mut pos, dir) = spawn_posvel(-12.00, 12.00);
                 // move laser so it targets player
                 let shift = rand(30.00) - 15.00;
@@ -260,7 +260,7 @@ impl State {
                 } else {
                     pos.1 = self.burger.pos.y() + shift;
                 }
-                self.warnings.push(Warning::new(pos, dir));
+                self.warnings.push(Warning::new(pos, dir, i as f64 * (15.00)));
             }
 
             // health packs
@@ -322,7 +322,7 @@ impl State {
             for warning in &self.warnings {
                 if warning.should_be_removed() {
                     let dir = warning.dir();
-                    let laser = Laser::new(warning.pos - dir * 40.00, dir * 5.00);
+                    let laser = Laser::new(warning.pos - dir * 40.00, dir * 7.00);
                     self.lasers.push(laser);
                 }
             }
@@ -358,19 +358,21 @@ impl State {
         }
         // warnings
         for warning in &self.warnings {
-            let clr = match warning.age % 6.00 < 3.00 {
-                true => Color::RGB(255, 55, 55),
-                false => Color::RGB(255, 255, 55),
-            };
-            canvas.set_draw_color(clr);
-            draw::rect(canvas, warning.pos, 10, 10)
+            if warning.is_visible() {
+                let clr = match warning.age % 6.00 < 3.00 {
+                    true => Color::RGB(255, 55, 55),
+                    false => Color::RGB(255, 255, 55),
+                };
+                canvas.set_draw_color(clr);
+                draw::rect(canvas, warning.pos, 10, 10)
+            }
         }
         // lasers
         canvas.set_draw_color(Color::RGB(255, 55, 55));
         for laser in &self.lasers {
             let (w, h) = match laser.vel.x().abs() > laser.vel.y().abs() {
-                true => (30, 6),
-                false => (6, 30),
+                true => (36, 6),
+                false => (6, 36),
             };
             draw::rect(canvas, laser.pos, w, h)
         }
