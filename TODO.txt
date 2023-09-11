@@ -1,0 +1,24 @@
+fix:
+    done:
+        laser hitbox
+    
+adjust:
+    cheese behaviour
+    done:
+        spawn logic
+add:
+    flak
+    power-ups
+    hp drops
+    done:
+        dash
+        dash cooldown indicator
+        visible bar indicating hp
+        smarter lasers
+
+
+eventually:
+    add:
+        sprites
+        sound
+        boss
