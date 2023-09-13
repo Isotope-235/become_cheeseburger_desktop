@@ -453,11 +453,11 @@ impl Counter for f64 {
     }
 }
 fn num_to_side(num: i32) -> V2 {
-    match num {
+    match num % 4 {
         1 => V2(1.00, 0.00),
         2 => V2(-1.00, 0.00),
         3 => V2(0.00, 1.00),
-        4 => V2(0.00, -1.00),
+        0 => V2(0.00, -1.00),
         _ => panic!("dear god")
     }
 }
