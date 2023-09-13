@@ -374,7 +374,8 @@ impl State {
         // warnings
         for warning in &self.warnings {
             if warning.is_visible() {
-                let clr = match warning.age % 6.00 < 3.00 {
+                let dur = 6.00;
+                let clr = match warning.age % dur < dur * 0.50 {
                     true => Color::RGB(255, 55, 55),
                     false => Color::RGB(255, 255, 55),
                 };
