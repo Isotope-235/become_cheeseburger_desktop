@@ -48,7 +48,7 @@ fn scale() -> f64 {
     8.00
 }
 fn fill_leading_zeroes(num: i32) -> String {
-    
+
     let missing_zeroes = 5 - num.checked_ilog10().unwrap_or(0) - 1;
     let lead = "0".repeat(missing_zeroes as usize);
     let mut output = num.to_string();
@@ -125,7 +125,7 @@ fn main() {
                                 }
                             }
                         }
-                    }   
+                    }
                 Event::KeyUp { keycode, repeat, .. } => {
                     if !repeat {
                         if let Some(key) = keycode {
@@ -242,7 +242,7 @@ impl State {
 
                 }
             }
-            
+
             // cheeses
 
             // slugs
@@ -305,7 +305,7 @@ impl State {
                 state_effect += self.cheese.state_effect_onhit();
             };
             do_all_hits(&mut self.health_packs, &mut state_effect, &burger_circle, &mut burger_effect);
-            
+
             if self.burger.is_targetable() {
                 do_all_hits(&mut self.bullets, &mut state_effect, &burger_circle, &mut burger_effect);
                 do_all_hits(&mut self.slugs, &mut state_effect, &burger_circle, &mut burger_effect);

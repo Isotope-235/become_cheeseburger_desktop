@@ -1,7 +1,7 @@
 fix:
     done:
         laser hitbox
-    
+
 adjust:
     cheese behaviour
     done:
@@ -9,8 +9,8 @@ adjust:
 add:
     flak
     power-ups
-    hp drops
     done:
+        hp drops
         dash
         dash cooldown indicator
         visible bar indicating hp
