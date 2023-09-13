@@ -1,5 +1,7 @@
 //#![windows_subsystem = "windows"]
-pub mod input; use input::Input;
+pub mod input; use std::time::Duration;
+
+use input::Input;
 mod player; use crate::player::*;
 mod bullet; use crate::bullet::*;
 mod cheese; use crate::cheese::*;
@@ -151,15 +153,17 @@ fn main() {
             state.score += score_change;
             score_txt = render_score(state.score, &joystix, &texture_creator);
         }
-        if state.game_is_over() {
-            score_txt = render_score(0, &joystix, &texture_creator);
-            state = State::reset()
-        };
 
         // draw calls
         state.draw(&mut canvas);
         let TextureQuery { width, height, .. } = score_txt.query();
         canvas.copy(&score_txt, None, Rect::from_center(Point::new(width as i32 / 2, height as i32 / 2), width, height)).unwrap();
+
+        // game should only end after freeze frames are rendered, so this goes after draw calls
+        if state.game_is_over() {
+            score_txt = render_score(0, &joystix, &texture_creator);
+            state = State::reset()
+        };
 
         // present
         canvas.present();
@@ -173,6 +177,7 @@ fn main() {
 struct State {
     difficulty: f64,
     score: i32,
+    freeze: f64,
     burger: Pos<Player>,
     cheese: Pos<Cheese>,
     bullet_counter: f64,
@@ -189,6 +194,10 @@ impl State {
     fn progress(&mut self, input: &Input) -> i32 {
         let mut score = 0;
         for _ in 0..ITERATIONS as usize {
+            if self.freeze > 0.00 {
+                self.freeze = (self.freeze - DT).max(0.00);
+                continue;
+            }
             // data saved for perf
             let diffscale = self.difficulty * 0.01;
             //
@@ -264,7 +273,7 @@ impl State {
             }
 
             // health packs
-            let times = self.health_packs_counter.revolve(0.10 * self.burger.missing_hp().max(0.00).min(8.00));
+            let times = self.health_packs_counter.revolve(0.10 * (self.burger.missing_hp() - (self.health_packs.len() * 2) as f64).max(0.00).min(8.00));
             
             for _ in 0..times {
                 let (pos, vel) = spawn_posvel(10.00, 12.00);
@@ -303,8 +312,14 @@ impl State {
                 do_all_hits(&mut self.lasers, &mut state_effect, &burger_circle, &mut burger_effect);
                 self.burger.takes_effect(&burger_effect);
             }
-            let StateEffect { score: added_score } = state_effect;
+            state_effect.freeze += burger_effect.damage;
+            let StateEffect { score: added_score, freeze } = state_effect;
             score += added_score;
+            self.freeze += freeze;
+            if self.freeze > 0.00 { // making sure that the player sees the fatal projectile
+                self.freeze = (self.freeze - DT).max(0.00);
+                continue;
+            }
             
 
             // special update behaviour
@@ -405,12 +420,13 @@ impl State {
         draw::rect(canvas, V2(from_left as f64, window_height - from_bot as f64), w as u32, h);
     }
     fn game_is_over(&self) -> bool {
-        !self.burger.is_alive()
+        !self.burger.is_alive() && self.freeze.abs() < 1e-10
     }
     fn reset() -> State {
         State {
             difficulty: 100.00,
             score: 0,
+            freeze: 0.00,
             burger: Player::new(center()),
             cheese: Cheese::new(center() - V2(4.00, 4.00)),
             bullet_counter: 0.00,

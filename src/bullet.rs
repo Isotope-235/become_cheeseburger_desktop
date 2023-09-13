@@ -21,7 +21,7 @@ impl Pos<Bullet> {
 }
 impl Onhit for Pos<Bullet> {
     fn target_effect_onhit(&self) -> Effect {
-        Effect { damage: 3.00 }
+        Effect { damage: self.bhv.hp }
     }
 
     fn self_effect_onhit(&self) -> Effect {

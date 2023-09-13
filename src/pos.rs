@@ -73,17 +73,19 @@ impl Default for Effect {
     }
 }
 pub struct StateEffect {
-    pub score: i32
+    pub score: i32,
+    pub freeze: f64
 }
 impl Default for StateEffect {
     fn default() -> Self {
-        StateEffect { score: 0 }
+        StateEffect { score: 0, freeze: 0.00 }
     }
 }
 impl AddAssign<StateEffect> for StateEffect {
     fn add_assign(&mut self, rhs: StateEffect) {
-        let StateEffect { score } = rhs;
+        let StateEffect { score, freeze } = rhs;
         self.score += score;
+        self.freeze += freeze;
     }
 }
 impl AddAssign<Effect> for Effect {

@@ -28,7 +28,7 @@ impl Pos<Slug> {
 }
 impl Onhit for Pos<Slug> {
     fn target_effect_onhit(&self) -> Effect {
-        Effect { damage: 7.00 }
+        Effect { damage: self.bhv.hp }
     }
 
     fn self_effect_onhit(&self) -> Effect {

@@ -28,7 +28,7 @@ impl Pos<Laser> {
 }
 impl Onhit for Pos<Laser> {
     fn target_effect_onhit(&self) -> Effect {
-        Effect { damage: 5.00 }
+        Effect { damage: self.bhv.hp }
     }
 
     fn self_effect_onhit(&self) -> Effect {
