@@ -54,7 +54,7 @@ impl Pos<Player> {
         self.bhv.dash_charge = self.bhv.dash_charge - charge_used;
     }
     pub fn can_dash(&self) -> bool {
-        self.bhv.dash_charge > 0.75
+        self.bhv.dash_charge >= 1.00
     }
     pub fn color(&self) -> Color {
         match self.bhv.invuln > 0.00 {

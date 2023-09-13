@@ -274,7 +274,7 @@ impl State {
 
             // health packs
             let times = self.health_packs_counter.revolve(0.10 * (self.burger.missing_hp() - (self.health_packs.len() * 2) as f64).max(0.00).min(8.00));
-            
+
             for _ in 0..times {
                 let (pos, vel) = spawn_posvel(10.00, 12.00);
                 let health_pack = HealthPack::new(
@@ -320,7 +320,7 @@ impl State {
                 self.freeze = (self.freeze - DT).max(0.00);
                 continue;
             }
-            
+
 
             // special update behaviour
             self.burger.update_bhv(input);
