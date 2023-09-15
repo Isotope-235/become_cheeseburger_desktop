@@ -100,7 +100,15 @@ async fn main() {
         set_camera(&canvas.camera);
         clear_background(BG);
         state.draw();
-        draw_text_ex("hewwo", 0.00, 10.00, TextParams { font: Some(&joystix), font_size: 10, color: YELLOW, ..Default::default() });
+        let text_params = TextParams {
+            font: Some(&joystix),
+            font_size: 80,
+            font_scale: 0.125,
+            font_scale_aspect: 1.00,
+            color: YELLOW,
+            ..Default::default()
+        };
+        draw_text_ex(&fill_leading_zeroes(state.score), 0.00, 10.00, text_params);
         set_default_camera();
         canvas.get_texture_mut().set_filter(FilterMode::Nearest);
         canvas.draw();
