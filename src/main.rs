@@ -13,14 +13,14 @@ mod health_pack; use crate::health_pack::*;
 mod pos; use crate::pos::*;
 mod vector; use crate::vector::*;
 
+
+use macroquad::prelude as mq;
 use sdl2::rect::Point;
 use sdl2::render::Texture;
 use sdl2::render::TextureCreator;
 use sdl2::render::TextureQuery;
 use sdl2::ttf::Font;
 use sdl2::video::WindowContext;
-
-use rand::prelude::*;
 
 use sdl2::{self, pixels::Color, rect::Rect, render::Canvas, video::Window};
 
@@ -34,7 +34,7 @@ fn feq(x: f64, y: f64) -> bool {
     (x - y).abs() < 1e-10
 }
 fn rand(x: f64) -> f64 {
-    rand::thread_rng().gen::<f64>() * x
+    mq
 }
 fn rrange(x: i32) -> i32 {
     rand::thread_rng().gen_range(1..=x)
@@ -60,10 +60,8 @@ fn render_score<'a, 'b>(score: i32, font: &Font<'a, 'b>, texture_creator: &'a Te
     font.render(&fill_leading_zeroes(score)).solid(Color::YELLOW).unwrap().as_texture(&texture_creator).unwrap()
 }
 
-fn main() {
-    let context = sdl2::init().unwrap();
-    let video = context.video().unwrap();
-    let fontext = sdl2::ttf::init().unwrap();
+#[macroquad::main("Limited Alpha v0.2.0 - Become Cheeseburger: Desktop Edition")]
+async fn main() {
     let joystix = fontext.load_font("joystix.otf", 10).unwrap();
 
     let V2(w, h) = center();
@@ -172,6 +170,7 @@ fn main() {
         // wait for the frame timer
         let frame_time = start_of_frame.elapsed();
         std::thread::sleep(if FRAME_DURATION > frame_time {FRAME_DURATION - frame_time} else {std::time::Duration::ZERO})
+        next_frame().await
     }
 }
 
