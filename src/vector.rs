@@ -5,21 +5,12 @@ use std::ops::Add;
 use std::ops::AddAssign;
 use std::ops::Sub;
 
-use sdl2::rect::Point;
-
 #[derive(Debug, Clone, Copy)]
 pub struct V2(pub f64, pub f64);
 
 impl From<f64> for V2 {
     fn from(value: f64) -> Self {
         Self(value.cos(), value.sin())
-    }
-}
-
-impl From<V2> for Point {
-    fn from(value: V2) -> Self {
-        let V2(x, y) = value;
-        Point::new(x as i32, y as i32)
     }
 }
 

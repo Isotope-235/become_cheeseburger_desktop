@@ -2,7 +2,7 @@
 pub mod input; use std::time::Duration;
 
 use input::Input;
-use sdl2::audio::AudioSpecDesired;
+use macroquad::miniquad::TextureParams;
 mod player; use crate::player::*;
 mod bullet; use crate::bullet::*;
 mod cheese; use crate::cheese::*;
@@ -14,30 +14,23 @@ mod pos; use crate::pos::*;
 mod vector; use crate::vector::*;
 
 
-use macroquad::prelude as mq;
-use sdl2::rect::Point;
-use sdl2::render::Texture;
-use sdl2::render::TextureCreator;
-use sdl2::render::TextureQuery;
-use sdl2::ttf::Font;
-use sdl2::video::WindowContext;
+use macroquad::prelude::*;
+use macroquad_canvas::Canvas2D;
 
-use sdl2::{self, pixels::Color, rect::Rect, render::Canvas, video::Window};
-
-const BG: Color = Color::RGB(55, 55, 55);
+const BG: Color = color_u8!(55, 55, 55, 255);
 const TITLE: &'static str = "Limited Alpha v0.2.0 - Become Cheeseburger: Desktop Edition";
 const ITERATIONS: i32 = 10;
 const DT: f64 = 1.00 / ITERATIONS as f64;
-const FRAME_DURATION: std::time::Duration = std::time::Duration::from_micros(16_667);
+const FRAME_DURATION: std::time::Duration = std::time::Duration::from_micros(16_667 / 2);
 
 fn feq(x: f64, y: f64) -> bool {
     (x - y).abs() < 1e-10
 }
 fn rand(x: f64) -> f64 {
-    mq
+    rand::gen_range(0.00, x)
 }
 fn rrange(x: i32) -> i32 {
-    rand::thread_rng().gen_range(1..=x)
+    rand::gen_range(0, x + 1)
 }
 fn chance(x: f64) -> bool {
     rand(1.00) < x
@@ -49,44 +42,31 @@ fn scale() -> f64 {
     8.00
 }
 fn fill_leading_zeroes(num: i32) -> String {
-
     let missing_zeroes = 5 - num.checked_ilog10().unwrap_or(0) - 1;
     let lead = "0".repeat(missing_zeroes as usize);
     let mut output = num.to_string();
     output.insert_str(0, &lead);
     output
 }
-fn render_score<'a, 'b>(score: i32, font: &Font<'a, 'b>, texture_creator: &'a TextureCreator<WindowContext>) -> Texture<'a> {
-    font.render(&fill_leading_zeroes(score)).solid(Color::YELLOW).unwrap().as_texture(&texture_creator).unwrap()
+
+fn window_conf() -> Conf {
+    Conf {
+        window_title: TITLE.to_string(),
+        window_width: (center().x() * 2.00 * scale()) as i32,
+        window_height: (center().y() * 2.00 * scale()) as i32,
+        sample_count: 0,
+        window_resizable: false,
+        ..Default::default()
+    }
 }
-
-#[macroquad::main("Limited Alpha v0.2.0 - Become Cheeseburger: Desktop Edition")]
+#[macroquad::main(window_conf())]
 async fn main() {
-    let joystix = fontext.load_font("joystix.otf", 10).unwrap();
-
-    let V2(w, h) = center();
-    let window = video
-        .window(
-            TITLE,
-            (w * 2.00 * scale()) as u32,
-            (h * 2.00 * scale()) as u32,
-        )
-        .position_centered()
-        .resizable()
-        .build()
-        .unwrap();
-
-    let mut canvas = window.into_canvas().build().unwrap();
-    let texture_creator = canvas.texture_creator();
-    let mut score_txt = render_score(0, &joystix, &texture_creator);
-
-    // ready canvas for first frame
-    canvas.set_integer_scale(true).unwrap();
-    canvas.set_scale(8.00, 8.00).unwrap();
-    canvas.set_draw_color(BG);
-    canvas.clear();
-    canvas.present();
-
+    let joystix = load_ttf_font("joystix.otf").await.unwrap();
+    // camera
+    let mut camera = Camera2D::from_display_rect(Rect::new(0.00, 0.00, (center().x() * 2.00) as f32, (center().y() * 2.00) as f32));
+    camera.zoom = vec2(camera.zoom.x, camera.zoom.y * -1.00);
+    set_camera(&camera);
+    let mut canvas = Canvas2D::new((center().x() * 2.00) as f32, (center().y() * 2.00) as f32);
     // state init
     let mut input = Input::init();
     let mut state = State::reset();
@@ -94,82 +74,48 @@ async fn main() {
     // once-tests
 
     // we do a little bit of trolling
-    let mut event_pump = context.event_pump().unwrap();
 
     // main game loop
     'game: loop {
         // first: take the time
         let start_of_frame = std::time::Instant::now();
         // get inputs for this frame
-        for event in event_pump.poll_iter() {
-            use sdl2::event::Event;
-            match event {
-                Event::Quit { .. } => {
-                    break 'game;
-                }
-                Event::KeyDown { keycode, repeat, .. } => {
-                        if !repeat {
-                            if let Some(key) = keycode {
-                                use sdl2::keyboard::Keycode;
-                                match key {
-                                    Keycode::Escape => {
-                                        break 'game;
-                                    }
-                                    Keycode::W => input.w = true,
-                                    Keycode::A => input.a = true,
-                                    Keycode::S => input.s = true,
-                                    Keycode::D => input.d = true,
-                                    Keycode::Space => input.space = true,
-                                    _ => {}
-                                }
-                            }
-                        }
-                    }
-                Event::KeyUp { keycode, repeat, .. } => {
-                    if !repeat {
-                        if let Some(key) = keycode {
-                            use sdl2::keyboard::Keycode;
-                            match key {
-                                Keycode::W => input.w = false,
-                                Keycode::A => input.a = false,
-                                Keycode::S => input.s = false,
-                                Keycode::D => input.d = false,
-                                Keycode::Space => input.space = false,
-                                _ => {}
-                            }
-                        }
-                    }
-                }
-                _ => {}
-            }
-        }
+        
         // canvas clear
-        canvas.set_draw_color(BG);
-        canvas.clear();
         // core update
+        input = Input {
+            w: is_key_down(KeyCode::W),
+            a: is_key_down(KeyCode::A), 
+            s: is_key_down(KeyCode::S),
+            d: is_key_down(KeyCode::D),
+            space: is_key_down(KeyCode::Space)
+        };
         let score_change = state.progress(&input);
         if score_change > 0 {
             state.score += score_change;
-            score_txt = render_score(state.score, &joystix, &texture_creator);
+            // score_txt = render_score(state.score, &joystix, &texture_creator);
         }
 
         // draw calls
-        state.draw(&mut canvas);
-        let TextureQuery { width, height, .. } = score_txt.query();
-        canvas.copy(&score_txt, None, Rect::from_center(Point::new(width as i32 / 2, height as i32 / 2), width, height)).unwrap();
+        set_camera(&canvas.camera);
+        clear_background(BG);
+        state.draw();
+        draw_text_ex("hewwo", 0.00, 10.00, TextParams { font: Some(&joystix), font_size: 10, color: YELLOW, ..Default::default() });
+        set_default_camera();
+        canvas.get_texture_mut().set_filter(FilterMode::Nearest);
+        canvas.draw();
 
         // game should only end after freeze frames are rendered, so this goes after draw calls
         if state.game_is_over() {
-            score_txt = render_score(0, &joystix, &texture_creator);
+            // score_txt = render_score(0, &joystix, &texture_creator);
             state = State::reset()
         };
 
         // present
-        canvas.present();
 
         // wait for the frame timer
         let frame_time = start_of_frame.elapsed();
-        std::thread::sleep(if FRAME_DURATION > frame_time {FRAME_DURATION - frame_time} else {std::time::Duration::ZERO})
+        std::thread::sleep(if FRAME_DURATION > frame_time {FRAME_DURATION - frame_time} else {std::time::Duration::ZERO});
         next_frame().await
     }
 }
@@ -350,47 +296,48 @@ impl State {
         };
         score
     }
-    fn draw(&self, canvas: &mut Canvas<Window>) {
+    fn draw(&self) {
         // burger
-        canvas.set_draw_color(self.burger.color());
-        draw::rect(canvas, self.burger.pos, 8, 8);
+        let burger_color = {
+            match self.burger.bhv.invuln > 0.00 {
+                true => Color::from_rgba(255, 255, 255, 255),
+                false => Color::from_rgba(155, 155, 255, 255),
+            }
+        };
+        draw_rec(self.burger.pos, 8, 8, burger_color);
         // cheese
-        canvas.set_draw_color(Color::YELLOW);
-        draw::rect(canvas, self.cheese.pos, 6, 6);
+        draw_rec(self.cheese.pos, 6, 6, YELLOW);
         // health packs
-        canvas.set_draw_color(Color::RGB(55, 255, 55));
         for health_pack in &self.health_packs {
-            draw::rect(canvas, health_pack.pos, 6, 6)
+            draw_rec(health_pack.pos, 6, 6, Color::from_rgba(55, 255, 55, 255));
         }
         // bullets
-        canvas.set_draw_color(Color::RGB(255, 155, 155));
+        let bullet_color = Color::from_rgba(255, 155, 155, 255);
         for bullet in &self.bullets {
-            draw::rect(canvas, bullet.pos, 6, 6)
+            draw_rec(bullet.pos, 6, 6, bullet_color);
         }
         // slugs
         for slug in &self.slugs {
-            draw::rect(canvas, slug.pos, 20, 20)
+            draw_rec(slug.pos, 20, 20, bullet_color);
         }
         // warnings
         for warning in &self.warnings {
             if warning.is_visible() {
                 let dur = 6.00;
                 let clr = match warning.age % dur < dur * 0.50 {
-                    true => Color::RGB(255, 55, 55),
-                    false => Color::RGB(255, 255, 55),
+                    true => Color::from_rgba(255, 55, 55, 255),
+                    false => Color::from_rgba(255, 255, 55, 255),
                 };
-                canvas.set_draw_color(clr);
-                draw::rect(canvas, warning.pos, 10, 10)
+                draw_rec(warning.pos, 10, 10, clr)
             }
         }
         // lasers
-        canvas.set_draw_color(Color::RGB(255, 55, 55));
         for laser in &self.lasers {
             let (w, h) = match laser.vel.x().abs() > laser.vel.y().abs() {
                 true => (36, 6),
                 false => (6, 36),
             };
-            draw::rect(canvas, laser.pos, w, h)
+            draw_rec(laser.pos, w, h, Color::from_rgba(255, 55, 55, 255));
         }
         // health bar
         let h = 4;
@@ -401,10 +348,8 @@ impl State {
         let from_bot = halfh + 2;
         let mw = mhp * 8.00;
         let window_height = center().y() * 2.00;
-        canvas.set_draw_color(Color::RGB(155, 155, 155));
-        draw::rect(canvas, V2(mw * 0.50 + 2.00, window_height - from_bot as f64), mw as u32, h);
-        canvas.set_draw_color(Color::RGB(255, 55, 55));
-        draw::rect(canvas, V2(from_left as f64, window_height - from_bot as f64), w as u32, h);
+        draw_rec(V2(mw * 0.50 + 2.00, window_height - from_bot as f64), mw as i32, h, Color::from_rgba(155, 155, 155, 255));
+        draw_rec(V2(from_left as f64, window_height - from_bot as f64), w.max(0.00) as i32, h, Color::from_rgba(255, 155, 155, 255));
         // dash bar
         let h = 2;
         let halfh = h / 2;
@@ -414,11 +359,10 @@ impl State {
         let from_bot = halfh + 6;
         let mw = mdc * 8.00;
         let clr = match self.burger.can_dash() {
-            true => Color::RGB(255, 255, 255),
-            false => Color::RGB(55, 155, 255),
+            true => Color::from_rgba(255, 255, 255, 255),
+            false => Color::from_rgba(55, 155, 255, 255),
         };
-        canvas.set_draw_color(clr);
-        draw::rect(canvas, V2(from_left as f64, window_height - from_bot as f64), w as u32, h);
+        draw_rec(V2(from_left as f64, window_height - from_bot as f64), w as i32, h, clr);
     }
     fn game_is_over(&self) -> bool {
         !self.burger.is_alive() && self.freeze.abs() < 1e-10
@@ -484,12 +428,9 @@ fn get_shift(dir: V2, edge_buffer: f64) -> V2 {
     let shift_range = rot_dir.mul_per(center()).len() - edge_buffer;
     rot_dir * (rand(shift_range * 2.00) - shift_range)
 }
-pub mod draw {
-    use sdl2::{rect::Rect, render::Canvas, video::Window};
-
-    use crate::vector::V2;
-
-    pub fn rect(canvas: &mut Canvas<Window>, pos: V2, w: u32 , h: u32) {
-        canvas.fill_rect(Rect::from_center(pos, w, h)).unwrap()
-    }
+fn draw_rec(pos: V2, w: i32, h: i32, color: Color) {
+    debug_assert!(w % 2 == 0);
+    debug_assert!(h % 2 == 0);
+    let (half_w, half_h) = (w / 2, h / 2);
+    draw_rectangle(pos.x() as f32 - half_w as f32, pos.y() as f32 - half_h as f32, w as f32, h as f32, color);
 }

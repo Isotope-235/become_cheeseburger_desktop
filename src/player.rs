@@ -56,12 +56,6 @@ impl Pos<Player> {
     pub fn can_dash(&self) -> bool {
         self.bhv.dash_charge >= 1.00
     }
-    pub fn color(&self) -> Color {
-        match self.bhv.invuln > 0.00 {
-            true => Color::RGB(255, 255, 255),
-            false => Color::RGB(155, 155, 255),
-        }
-    }
     pub fn is_targetable(&self) -> bool {
         self.bhv.invuln <= 0.00
     }
