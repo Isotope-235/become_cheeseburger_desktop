@@ -1,5 +1,6 @@
 //#![windows_subsystem = "windows"]
-pub mod input; use std::time::Duration;
+pub mod input; use std::ops::SubAssign;
+use std::time::Duration;
 
 use input::Input;
 use macroquad::miniquad::TextureParams;
@@ -72,6 +73,14 @@ async fn main() {
     let mut state = State::reset();
 
     // once-tests
+    let text_params = TextParams {
+        font: Some(&joystix),
+        font_size: 80,
+        font_scale: 0.125,
+        font_scale_aspect: 1.00,
+        color: YELLOW,
+        ..Default::default()
+    };
 
     // we do a little bit of trolling
 
@@ -100,15 +109,13 @@ async fn main() {
         set_camera(&canvas.camera);
         clear_background(BG);
         state.draw();
-        let text_params = TextParams {
-            font: Some(&joystix),
-            font_size: 80,
-            font_scale: 0.125,
-            font_scale_aspect: 1.00,
-            color: YELLOW,
-            ..Default::default()
+        let score_text = fill_leading_zeroes(state.score);
+        let mut score_chars = score_text.chars();
+        let mut i = 0;
+        while let Some(c) = score_chars.next() {
+            draw_text_ex(&c.to_owned().to_string(), 1.00 + i as f32 * 8.00, 9.00, text_params.clone());
+            i += 1;
         };
-        draw_text_ex(&fill_leading_zeroes(state.score), 0.00, 10.00, text_params);
         set_default_camera();
         canvas.get_texture_mut().set_filter(FilterMode::Nearest);
         canvas.draw();
@@ -123,7 +130,7 @@ async fn main() {
 
         // wait for the frame timer
         let frame_time = start_of_frame.elapsed();
-        std::thread::sleep(if FRAME_DURATION > frame_time {FRAME_DURATION - frame_time} else {std::time::Duration::ZERO});
+        if FRAME_DURATION > frame_time {std::thread::sleep(FRAME_DURATION - frame_time)};
         next_frame().await
     }
 }
