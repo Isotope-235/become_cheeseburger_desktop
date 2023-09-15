@@ -356,28 +356,22 @@ impl State {
         }
         // health bar
         let h = 4;
-        let halfh = h / 2;
         let mhp = self.burger.max_hp();
         let w = self.burger.bhv.hp * 8.00;
-        let from_left = w * 0.50 + 2.00;
-        let from_bot = halfh + 2;
+        let from_bot = h + 2;
         let mw = mhp * 8.00;
         let window_height = center().y() * 2.00;
-        draw_rec(V2(mw * 0.50 + 2.00, window_height - from_bot as f64), mw as i32, h, Color::from_rgba(155, 155, 155, 255));
-        draw_rec(V2(from_left as f64, window_height - from_bot as f64), w.max(0.00) as i32, h, Color::from_rgba(255, 155, 155, 255));
+        draw_rec_top_left(V2(2.00, window_height - from_bot as f64), mw as i32, h, Color::from_rgba(155, 155, 155, 255));
+        draw_rec_top_left(V2(2.00, window_height - from_bot as f64), w.max(0.00) as i32, h, Color::from_rgba(255, 155, 155, 255));
         // dash bar
         let h = 2;
-        let halfh = h / 2;
-        let mdc = 1.00;
         let w = self.burger.bhv.dash_charge * 8.00 * 8.00;
-        let from_left = w * 0.50 + 2.00;
-        let from_bot = halfh + 6;
-        let mw = mdc * 8.00;
+        let dash_from_bot = from_bot + h;
         let clr = match self.burger.can_dash() {
             true => Color::from_rgba(255, 255, 255, 255),
             false => Color::from_rgba(55, 155, 255, 255),
         };
-        draw_rec(V2(from_left as f64, window_height - from_bot as f64), w as i32, h, clr);
+        draw_rec_top_left(V2(2.00, window_height - dash_from_bot as f64), w as i32, h, clr);
     }
     fn game_is_over(&self) -> bool {
         !self.burger.is_alive() && self.freeze.abs() < 1e-10
@@ -448,4 +442,7 @@ fn draw_rec(pos: V2, w: i32, h: i32, color: Color) {
     debug_assert!(h % 2 == 0);
     let (half_w, half_h) = (w / 2, h / 2);
     draw_rectangle(pos.x() as f32 - half_w as f32, pos.y() as f32 - half_h as f32, w as f32, h as f32, color);
+}
+fn draw_rec_top_left(pos: V2, w: i32, h: i32, color: Color) {
+    draw_rectangle(pos.x() as f32, pos.y() as f32, w as f32, h as f32, color);
 }
