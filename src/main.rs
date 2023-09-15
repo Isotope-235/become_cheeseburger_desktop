@@ -2,6 +2,7 @@
 pub mod input; use std::time::Duration;
 
 use input::Input;
+use sdl2::audio::AudioSpecDesired;
 mod player; use crate::player::*;
 mod bullet; use crate::bullet::*;
 mod cheese; use crate::cheese::*;
