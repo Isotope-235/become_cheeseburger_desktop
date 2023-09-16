@@ -369,8 +369,9 @@ impl State {
         let from_bot = h + 2;
         let mw = mhp * 8.00;
         let window_height = center().y() * 2.00;
-        draw_rec_top_left(V2(2.00, window_height - from_bot as f64), mw as i32, h, Color::from_rgba(155, 155, 155, 255));
-        draw_rec_top_left(V2(2.00, window_height - from_bot as f64), w.max(0.00) as i32, h, Color::from_rgba(255, 155, 155, 255));
+        let hp_pos = V2(2.00, window_height - from_bot as f64);
+        draw_rec_top_left(hp_pos, mw as i32, h, Color::from_rgba(155, 155, 155, 255));
+        draw_rec_top_left(hp_pos, w.max(0.00) as i32, h, Color::from_rgba(255, 105, 105, 255));
         // dash bar
         let h = 2;
         let w = self.burger.bhv.dash_charge * 8.00 * 8.00;
