@@ -1,5 +1,6 @@
 //#![windows_subsystem = "windows"]
-pub mod input; use std::ops::SubAssign;
+pub mod input; use std::f64::consts::E;
+use std::ops::SubAssign;
 use std::time::Duration;
 
 use input::Input;
@@ -82,6 +83,14 @@ async fn main() {
         ..Default::default()
     };
 
+    let mut num = 1.00;
+    let iters = 13;
+    let growth = 2.00f64.powf(1.00 / iters as f64);
+    for i in 0..iters {
+        num *= growth
+    }
+
+    dbg!(num);
     // we do a little bit of trolling
 
     // main game loop
@@ -89,12 +98,11 @@ async fn main() {
         // first: take the time
         let start_of_frame = std::time::Instant::now();
         // get inputs for this frame
-        
         // canvas clear
         // core update
         input = Input {
             w: is_key_down(KeyCode::W),
-            a: is_key_down(KeyCode::A), 
+            a: is_key_down(KeyCode::A),
             s: is_key_down(KeyCode::S),
             d: is_key_down(KeyCode::D),
             space: is_key_down(KeyCode::Space)

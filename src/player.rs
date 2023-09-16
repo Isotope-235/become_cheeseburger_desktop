@@ -7,7 +7,7 @@ pub struct Player {
 
 impl Behaviour for Player {
     fn update(this: &mut Pos<Self>, input: &Input) {
-        this.vel = input.dir().normal() * (1.00 / 3.00) * DT + this.vel * 0.825f64.powf(DT);
+        this.vel = input.dir().normal() * (0.55) * DT + this.vel * 0.675f64.powf(DT);
         this.bhv.invuln = (this.bhv.invuln - DT).max(0.00);
         this.bhv.dash_charge = (this.bhv.dash_charge + 0.01 * DT).min(1.00);
         this.bhv.hp = this.bhv.hp.min(this.max_hp());
