@@ -1,9 +1,11 @@
 //#![windows_subsystem = "windows"]
-pub mod input; use std::ops::SubAssign;
+pub mod input; use std::f64::consts::PI;
+use std::ops::SubAssign;
 use std::time::Duration;
 
 use input::Input;
 use macroquad::miniquad::TextureParams;
+use macroquad::prelude::scene::Node;
 mod player; use crate::player::*;
 mod bullet; use crate::bullet::*;
 mod cheese; use crate::cheese::*;
@@ -11,9 +13,11 @@ mod slug; use crate::slug::*;
 mod laser; use crate::laser::*;
 mod warning; use crate::warning::*;
 mod health_pack; use crate::health_pack::*;
+mod flak; use crate::flak::*;
 mod pos; use crate::pos::*;
 mod vector; use crate::vector::*;
 
+use std::collections::linked_list::LinkedList;
 
 use macroquad::prelude::*;
 use macroquad_canvas::Canvas2D;
@@ -150,6 +154,9 @@ struct State {
     lasers: Vec<Pos<Laser>>,
     health_packs_counter: f64,
     health_packs: Vec<Pos<HealthPack>>,
+    flak_counter: f64,
+    flaks: Vec<Pos<Flak>>,
+    flak_children: Vec<Pos<FlakChild>>,
 }
 impl State {
     fn progress(&mut self, input: &Input) -> i32 {
@@ -245,6 +252,17 @@ impl State {
                 self.health_packs.push(health_pack);
             }
 
+            let times = self.flak_counter.revolve(0.30 * diffscale);
+
+            for _ in 0..times {
+                let (pos, vel) = spawn_posvel(4.00, 4.00);
+                let flak = Flak::new(
+                    pos,
+                    vel * 0.50
+                );
+                self.flaks.push(flak);
+            }
+
             // movement logic
             self.burger.update_pos();
             self.burger.stays_in_bounds();
@@ -254,6 +272,8 @@ impl State {
             update_all_pos(&mut self.warnings);
             update_all_pos(&mut self.lasers);
             update_all_pos(&mut self.health_packs);
+            update_all_pos(&mut self.flaks);
+            update_all_pos(&mut self.flak_children);
 
             // inter-unitary logic
             let burger_circle = self.burger.hitcircle();
@@ -271,6 +291,8 @@ impl State {
                 do_all_hits(&mut self.bullets, &mut state_effect, &burger_circle, &mut burger_effect);
                 do_all_hits(&mut self.slugs, &mut state_effect, &burger_circle, &mut burger_effect);
                 do_all_hits(&mut self.lasers, &mut state_effect, &burger_circle, &mut burger_effect);
+                do_all_hits(&mut self.flaks, &mut state_effect, &burger_circle, &mut burger_effect);
+                do_all_hits(&mut self.flak_children, &mut state_effect, &burger_circle, &mut burger_effect);
                 self.burger.takes_effect(&burger_effect);
             }
             state_effect.freeze += burger_effect.damage;
@@ -291,6 +313,7 @@ impl State {
             update_all_bhv(&mut self.warnings, input);
             update_all_bhv(&mut self.lasers, input);
             update_all_bhv(&mut self.health_packs, input);
+            update_all_bhv(&mut self.flaks, input);
 
             // remove elements
             self.bullets.retain(|b| b.age < 750.00 && !b.should_be_removed());
@@ -305,6 +328,18 @@ impl State {
             self.warnings.retain(|w| !w.should_be_removed());
             self.lasers.retain(|l| !l.should_be_removed());
             self.health_packs.retain(|hp| !hp.should_be_removed());
+            for flak in &self.flaks {
+                if flak.should_be_removed() {
+                    let number = 8;
+                    for i in 0..number {
+                        let dir = i as f64 * PI * 2.00 / number as f64;
+                        let child = FlakChild::new(flak.pos, V2::from(dir));
+                        self.flak_children.push(child);
+                    }
+                }
+            }
+            self.flaks.retain(|f| !f.should_be_removed());
+            self.flak_children.retain(|c| !c.should_be_removed());
 
             // up difficulty
             self.difficulty += 0.10 * DT;
@@ -354,6 +389,14 @@ impl State {
             };
             draw_rec(laser.pos, w, h, Color::from_rgba(255, 55, 55, 255));
         }
+        // flak
+        for flak in &self.flaks {
+            draw_rec(flak.pos, 14, 14, Color::from_rgba(255, 155, 155, 255));
+        }
+        // flak children
+        for flak_child in &self.flak_children {
+            draw_rec(flak_child.pos, 4, 4, Color::from_rgba(255, 155, 155, 255));
+        }
         // health bar
         let h = 4;
         let mhp = self.burger.max_hp();
@@ -392,6 +435,9 @@ impl State {
             lasers: Vec::new(),
             health_packs_counter: 0.00,
             health_packs: Vec::new(),
+            flak_counter: 0.00,
+            flaks: Vec::new(),
+            flak_children: Vec::new(),
         }
     }
 }
@@ -446,3 +492,4 @@ fn draw_rec(pos: V2, w: i32, h: i32, color: Color) {
 fn draw_rec_top_left(pos: V2, w: i32, h: i32, color: Color) {
     draw_rectangle(pos.x() as f32, pos.y() as f32, w as f32, h as f32, color);
 }
+

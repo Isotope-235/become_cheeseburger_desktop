@@ -16,9 +16,12 @@ impl From<f64> for V2 {
 
 impl V2 {
     pub const ZERO: V2 = V2(0.00, 0.00);
-    pub fn len(self) -> f64 {
+    pub fn square_len(self) -> f64 {
         let V2(x, y) = self;
-        (x.powi(2) + y.powi(2)).sqrt()
+        x.powi(2) + y.powi(2)
+    }
+    pub fn len(self) -> f64 {
+        self.square_len().sqrt()
     }
     pub fn normal(self) -> V2 {
         let length = self.len();
