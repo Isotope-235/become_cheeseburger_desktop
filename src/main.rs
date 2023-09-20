@@ -1,11 +1,8 @@
 //#![windows_subsystem = "windows"]
-pub mod input; use std::f64::consts::PI;
-use std::ops::SubAssign;
-use std::time::Duration;
+pub mod input;
+use std::f64::consts::PI;
 
 use input::Input;
-use macroquad::miniquad::TextureParams;
-use macroquad::prelude::scene::Node;
 mod player; use crate::player::*;
 mod bullet; use crate::bullet::*;
 mod cheese; use crate::cheese::*;
@@ -17,8 +14,6 @@ mod flak; use crate::flak::*;
 mod pos; use crate::pos::*;
 mod vector; use crate::vector::*;
 
-use std::collections::linked_list::LinkedList;
-
 use macroquad::prelude::*;
 use macroquad_canvas::Canvas2D;
 
@@ -28,9 +23,6 @@ const ITERATIONS: i32 = 10;
 const DT: f64 = 1.00 / ITERATIONS as f64;
 const FRAME_DURATION: std::time::Duration = std::time::Duration::from_micros(16_667 / 2);
 
-fn feq(x: f64, y: f64) -> bool {
-    (x - y).abs() < 1e-10
-}
 fn rand(x: f64) -> f64 {
     rand::gen_range(0.00, x)
 }
@@ -73,7 +65,6 @@ async fn main() {
     set_camera(&camera);
     let mut canvas = Canvas2D::new((center().x() * 2.00) as f32, (center().y() * 2.00) as f32);
     // state init
-    let mut input = Input::init();
     let mut state = State::reset();
 
     // once-tests
@@ -86,19 +77,26 @@ async fn main() {
         ..Default::default()
     };
 
+    let mut num = 1.00;
+    let iters = 13;
+    let growth = 2.00f64.powf(1.00 / iters as f64);
+    for _ in 0..iters {
+        num *= growth
+    }
+
+    dbg!(num);
     // we do a little bit of trolling
 
     // main game loop
-    'game: loop {
+    loop {
         // first: take the time
         let start_of_frame = std::time::Instant::now();
         // get inputs for this frame
-        
         // canvas clear
         // core update
-        input = Input {
+        let input = Input {
             w: is_key_down(KeyCode::W),
-            a: is_key_down(KeyCode::A), 
+            a: is_key_down(KeyCode::A),
             s: is_key_down(KeyCode::S),
             d: is_key_down(KeyCode::D),
             space: is_key_down(KeyCode::Space)
@@ -404,8 +402,9 @@ impl State {
         let from_bot = h + 2;
         let mw = mhp * 8.00;
         let window_height = center().y() * 2.00;
-        draw_rec_top_left(V2(2.00, window_height - from_bot as f64), mw as i32, h, Color::from_rgba(155, 155, 155, 255));
-        draw_rec_top_left(V2(2.00, window_height - from_bot as f64), w.max(0.00) as i32, h, Color::from_rgba(255, 155, 155, 255));
+        let hp_pos = V2(2.00, window_height - from_bot as f64);
+        draw_rec_top_left(hp_pos, mw as i32, h, Color::from_rgba(155, 155, 155, 255));
+        draw_rec_top_left(hp_pos, w.max(0.00) as i32, h, Color::from_rgba(255, 105, 105, 255));
         // dash bar
         let h = 2;
         let w = self.burger.bhv.dash_charge * 8.00 * 8.00;
