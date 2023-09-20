@@ -4,7 +4,7 @@ pub struct Flak {
     hp: f64
 }
 impl Behaviour for Flak {
-    
+
 }
 impl Hitbox for Pos<Flak> {
     fn hitcircle(&self) -> Circle {
@@ -45,7 +45,7 @@ pub struct FlakChild {
     hp: f64
 }
 impl Behaviour for FlakChild {
-    
+
 }
 impl Hitbox for Pos<FlakChild> {
     fn hitcircle(&self) -> Circle {
@@ -53,8 +53,8 @@ impl Hitbox for Pos<FlakChild> {
     }
 }
 impl FlakChild {
-    pub fn new(pos: V2, vel: V2) -> Pos<FlakChild> {
-        Pos { pos, vel, ..Pos::default() }
+    pub fn new(pos: V2, vel: V2, acc: V2) -> Pos<FlakChild> {
+        Pos { pos, vel, acc, ..Pos::default() }
     }
 }
 impl Default for FlakChild {
