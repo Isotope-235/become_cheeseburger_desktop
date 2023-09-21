@@ -3,9 +3,6 @@ use crate::*;
 pub struct Slug {
     hp: f64
 }
-impl Behaviour for Slug {
-    
-}
 impl Hitbox for Pos<Slug> {
     fn hitcircle(&self) -> Circle {
         Circle::new(self.pos, 10.00)

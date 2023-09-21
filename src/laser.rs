@@ -3,9 +3,6 @@ use crate::*;
 pub struct Laser {
     hp: f64
 }
-impl Behaviour for Laser {
-    
-}
 impl Hitbox for Pos<Laser> {
     fn hitcircle(&self) -> Circle {
         Circle::new(self.pos, 3.00)

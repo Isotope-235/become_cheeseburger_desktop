@@ -304,14 +304,44 @@ impl State {
 
 
             // special update behaviour
-            self.burger.update_bhv(input);
-            self.cheese.update_bhv(input);
-            update_all_bhv(&mut self.bullets, input);
-            update_all_bhv(&mut self.slugs, input);
-            update_all_bhv(&mut self.warnings, input);
-            update_all_bhv(&mut self.lasers, input);
-            update_all_bhv(&mut self.health_packs, input);
-            update_all_bhv(&mut self.flaks, input);
+            { // burger
+                let ref mut burger = self.burger;
+                burger.vel = input.dir().normal() * (0.55) * DT + burger.vel * 0.675f64.powf(DT);
+                burger.bhv.invuln = (burger.bhv.invuln - DT).max(0.00);
+                burger.bhv.dash_charge = (burger.bhv.dash_charge + 0.01 * DT).min(1.00);
+                burger.bhv.hp = burger.bhv.hp.min(burger.max_hp());
+                if input.space && burger.can_dash() && input.dir().len() > 0.00 {
+                    burger.dash(input);
+                }
+            };
+            
+            
+            { // cheese
+                let ref mut cheese = self.cheese;
+                if cheese.bhv.hp < 1e-10 {
+                    let V2(x, y) = center();
+                    cheese.pos = V2(rand(x), rand(y)) + center() * 0.50;
+                    cheese.bhv.hp = 1.00;
+                }
+            };
+            { // bullets
+                // nothing for now
+            };
+            { // slugs
+                // nothing for now
+            };
+            { // warnings
+                // nothing for now
+            };
+            { // lasers
+                // nothing for now
+            };
+            { // health packs
+                // nothing for now
+            };
+            { // flaks
+                // nothing for now
+            };
 
             // remove elements
             self.bullets.retain(|b| b.age < 750.00 && !b.should_be_removed());
@@ -491,4 +521,3 @@ fn draw_rec(pos: V2, w: i32, h: i32, color: Color) {
 fn draw_rec_top_left(pos: V2, w: i32, h: i32, color: Color) {
     draw_rectangle(pos.x() as f32, pos.y() as f32, w as f32, h as f32, color);
 }
-

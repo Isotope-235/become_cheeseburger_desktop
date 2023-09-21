@@ -36,12 +36,3 @@ impl TakeEffect for Pos<Cheese> {
         self.bhv.hp -= damage;
     }
 }
-impl Behaviour for Cheese {
-    fn update(this: &mut Pos<Self>, input: &Input) {
-        if this.bhv.hp < 1e-10 {
-            let V2(x, y) = center();
-            this.pos = V2(rand(x), rand(y)) + center() * 0.50;
-            this.bhv.hp = 1.00;
-        }
-    }
-}

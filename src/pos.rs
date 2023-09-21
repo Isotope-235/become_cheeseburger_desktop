@@ -15,24 +15,9 @@ impl<T> Pos<T> {
         self.age = self.age + 1.00 * DT;
     }
 }
-impl<T: Behaviour> Pos<T> {
-    pub fn update_bhv(&mut self, input: &Input) {
-        T::update(self, input)
-    }
-}
 impl<T: Default> Default for Pos<T> {
     fn default() -> Self {
         Self { pos: center(), vel: V2::ZERO, acc: V2::ZERO, age: 0.00, bhv: T::default() }
-    }
-}
-pub trait Behaviour : Sized {
-    fn update(this: &mut Pos<Self>, input: &Input) {
-
-    }
-}
-pub fn update_all_bhv<T: Behaviour>(items: &mut Vec<Pos<T>>, input: &Input) {
-    for item in items {
-        item.update_bhv(input)
     }
 }
 pub fn update_all_pos<T>(items: &mut Vec<Pos<T>>) {

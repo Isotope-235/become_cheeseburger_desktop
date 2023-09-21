@@ -4,7 +4,6 @@ pub struct Warning {
     dir: V2,
     delay: f64
 }
-impl Behaviour for Warning {}
 
 impl Warning {
     pub fn new(pos: V2, dir: V2, delay: f64) -> Pos<Warning> {

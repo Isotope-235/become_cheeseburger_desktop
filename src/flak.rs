@@ -3,9 +3,6 @@ use crate::*;
 pub struct Flak {
     hp: f64
 }
-impl Behaviour for Flak {
-    
-}
 impl Hitbox for Pos<Flak> {
     fn hitcircle(&self) -> Circle {
         Circle::new(self.pos, 7.00)
@@ -43,9 +40,6 @@ impl TakeEffect for Pos<Flak> {
 }
 pub struct FlakChild {
     hp: f64
-}
-impl Behaviour for FlakChild {
-    
 }
 impl Hitbox for Pos<FlakChild> {
     fn hitcircle(&self) -> Circle {

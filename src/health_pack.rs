@@ -2,8 +2,6 @@ use crate::*;
 pub struct HealthPack {
     pub hp: f64
 }
-impl Behaviour for HealthPack {
-}
 impl Hitbox for Pos<HealthPack>{
     fn hitcircle(&self) -> Circle {
         Circle::new(self.pos, 5.00)

@@ -5,17 +5,6 @@ pub struct Player {
     pub dash_charge: f64
 }
 
-impl Behaviour for Player {
-    fn update(this: &mut Pos<Self>, input: &Input) {
-        this.vel = input.dir().normal() * (0.55) * DT + this.vel * 0.675f64.powf(DT);
-        this.bhv.invuln = (this.bhv.invuln - DT).max(0.00);
-        this.bhv.dash_charge = (this.bhv.dash_charge + 0.01 * DT).min(1.00);
-        this.bhv.hp = this.bhv.hp.min(this.max_hp());
-        if input.space && this.can_dash() && input.dir().len() > 0.00 {
-            this.dash(input);
-        }
-    }
-}
 impl Hitbox for Pos<Player> {
     fn hitcircle(&self) -> Circle {
         Circle::new(self.pos, 2.00)

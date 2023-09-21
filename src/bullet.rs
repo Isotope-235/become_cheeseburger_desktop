@@ -2,8 +2,6 @@ use crate::*;
 pub struct Bullet {
     hp: f64
 }
-impl Behaviour for Bullet {
-}
 impl Hitbox for Pos<Bullet>{
     fn hitcircle(&self) -> Circle {
         Circle::new(self.pos, 3.00)
