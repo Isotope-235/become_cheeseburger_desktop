@@ -19,8 +19,8 @@ impl Default for Flak {
     }
 }
 impl Pos<Flak> {
-    pub fn should_be_removed(&self) -> bool {
-        self.bhv.hp < 1e-10 || self.age > 200.00
+    pub fn will_live(&self) -> bool {
+        self.bhv.hp > 1e-10 && self.age < 200.00
     }
 }
 impl Onhit for Pos<Flak> {
@@ -39,7 +39,7 @@ impl TakeEffect for Pos<Flak> {
     }
 }
 pub struct FlakChild {
-    hp: f64
+    pub hp: f64
 }
 impl Hitbox for Pos<FlakChild> {
     fn hitcircle(&self) -> Circle {
@@ -54,11 +54,6 @@ impl FlakChild {
 impl Default for FlakChild {
     fn default() -> Self {
         FlakChild { hp: 2.00 }
-    }
-}
-impl Pos<FlakChild> {
-    pub fn should_be_removed(&self) -> bool {
-        self.bhv.hp < 1e-10 || self.age > 300.00
     }
 }
 impl Onhit for Pos<FlakChild> {

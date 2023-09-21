@@ -1,7 +1,7 @@
 use crate::*;
 
 pub struct Slug {
-    hp: f64
+    pub hp: f64
 }
 impl Hitbox for Pos<Slug> {
     fn hitcircle(&self) -> Circle {
@@ -16,11 +16,6 @@ impl Slug {
 impl Default for Slug {
     fn default() -> Self {
         Slug { hp: 7.00 }
-    }
-}
-impl Pos<Slug> {
-    pub fn should_be_removed(&self) -> bool {
-        self.bhv.hp < 1e-10
     }
 }
 impl Onhit for Pos<Slug> {

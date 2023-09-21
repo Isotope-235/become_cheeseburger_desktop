@@ -329,7 +329,13 @@ impl State {
                 // nothing for now
             };
             { // warnings
-                // nothing for now
+                for warning in &self.warnings {
+                    if !warning.will_live() {
+                        let dir = warning.dir();
+                        let laser = Laser::new(warning.pos - dir * 40.00, dir * 7.00);
+                        self.lasers.push(laser);
+                    }
+                }
             };
             { // lasers
                 // nothing for now
@@ -338,34 +344,26 @@ impl State {
                 // nothing for now
             };
             { // flaks
-                // nothing for now
+                for flak in &self.flaks {
+                    if !flak.will_live() {
+                        let number = 8;
+                        for i in 0..number {
+                            let dir = i as f64 * PI * 2.00 / number as f64;
+                            let child = FlakChild::new(flak.pos, V2::ZERO, V2::from(dir) * 0.01);
+                            self.flak_children.push(child);
+                        }
+                    }
+                }
             };
 
             // remove elements
-            self.bullets.retain(|b| b.age < 750.00 && !b.should_be_removed());
-            self.slugs.retain(|s| s.age < 1500.00 && !s.should_be_removed());
-            for warning in &self.warnings {
-                if warning.should_be_removed() {
-                    let dir = warning.dir();
-                    let laser = Laser::new(warning.pos - dir * 40.00, dir * 7.00);
-                    self.lasers.push(laser);
-                }
-            }
-            self.warnings.retain(|w| !w.should_be_removed());
-            self.lasers.retain(|l| !l.should_be_removed());
-            self.health_packs.retain(|hp| !hp.should_be_removed());
-            for flak in &self.flaks {
-                if flak.should_be_removed() {
-                    let number = 8;
-                    for i in 0..number {
-                        let dir = i as f64 * PI * 2.00 / number as f64;
-                        let child = FlakChild::new(flak.pos, V2::ZERO, V2::from(dir) * 0.01);
-                        self.flak_children.push(child);
-                    }
-                }
-            }
-            self.flaks.retain(|f| !f.should_be_removed());
-            self.flak_children.retain(|c| !c.should_be_removed());
+            self.bullets.retain(|b| b.age < 750.00 || b.bhv.hp < 1e-10);
+            self.slugs.retain(|s| s.age < 1500.00 || s.bhv.hp < 1e-10);
+            self.warnings.retain(|w| w.will_live());
+            self.lasers.retain(|l| l.age < 500.00 && l.bhv.hp > 1e-10);
+            self.health_packs.retain(|hp| hp.bhv.hp > 1e-10);
+            self.flaks.retain(|f| f.will_live());
+            self.flak_children.retain(|c| c.age < 300.00 && c.bhv.hp > 1e-10);
 
             // up difficulty
             self.difficulty += 0.10 * DT;

@@ -1,7 +1,7 @@
 use crate::*;
 
 pub struct Laser {
-    hp: f64
+    pub hp: f64
 }
 impl Hitbox for Pos<Laser> {
     fn hitcircle(&self) -> Circle {
@@ -16,11 +16,6 @@ impl Laser {
 impl Default for Laser {
     fn default() -> Self {
         Laser { hp: 5.00 }
-    }
-}
-impl Pos<Laser> {
-    pub fn should_be_removed(&self) -> bool {
-        self.bhv.hp < 1e-10 || self.age > 500.00
     }
 }
 impl Onhit for Pos<Laser> {

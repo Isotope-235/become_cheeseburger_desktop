@@ -1,6 +1,6 @@
 use crate::*;
 pub struct Bullet {
-    hp: f64
+    pub hp: f64
 }
 impl Hitbox for Pos<Bullet>{
     fn hitcircle(&self) -> Circle {
@@ -10,11 +10,6 @@ impl Hitbox for Pos<Bullet>{
 impl Bullet {
     pub fn new(pos: V2, vel: V2, extra_lifetime: f64) -> Pos<Self> {
         Pos { pos, vel, acc: V2::ZERO, age: -extra_lifetime, bhv: Bullet { hp: 3.00 } }
-    }
-}
-impl Pos<Bullet> {
-    pub fn should_be_removed(&self) -> bool {
-        self.bhv.hp < 1e-10
     }
 }
 impl Onhit for Pos<Bullet> {

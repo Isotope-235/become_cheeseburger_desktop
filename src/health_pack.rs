@@ -17,11 +17,6 @@ impl Default for HealthPack {
         HealthPack { hp: 1.00 }
     }    
 }
-impl Pos<HealthPack> {
-    pub fn should_be_removed(&self) -> bool {
-        self.bhv.hp < 1e-10
-    }
-}
 impl Onhit for Pos<HealthPack> {
     fn target_effect_onhit(&self) -> Effect {
         Effect { damage: -2.00 }

@@ -2,7 +2,7 @@ use crate::*;
 
 pub struct Warning {
     dir: V2,
-    delay: f64
+    pub delay: f64
 }
 
 impl Warning {
@@ -16,8 +16,8 @@ impl Default for Warning {
     }
 }
 impl Pos<Warning> {
-    pub fn should_be_removed(&self) -> bool {
-        self.age >= 60.00 + self.bhv.delay
+    pub fn will_live(&self) -> bool {
+        self.age < 60.00 + self.bhv.delay
     }
     pub fn dir(&self) -> V2 {
         self.bhv.dir
