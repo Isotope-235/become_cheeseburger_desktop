@@ -47,8 +47,8 @@ impl Hitbox for Pos<FlakChild> {
     }
 }
 impl FlakChild {
-    pub fn new(pos: V2, vel: V2) -> Pos<FlakChild> {
-        Pos { pos, vel, ..Pos::default() }
+    pub fn new(pos: V2, vel: V2, acc: V2) -> Pos<FlakChild> {
+        Pos { pos, vel, acc, ..Pos::default() }
     }
 }
 impl Default for FlakChild {

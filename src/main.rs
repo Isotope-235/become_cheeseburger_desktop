@@ -171,15 +171,15 @@ impl State {
             // spawn_logic
 
             // bullets
-            let times = self.bullet_counter.revolve(1.00);
+            let times = self.bullet_counter.revolve(0.80 + 0.50 * diffscale);
 
             for _ in 0..times {
                 let side = rrange(4);
-                let snake_ch = diffscale * 0.40;
+                let snake_ch = diffscale * 0.225;
                 if chance(snake_ch / (1.00 + snake_ch)) {
                     let direction = num_to_side(side);
                     let shift = get_shift(direction, 4.00);
-                    for i in 0..((diffscale * 3.00) as i32) {
+                    for i in 0..((2.00 + diffscale) as i32) {
                         let delay = i as f64 * 10.00;
                         let (pos, vel) = {
                             let side_buffer = 4.00 + delay;
@@ -212,7 +212,7 @@ impl State {
             // cheeses
 
             // slugs
-            let times = self.slug_counter.revolve(0.20 * diffscale);
+            let times = self.slug_counter.revolve(0.125 + 0.025 * diffscale);
 
             for _ in 0..times {
                 let (pos, vel) = spawn_posvel(10.00, 10.00);
@@ -250,7 +250,7 @@ impl State {
                 self.health_packs.push(health_pack);
             }
 
-            let times = self.flak_counter.revolve(0.30 * diffscale);
+            let times = self.flak_counter.revolve(0.10 + 0.02 * diffscale);
 
             for _ in 0..times {
                 let (pos, vel) = spawn_posvel(4.00, 4.00);
@@ -361,7 +361,7 @@ impl State {
                     let number = 8;
                     for i in 0..number {
                         let dir = i as f64 * PI * 2.00 / number as f64;
-                        let child = FlakChild::new(flak.pos, V2::from(dir));
+                        let child = FlakChild::new(flak.pos, V2::ZERO, V2::from(dir) * 0.01);
                         self.flak_children.push(child);
                     }
                 }
