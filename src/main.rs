@@ -66,6 +66,11 @@ fn window_conf() -> Conf {
         ..Default::default()
     }
 }
+struct Sprites {
+    burger: Texture2D,
+    burger_invuln: Texture2D,
+    bullet: Texture2D,
+}
 #[macroquad::main(window_conf())]
 async fn main() {
     let joystix = load_ttf_font("joystix.otf").await.unwrap();
@@ -74,6 +79,14 @@ async fn main() {
     camera.zoom = vec2(camera.zoom.x, camera.zoom.y * -1.00);
     set_camera(&camera);
     let mut canvas = Canvas2D::new((center().x() * 2.00) as f32, (center().y() * 2.00) as f32);
+
+    // sprites
+    let sprites = Sprites {
+        burger: load_texture("burger.png").await.unwrap(),
+        burger_invuln: load_texture("burger_invuln.png").await.unwrap(),
+        bullet: load_texture("bullet.png").await.unwrap()
+    };
+
     // state init
     let mut state = State::reset();
 
@@ -86,14 +99,12 @@ async fn main() {
         color: YELLOW,
         ..Default::default()
     };
-
     let mut num = 1.00;
     let iters = 13;
     let growth = 2.00f64.powf(1.00 / iters as f64);
     for _ in 0..iters {
         num *= growth
     }
-
     dbg!(num);
     // we do a little bit of trolling
 
@@ -120,7 +131,7 @@ async fn main() {
         // draw calls
         set_camera(&canvas.camera);
         clear_background(BG);
-        state.draw();
+        state.draw(&sprites);
         let score_text = fill_leading_zeroes(state.score);
         let mut score_chars = score_text.chars();
         let mut i = 0;
@@ -367,11 +378,11 @@ impl State {
             };
 
             // remove elements
-            self.bullets.retain(|b| b.age < 750.00 || b.bhv.hp < 1e-10);
-            self.slugs.retain(|s| s.age < 1500.00 || s.bhv.hp < 1e-10);
+            self.bullets.retain(|b| b.age < 750.00 && b.bhv.hp > 1e-10);
+            self.slugs.retain(|s| s.age < 1500.00 && s.bhv.hp > 1e-10);
             self.warnings.retain(|w| w.will_live());
             self.lasers.retain(|l| l.age < 500.00 && l.bhv.hp > 1e-10);
-            self.health_packs.retain(|hp| hp.bhv.hp > 1e-10);
+            self.health_packs.retain(|hp| hp.age < 500.00 && hp.bhv.hp > 1e-10);
             self.flaks.retain(|f| f.will_live());
             self.flak_children.retain(|c| c.age < 300.00 && c.bhv.hp > 1e-10);
 
@@ -380,15 +391,13 @@ impl State {
         };
         score
     }
-    fn draw(&self) {
+    fn draw(&self, sprites: &Sprites) {
         // burger
-        let burger_color = {
-            match self.burger.bhv.invuln > 0.00 {
-                true => Color::from_rgba(255, 255, 255, 255),
-                false => Color::from_rgba(155, 155, 255, 255),
-            }
+        let b_sprite = match self.burger.bhv.invuln > 0.00 {
+            false => &sprites.burger,
+            true => &sprites.burger_invuln,
         };
-        draw_rec(self.burger.pos, 8, 8, burger_color);
+        copy_texture(b_sprite, self.burger.pos);
         // cheese
         draw_rec(self.cheese.pos, 6, 6, YELLOW);
         // health packs
@@ -398,7 +407,7 @@ impl State {
         // bullets
         let bullet_color = Color::from_rgba(255, 155, 155, 255);
         for bullet in &self.bullets {
-            draw_rec(bullet.pos, 6, 6, bullet_color);
+            copy_texture(&sprites.bullet, bullet.pos);
         }
         // slugs
         for slug in &self.slugs {
@@ -526,4 +535,8 @@ fn draw_rec(pos: V2, w: i32, h: i32, color: Color) {
 }
 fn draw_rec_top_left(pos: V2, w: i32, h: i32, color: Color) {
     draw_rectangle(pos.x() as f32, pos.y() as f32, w as f32, h as f32, color);
+}
+fn copy_texture(texture: &Texture2D, pos: V2) {
+    texture.set_filter(FilterMode::Nearest);
+    draw_texture(texture, pos.x() as f32 - texture.width() * 0.50, pos.y() as f32 - texture.height() * 0.50, WHITE);
 }

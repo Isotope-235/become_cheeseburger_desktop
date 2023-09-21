@@ -7,9 +7,9 @@ adjust:
     done:
         spawn logic
 add:
-    flak
     power-ups
     done:
+        flak
         hp drops
         dash
         dash cooldown indicator
