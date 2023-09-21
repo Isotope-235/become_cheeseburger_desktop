@@ -313,9 +313,7 @@ impl State {
                 if input.space && burger.can_dash() && input.dir().len() > 0.00 {
                     burger.dash(input);
                 }
-            };
-            
-            
+            };            
             { // cheese
                 let ref mut cheese = self.cheese;
                 if cheese.bhv.hp < 1e-10 {
