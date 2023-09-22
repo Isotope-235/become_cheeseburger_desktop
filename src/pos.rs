@@ -9,10 +9,10 @@ pub struct Pos<T> {
     pub bhv: T
 }
 impl<T> Pos<T> {
-    pub fn update_pos(&mut self) {
-        self.vel = self.vel + self.acc * DT;
-        self.pos = self.pos + self.vel * DT;
-        self.age = self.age + 1.00 * DT;
+    pub fn update_pos(&mut self, dt: f64) {
+        self.vel = self.vel + self.acc * dt;
+        self.pos = self.pos + self.vel * dt;
+        self.age = self.age + 1.00 * dt;
     }
 }
 impl<T: Default> Default for Pos<T> {
@@ -20,9 +20,9 @@ impl<T: Default> Default for Pos<T> {
         Self { pos: center(), vel: V2::ZERO, acc: V2::ZERO, age: 0.00, bhv: T::default() }
     }
 }
-pub fn update_all_pos<T>(items: &mut Vec<Pos<T>>) {
+pub fn update_all_pos<T>(items: &mut Vec<Pos<T>>, dt: f64) {
     for item in items {
-        item.update_pos()
+        item.update_pos(dt)
     }
 }
 pub fn do_all_hits<T: Hitbox + Onhit + TakeEffect>(items: &mut Vec<T>, state_effect_accumulator: &mut StateEffect, burger_circle: &Circle, burger_accumulator: &mut Effect) {
@@ -91,12 +91,12 @@ impl Circle {
     pub fn new(pos: V2, rad: f64) -> Circle {
         Circle { pos, rad }
     }
-    pub fn overlap(&self, other: &Circle) -> f64 {
+    pub fn _overlap(&self, other: &Circle) -> f64 {
         let dist_between_centers = (self.pos - other.pos).len();
         let combined_radii = self.rad + other.rad;
         (combined_radii - dist_between_centers) / combined_radii
     }
     pub fn is_hitting(&self, other: &Circle) -> bool {
-        self.overlap(other) > 0.00
+        (other.pos - self.pos).square_len() < (self.rad + other.rad).powi(2)
     }
 }

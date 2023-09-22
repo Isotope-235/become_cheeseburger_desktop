@@ -28,10 +28,10 @@ use macroquad::prelude::*;
 use macroquad_canvas::Canvas2D;
 
 const BG: Color = color_u8!(55, 55, 55, 255);
+const BGD: Color = color_u8!(255, 55, 55, 255);
 const TITLE: &'static str = "Limited Alpha v0.2.0 - Become Cheeseburger: Desktop Edition";
-const ITERATIONS: i32 = 10;
+const ITERATIONS: i32 = 5;
 const DT: f64 = 1.00 / ITERATIONS as f64;
-const FRAME_DURATION: std::time::Duration = std::time::Duration::from_micros(16_667 / 2);
 
 fn rand(x: f64) -> f64 {
     rand::gen_range(0.00, x)
@@ -70,6 +70,9 @@ struct Sprites {
     burger: Texture2D,
     burger_invuln: Texture2D,
     bullet: Texture2D,
+    slug: Texture2D,
+    flak: Texture2D,
+    flak_child: Texture2D,
 }
 #[macroquad::main(window_conf())]
 async fn main() {
@@ -84,11 +87,16 @@ async fn main() {
     let sprites = Sprites {
         burger: load_texture("burger.png").await.unwrap(),
         burger_invuln: load_texture("burger_invuln.png").await.unwrap(),
-        bullet: load_texture("bullet.png").await.unwrap()
+        bullet: load_texture("bullet.png").await.unwrap(),
+        flak: load_texture("flak.png").await.unwrap(),
+        slug: load_texture("slug.png").await.unwrap(),
+        flak_child: load_texture("flak_child.png").await.unwrap(),
     };
 
     // state init
     let mut state = State::reset();
+    let fps = get_fps();
+    let dt = DT * 60.00 / fps as f64;
 
     // once-tests
     let text_params = TextParams {
@@ -122,7 +130,7 @@ async fn main() {
             d: is_key_down(KeyCode::D),
             space: is_key_down(KeyCode::Space)
         };
-        let score_change = state.progress(&input);
+        let score_change = state.progress(&input, dt);
         if score_change > 0 {
             state.score += score_change;
             // score_txt = render_score(state.score, &joystix, &texture_creator);
@@ -130,7 +138,7 @@ async fn main() {
 
         // draw calls
         set_camera(&canvas.camera);
-        clear_background(BG);
+        clear_background(if state.freeze > 0.00 {BGD} else {BG});
         state.draw(&sprites);
         let score_text = fill_leading_zeroes(state.score);
         let mut score_chars = score_text.chars();
@@ -152,9 +160,9 @@ async fn main() {
         // present
 
         // wait for the frame timer
+        next_frame().await;
         let frame_time = start_of_frame.elapsed();
-        if FRAME_DURATION > frame_time {std::thread::sleep(FRAME_DURATION - frame_time)};
-        next_frame().await
+        // if FRAME_DURATION > frame_time {std::thread::sleep(FRAME_DURATION - frame_time)};
     }
 }
 
@@ -178,11 +186,11 @@ struct State {
     flak_children: Vec<Pos<FlakChild>>,
 }
 impl State {
-    fn progress(&mut self, input: &Input) -> i32 {
+    fn progress(&mut self, input: &Input, dt: f64) -> i32 {
         let mut score = 0;
         for _ in 0..ITERATIONS as usize {
             if self.freeze > 0.00 {
-                self.freeze = (self.freeze - DT).max(0.00);
+                self.freeze = (self.freeze - dt).max(0.00);
                 continue;
             }
             // data saved for perf
@@ -192,7 +200,7 @@ impl State {
             // spawn_logic
 
             // bullets
-            let times = self.bullet_counter.revolve(0.80 + 0.50 * diffscale);
+            let times = self.bullet_counter.revolve(0.80 + 0.50 * diffscale, dt);
 
             for _ in 0..times {
                 let side = rrange(4);
@@ -233,7 +241,7 @@ impl State {
             // cheeses
 
             // slugs
-            let times = self.slug_counter.revolve(0.125 + 0.025 * diffscale);
+            let times = self.slug_counter.revolve(0.125 + 0.025 * diffscale, dt);
 
             for _ in 0..times {
                 let (pos, vel) = spawn_posvel(10.00, 10.00);
@@ -245,7 +253,7 @@ impl State {
             }
 
             // warnings
-            let times = self.warning_counter.revolve(0.15);
+            let times = self.warning_counter.revolve(0.15, dt);
 
             for i in 0..(times * diffscale as i32) {
                 let (mut pos, dir) = spawn_posvel(-12.00, 12.00);
@@ -260,7 +268,7 @@ impl State {
             }
 
             // health packs
-            let times = self.health_packs_counter.revolve(0.10 * (self.burger.missing_hp() - (self.health_packs.len() * 2) as f64).max(0.00).min(8.00));
+            let times = self.health_packs_counter.revolve(0.10 * (self.burger.missing_hp() - (self.health_packs.len() * 2) as f64).max(0.00).min(8.00), dt);
 
             for _ in 0..times {
                 let (pos, vel) = spawn_posvel(10.00, 12.00);
@@ -271,7 +279,7 @@ impl State {
                 self.health_packs.push(health_pack);
             }
 
-            let times = self.flak_counter.revolve(0.10 + 0.02 * diffscale);
+            let times = self.flak_counter.revolve(0.10 + 0.02 * diffscale, dt);
 
             for _ in 0..times {
                 let (pos, vel) = spawn_posvel(4.00, 4.00);
@@ -283,16 +291,16 @@ impl State {
             }
 
             // movement logic
-            self.burger.update_pos();
+            self.burger.update_pos(dt);
             self.burger.stays_in_bounds();
-            self.cheese.update_pos();
-            update_all_pos(&mut self.bullets);
-            update_all_pos(&mut self.slugs);
-            update_all_pos(&mut self.warnings);
-            update_all_pos(&mut self.lasers);
-            update_all_pos(&mut self.health_packs);
-            update_all_pos(&mut self.flaks);
-            update_all_pos(&mut self.flak_children);
+            self.cheese.update_pos(dt);
+            update_all_pos(&mut self.bullets, dt);
+            update_all_pos(&mut self.slugs, dt);
+            update_all_pos(&mut self.warnings, dt);
+            update_all_pos(&mut self.lasers, dt);
+            update_all_pos(&mut self.health_packs, dt);
+            update_all_pos(&mut self.flaks, dt);
+            update_all_pos(&mut self.flak_children, dt);
 
             // inter-unitary logic
             let burger_circle = self.burger.hitcircle();
@@ -314,12 +322,12 @@ impl State {
                 do_all_hits(&mut self.flak_children, &mut state_effect, &burger_circle, &mut burger_effect);
                 self.burger.takes_effect(&burger_effect);
             }
-            state_effect.freeze += burger_effect.damage;
+            state_effect.freeze += burger_effect.damage.max(0.00);
             let StateEffect { score: added_score, freeze } = state_effect;
             score += added_score;
             self.freeze += freeze;
             if self.freeze > 0.00 { // making sure that the player sees the fatal projectile
-                self.freeze = (self.freeze - DT).max(0.00);
+                self.freeze = (self.freeze - dt).max(0.00);
                 continue;
             }
 
@@ -327,9 +335,9 @@ impl State {
             // special update behaviour
             { // burger
                 let ref mut burger = self.burger;
-                burger.vel = input.dir().normal() * (0.55) * DT + burger.vel * 0.675f64.powf(DT);
-                burger.bhv.invuln = (burger.bhv.invuln - DT).max(0.00);
-                burger.bhv.dash_charge = (burger.bhv.dash_charge + 0.01 * DT).min(1.00);
+                burger.vel = input.dir().normal() * (0.55) * dt + burger.vel * 0.675f64.powf(dt);
+                burger.bhv.invuln = (burger.bhv.invuln - dt).max(0.00);
+                burger.bhv.dash_charge = (burger.bhv.dash_charge + 0.01 * dt).min(1.00);
                 burger.bhv.hp = burger.bhv.hp.min(burger.max_hp());
                 if input.space && burger.can_dash() && input.dir().len() > 0.00 {
                     burger.dash(input);
@@ -387,7 +395,7 @@ impl State {
             self.flak_children.retain(|c| c.age < 300.00 && c.bhv.hp > 1e-10);
 
             // up difficulty
-            self.difficulty += 0.10 * DT;
+            self.difficulty += 0.10 * dt;
         };
         score
     }
@@ -405,13 +413,12 @@ impl State {
             draw_rec(health_pack.pos, 6, 6, Color::from_rgba(55, 255, 55, 255));
         }
         // bullets
-        let bullet_color = Color::from_rgba(255, 155, 155, 255);
         for bullet in &self.bullets {
             copy_texture(&sprites.bullet, bullet.pos);
         }
         // slugs
         for slug in &self.slugs {
-            draw_rec(slug.pos, 20, 20, bullet_color);
+            copy_with_rotation(&sprites.slug, slug.pos, slug.vel.angle() + PI * 0.50);
         }
         // warnings
         for warning in &self.warnings {
@@ -434,11 +441,11 @@ impl State {
         }
         // flak
         for flak in &self.flaks {
-            draw_rec(flak.pos, 14, 14, Color::from_rgba(255, 155, 155, 255));
+            copy_texture(&sprites.flak, flak.pos);
         }
         // flak children
         for flak_child in &self.flak_children {
-            draw_rec(flak_child.pos, 4, 4, Color::from_rgba(255, 155, 155, 255));
+            copy_texture(&sprites.flak_child, flak_child.pos);
         }
         // health bar
         let h = 4;
@@ -486,11 +493,11 @@ impl State {
     }
 }
 pub trait Counter {
-    fn revolve(&mut self, delta: f64) -> i32;
+    fn revolve(&mut self, delta: f64, dt: f64) -> i32;
 }
 impl Counter for f64 {
-    fn revolve(&mut self, delta: f64) -> i32 {
-        *self = *self + delta * DT;
+    fn revolve(&mut self, delta: f64, dt: f64) -> i32 {
+        *self = *self + delta * dt;
         let times = *self as i32 / 100;
         *self = *self % 100.00;
         times
@@ -539,4 +546,12 @@ fn draw_rec_top_left(pos: V2, w: i32, h: i32, color: Color) {
 fn copy_texture(texture: &Texture2D, pos: V2) {
     texture.set_filter(FilterMode::Nearest);
     draw_texture(texture, pos.x() as f32 - texture.width() * 0.50, pos.y() as f32 - texture.height() * 0.50, WHITE);
+}
+fn copy_with_rotation(texture: &Texture2D, pos: V2, rotation: f64) {
+    texture.set_filter(FilterMode::Nearest);
+    draw_texture_ex(texture, pos.x() as f32 - texture.width() * 0.50, pos.y() as f32 - texture.height() * 0.50, WHITE, DrawTextureParams {
+        dest_size: None,
+        rotation: rotation as f32,
+        ..Default::default()
+    });
 }

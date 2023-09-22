@@ -32,6 +32,10 @@ impl V2 {
             V2::ZERO
         }
     }
+    pub fn angle(self) -> f64 {
+        let V2(x, y) = self;
+        y.atan2(x)
+    }
     pub fn negate(self) -> V2 {
         let V2(x, y) = self;
         V2(-x, -y)
