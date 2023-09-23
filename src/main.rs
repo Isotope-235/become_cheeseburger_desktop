@@ -76,6 +76,32 @@ struct Sprites {
 }
 #[macroquad::main(window_conf())]
 async fn main() {
+    // disgusting
+    let mut attempts = 0;
+    let fps = 'fps: loop {
+        attempts += 1;
+        let mut frames = Vec::new();
+        for _ in 0..16 {
+            clear_background(BG);
+            next_frame().await;
+            frames.push(get_fps());
+        }
+        let mut adjusted: Vec<_> = frames.iter().skip(8).collect();
+        adjusted.sort_unstable();
+        let mean = *adjusted[7];
+        println!("Targeted framerate: {mean}");
+        match mean {
+            25..=34 |
+            55..=64 |
+            85..=94 |
+            115..=124 |
+            139..=148 |
+            235..=244 => break 'fps mean,
+            _ => if attempts > 3 {panic!()} else {continue;}
+        }
+    };
+    // skip reading until here to avoid brain damage
+    let dt = DT * 60.00 / fps as f64;
     let joystix = load_ttf_font("joystix.otf").await.unwrap();
     // camera
     let mut camera = Camera2D::from_display_rect(Rect::new(0.00, 0.00, (center().x() * 2.00) as f32, (center().y() * 2.00) as f32));
@@ -95,8 +121,6 @@ async fn main() {
 
     // state init
     let mut state = State::reset();
-    let fps = get_fps();
-    let dt = DT * 60.00 / fps as f64;
 
     // once-tests
     let text_params = TextParams {
@@ -118,11 +142,7 @@ async fn main() {
 
     // main game loop
     loop {
-        // first: take the time
-        let start_of_frame = std::time::Instant::now();
         // get inputs for this frame
-        // canvas clear
-        // core update
         let input = Input {
             w: is_key_down(KeyCode::W),
             a: is_key_down(KeyCode::A),
@@ -161,8 +181,6 @@ async fn main() {
 
         // wait for the frame timer
         next_frame().await;
-        let frame_time = start_of_frame.elapsed();
-        // if FRAME_DURATION > frame_time {std::thread::sleep(FRAME_DURATION - frame_time)};
     }
 }
 
@@ -342,7 +360,7 @@ impl State {
                 if input.space && burger.can_dash() && input.dir().len() > 0.00 {
                     burger.dash(input);
                 }
-            };            
+            };
             { // cheese
                 let ref mut cheese = self.cheese;
                 if cheese.bhv.hp < 1e-10 {
