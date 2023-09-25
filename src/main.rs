@@ -218,11 +218,11 @@ impl State {
             // spawn_logic
 
             // bullets
-            let times = self.bullet_counter.revolve(0.80 + 0.50 * diffscale, dt);
+            let times = self.bullet_counter.revolve(1.10 + 0.25 * diffscale, dt);
 
             for _ in 0..times {
                 let side = rrange(4);
-                let snake_ch = diffscale * 0.225;
+                let snake_ch = diffscale * 0.25;
                 if chance(snake_ch / (1.00 + snake_ch)) {
                     let direction = num_to_side(side);
                     let shift = get_shift(direction, 4.00);
@@ -242,7 +242,7 @@ impl State {
                         self.bullets.push(bullet);
                     }
                 } else {
-                    for i in 0..((diffscale * 3.00) as i32) {
+                    for i in 0..((1.00 + diffscale * 2.00) as i32) {
                         let delay = i as f64 * 10.00;
                         let (pos, vel) = spawn_posvel_from(side, 4.00 + delay, 4.00);
                         let bullet = Bullet::new(
@@ -271,7 +271,7 @@ impl State {
             }
 
             // warnings
-            let times = self.warning_counter.revolve(0.15, dt);
+            let times = self.warning_counter.revolve(0.15 + 0.10 * diffscale, dt);
 
             for i in 0..(times * diffscale as i32) {
                 let (mut pos, dir) = spawn_posvel(-12.00, 12.00);
