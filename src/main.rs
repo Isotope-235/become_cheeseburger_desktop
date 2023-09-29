@@ -4,6 +4,8 @@ pub mod constants;
 
 use constants::*;
 use std::f64::consts::PI;
+mod convenience;
+use convenience::*;
 
 use input::Input;
 
@@ -437,7 +439,7 @@ impl State {
                     if !flak.will_live() {
                         let number = 8;
                         for i in 0..number {
-                            let dir = i as f64 * PI * 2.00 / number as f64;
+                            let dir = (i as f64).as_radians() / number as f64;
                             let child = FlakChild::new(flak.pos, V2::ZERO, V2::from(dir) * 0.01);
                             self.flak_children.push(child);
                         }
