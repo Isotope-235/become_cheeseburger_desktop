@@ -44,10 +44,10 @@ impl SpriteLoader {
     }
 
     pub fn texture(&self, path: &str) -> &Texture2D {
-        &self.0.get(path).unwrap().texture
+        &self.0.get(path).unwrap_or_else(|| panic!("Invalid path '{}' for texture", path)).texture
     }
 
     pub fn color(&self, path: &str) -> &Color {
-        &self.0.get(path).unwrap().color
+        &self.0.get(path).unwrap_or_else(|| panic!("Invalid path '{}' for color", path)).color
     }
 }
