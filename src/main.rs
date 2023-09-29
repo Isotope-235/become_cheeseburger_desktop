@@ -1,64 +1,13 @@
 //#![windows_subsystem = "windows"]
-pub mod input;
-pub mod constants;
+pub mod lib;
 
-use constants::*;
 use std::f64::consts::PI;
-mod convenience;
-use convenience::*;
-
-use input::Input;
-
-mod player;
-
-use crate::player::*;
-
-mod bullet;
-
-use crate::bullet::*;
-
-mod cheese;
-
-use crate::cheese::*;
-
-mod slug;
-
-use crate::slug::*;
-
-mod laser;
-
-use crate::laser::*;
-
-mod warning;
-
-use crate::warning::*;
-
-mod health_pack;
-
-use crate::health_pack::*;
-
-mod flak;
-
-use crate::flak::*;
-
-mod pos;
-
-use crate::pos::*;
-
-mod vector;
-
-use crate::vector::*;
-
-mod particle;
-mod sprites;
-
-use crate::sprites::*;
-
-use crate::particle::*;
-
+use lib::*;
 
 use macroquad::prelude::*;
 use macroquad_canvas::Canvas2D;
+
+
 
 fn rand(x: f64) -> f64 {
     rand::gen_range(0.00, x)
@@ -228,7 +177,7 @@ struct State {
     health_packs_counter: f64,
     health_packs: Vec<Pos<HealthPack>>,
     flak_counter: f64,
-    flaks: Vec<Pos<Flak>>,
+    flaks: Vec<Pos<Frag>>,
     flak_children: Vec<Pos<FlakChild>>,
     particles: Vec<Pos<Particle>>,
 }
@@ -330,7 +279,7 @@ impl State {
 
             for _ in 0..times {
                 let (pos, vel) = spawn_posvel(4.00, 4.00);
-                let flak = Flak::new(
+                let flak = Frag::new(
                     pos,
                     vel * 0.50,
                 );

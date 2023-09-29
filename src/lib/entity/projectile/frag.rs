@@ -1,29 +1,29 @@
 use crate::*;
 
-pub struct Flak {
+pub struct Frag {
     hp: f64
 }
-impl Hitbox for Pos<Flak> {
+impl Hitbox for Pos<Frag> {
     fn hitcircle(&self) -> Circle {
         Circle::new(self.pos, 7.00)
     }
 }
-impl Flak {
-    pub fn new(pos: V2, vel: V2) -> Pos<Flak> {
+impl Frag {
+    pub fn new(pos: V2, vel: V2) -> Pos<Frag> {
         Pos { pos, vel, ..Pos::default() }
     }
 }
-impl Default for Flak {
+impl Default for Frag {
     fn default() -> Self {
-        Flak { hp: 5.00 }
+        Frag { hp: 5.00 }
     }
 }
-impl Pos<Flak> {
+impl Pos<Frag> {
     pub fn will_live(&self) -> bool {
         self.bhv.hp > 1e-10 && self.age < 200.00
     }
 }
-impl Onhit for Pos<Flak> {
+impl Onhit for Pos<Frag> {
     fn target_effect_onhit(&self) -> Effect {
         Effect { damage: self.bhv.hp }
     }
@@ -32,7 +32,7 @@ impl Onhit for Pos<Flak> {
         self.target_effect_onhit()
     }
 }
-impl TakeEffect for Pos<Flak> {
+impl TakeEffect for Pos<Frag> {
     fn takes_effect(&mut self, effect: &Effect) {
         let Effect { damage, .. } = effect;
         self.bhv.hp -= damage

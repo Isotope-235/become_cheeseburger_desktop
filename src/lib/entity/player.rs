@@ -1,8 +1,9 @@
 use crate::*;
+
 pub struct Player {
     pub hp: f64,
     pub invuln: f64,
-    pub dash_charge: f64
+    pub dash_charge: f64,
 }
 
 impl Hitbox for Pos<Player> {
@@ -52,6 +53,7 @@ impl Pos<Player> {
         self.max_hp() - self.bhv.hp
     }
 }
+
 impl TakeEffect for Pos<Player> {
     fn takes_effect(&mut self, effect: &Effect) {
         let Effect { damage, .. } = effect;
