@@ -7,30 +7,6 @@ use lib::*;
 use macroquad::prelude::*;
 use macroquad_canvas::Canvas2D;
 
-
-
-fn rand(x: f64) -> f64 {
-    rand::gen_range(0.00, x)
-}
-
-fn rrange(x: i32) -> i32 {
-    rand::gen_range(0, x + 1)
-}
-
-fn chance(x: f64) -> bool {
-    rand(1.00) < x
-}
-
-fn center() -> vector::V2 {
-    vector::V2(80.00, 60.00)
-}
-
-fn scale() -> f64 {
-    8.00
-}
-
-
-
 fn window_conf() -> Conf {
     Conf {
         window_title: TITLE.to_string(),
