@@ -99,17 +99,6 @@ fn window_conf() -> Conf {
     }
 }
 
-struct Sprites {
-    burger: Texture2D,
-    cheese: Texture2D,
-    burger_invuln: Texture2D,
-    bullet: Texture2D,
-    slug: Texture2D,
-    flak: Texture2D,
-    flak_child: Texture2D,
-    heart: Texture2D,
-}
-
 #[macroquad::main(window_conf())]
 async fn main() {
     // disgusting
