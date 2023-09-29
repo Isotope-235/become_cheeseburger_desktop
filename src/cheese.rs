@@ -27,7 +27,7 @@ impl Onhit for Pos<Cheese> {
     }
 
     fn state_effect_onhit(&self) -> StateEffect {
-        StateEffect { score: 100, particles: Particle::from_center(5, rand(1.00), self.pos, 4.00, 0.00, 0.05, 20.00, YELLOW), ..StateEffect::default() }
+        StateEffect { score: 100, particles: Particle::from_center(5, rand(1.00), self.pos, 4.00, 0.00, 0.40, 20.00, YELLOW), ..StateEffect::default() }
     }
 }
 impl TakeEffect for Pos<Cheese> {
