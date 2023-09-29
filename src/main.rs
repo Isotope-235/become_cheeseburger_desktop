@@ -1,32 +1,55 @@
 //#![windows_subsystem = "windows"]
 pub mod input;
 pub mod constants;
+
 use constants::*;
 use std::f64::consts::PI;
 
 use input::Input;
+
 mod player;
+
 use crate::player::*;
+
 mod bullet;
+
 use crate::bullet::*;
+
 mod cheese;
+
 use crate::cheese::*;
+
 mod slug;
+
 use crate::slug::*;
+
 mod laser;
+
 use crate::laser::*;
+
 mod warning;
+
 use crate::warning::*;
+
 mod health_pack;
+
 use crate::health_pack::*;
+
 mod flak;
+
 use crate::flak::*;
+
 mod pos;
+
 use crate::pos::*;
+
 mod vector;
+
 use crate::vector::*;
+
 mod particle;
 mod sprites;
+
 use crate::sprites::*;
 
 use crate::particle::*;
@@ -38,18 +61,23 @@ use macroquad_canvas::Canvas2D;
 fn rand(x: f64) -> f64 {
     rand::gen_range(0.00, x)
 }
+
 fn rrange(x: i32) -> i32 {
     rand::gen_range(0, x + 1)
 }
+
 fn chance(x: f64) -> bool {
     rand(1.00) < x
 }
+
 fn center() -> vector::V2 {
     vector::V2(80.00, 60.00)
 }
+
 fn scale() -> f64 {
     8.00
 }
+
 fn fill_leading_zeroes(num: i32) -> String {
     let missing_zeroes = 5 - num.checked_ilog10().unwrap_or(0) - 1;
     let lead = "0".repeat(missing_zeroes as usize);
@@ -68,6 +96,7 @@ fn window_conf() -> Conf {
         ..Default::default()
     }
 }
+
 struct Sprites {
     burger: Texture2D,
     cheese: Texture2D,
@@ -78,6 +107,7 @@ struct Sprites {
     flak_child: Texture2D,
     heart: Texture2D,
 }
+
 #[macroquad::main(window_conf())]
 async fn main() {
     // disgusting
@@ -101,7 +131,7 @@ async fn main() {
             115..=124 |
             139..=148 |
             235..=244 => break 'fps mean,
-            _ => if attempts > 3 {panic!()} else {continue;}
+            _ => if attempts > 3 { panic!() } else { continue; }
         }
     };
     // skip reading until here to avoid brain damage
@@ -115,19 +145,16 @@ async fn main() {
 
     let mut sprite_manager = SpriteLoader::new();
 
-    let future = sprite_manager.load_many(vec!["burger", "cheese", "burger_invuln", "bullet"]);
-
-    // sprites
-    let sprites = Sprites {
-        burger: load_texture("burger.png").await.unwrap(),
-        cheese: load_texture("cheese.png").await.unwrap(),
-        burger_invuln: load_texture("burger_invuln.png").await.unwrap(),
-        bullet: load_texture("bullet.png").await.unwrap(),
-        flak: load_texture("flak.png").await.unwrap(),
-        slug: load_texture("slug.png").await.unwrap(),
-        flak_child: load_texture("flak_child.png").await.unwrap(),
-        heart: load_texture("heart.png").await.unwrap(),
-    };
+    sprite_manager.load_many(vec![
+        ("burger", Color::from_hex(0x000000)),
+        ("cheese", Color::from_hex(0x000000)),
+        ("burger_invuln", Color::from_hex(0x000000)),
+        ("bullet", Color::from_hex(0x000000)),
+        ("flak", Color::from_hex(0x000000)),
+        ("slug", Color::from_hex(0x000000)),
+        ("flak_child", Color::from_hex(0x000000)),
+        ("heart", Color::from_hex(0x000000)),
+    ]).await;
 
     // state init
     let mut state = State::reset();
@@ -150,8 +177,6 @@ async fn main() {
     dbg!(num);
     // we do a little bit of trolling
 
-    future.await;
-
     // main game loop
     loop {
         // get inputs for this frame
@@ -160,7 +185,7 @@ async fn main() {
             a: is_key_down(KeyCode::A),
             s: is_key_down(KeyCode::S),
             d: is_key_down(KeyCode::D),
-            space: is_key_down(KeyCode::Space)
+            space: is_key_down(KeyCode::Space),
         };
         let score_change = state.progress(&input, dt);
         if score_change > 0 {
@@ -170,8 +195,8 @@ async fn main() {
 
         // draw calls
         set_camera(&canvas.camera);
-        clear_background(if state.freeze > 0.00 {BG_ON_DAMAGE} else {BG});
-        state.draw(&sprites);
+        clear_background(if state.freeze > 0.00 { BG_ON_DAMAGE } else { BG });
+        state.draw(&sprite_manager);
         let score_text = fill_leading_zeroes(state.score);
         let mut score_chars = score_text.chars();
         let mut i = 0;
@@ -216,6 +241,7 @@ struct State {
     flak_children: Vec<Pos<FlakChild>>,
     particles: Vec<Pos<Particle>>,
 }
+
 impl State {
     fn progress(&mut self, input: &Input, dt: f64) -> i32 {
         let mut score = 0;
@@ -250,7 +276,7 @@ impl State {
                         let bullet = Bullet::new(
                             pos,
                             vel * 1.25,
-                            delay
+                            delay,
                         );
                         self.bullets.push(bullet);
                     }
@@ -261,11 +287,10 @@ impl State {
                         let bullet = Bullet::new(
                             pos,
                             vel * 1.25,
-                            delay
+                            delay,
                         );
                         self.bullets.push(bullet);
                     }
-
                 }
             }
 
@@ -278,7 +303,7 @@ impl State {
                 let (pos, vel) = spawn_posvel(10.00, 10.00);
                 let slug = Slug::new(
                     pos,
-                    vel * 0.50
+                    vel * 0.50,
                 );
                 self.slugs.push(slug);
             }
@@ -305,7 +330,7 @@ impl State {
                 let (pos, vel) = spawn_posvel(10.00, 12.00);
                 let health_pack = HealthPack::new(
                     pos,
-                    vel * 0.30
+                    vel * 0.30,
                 );
                 self.health_packs.push(health_pack);
             }
@@ -316,7 +341,7 @@ impl State {
                 let (pos, vel) = spawn_posvel(4.00, 4.00);
                 let flak = Flak::new(
                     pos,
-                    vel * 0.50
+                    vel * 0.50,
                 );
                 self.flaks.push(flak);
             }
@@ -440,26 +465,26 @@ impl State {
         };
         score
     }
-    fn draw(&self, sprites: &Sprites) {
+    fn draw(&self, sprite_loader: &SpriteLoader) {
         // burger
         let b_sprite = match self.burger.bhv.invuln > 0.00 {
-            false => &sprites.burger,
-            true => &sprites.burger_invuln,
+            false => sprite_loader.texture("burger"),
+            true => sprite_loader.texture("burder_invuln"),
         };
         copy_texture(b_sprite, self.burger.pos);
         // cheese
-        copy_texture(&sprites.cheese, self.cheese.pos);
+        copy_texture(&sprite_loader.texture("cheese"), self.cheese.pos);
         // health packs
         for health_pack in &self.health_packs {
-            copy_texture(&sprites.heart, health_pack.pos);
+            copy_texture(&sprite_loader.texture("heart"), health_pack.pos);
         }
         // bullets
         for bullet in &self.bullets {
-            copy_texture(&sprites.bullet, bullet.pos);
+            copy_texture(&sprite_loader.texture("bullet"), bullet.pos);
         }
         // slugs
         for slug in &self.slugs {
-            copy_with_rotation(&sprites.slug, slug.pos, slug.vel.angle() + PI * 0.50);
+            copy_with_rotation(&sprite_loader.texture("slug"), slug.pos, slug.vel.angle() + PI * 0.50);
         }
         // warnings
         for warning in &self.warnings {
@@ -482,11 +507,11 @@ impl State {
         }
         // flak
         for flak in &self.flaks {
-            copy_texture(&sprites.flak, flak.pos);
+            copy_texture(&sprite_loader.texture("flak"), flak.pos);
         }
         // flak children
         for flak_child in &self.flak_children {
-            copy_texture(&sprites.flak_child, flak_child.pos);
+            copy_texture(&sprite_loader.texture("flak_child"), flak_child.pos);
         }
         // particles
         for particle in &self.particles {
@@ -539,9 +564,11 @@ impl State {
         }
     }
 }
+
 pub trait Counter {
     fn revolve(&mut self, delta: f64, dt: f64) -> i32;
 }
+
 impl Counter for f64 {
     fn revolve(&mut self, delta: f64, dt: f64) -> i32 {
         *self = *self + delta * dt;
@@ -550,6 +577,7 @@ impl Counter for f64 {
         times
     }
 }
+
 fn num_to_side(num: i32) -> V2 {
     match num % 4 {
         1 => V2(1.00, 0.00),
@@ -559,9 +587,11 @@ fn num_to_side(num: i32) -> V2 {
         _ => panic!("dear god")
     }
 }
+
 fn get_rand_dir() -> V2 {
     num_to_side(rrange(4))
 }
+
 fn spawn_posvel(side_buffer: f64, edge_buffer: f64) -> (V2, V2) {
     let direction = get_rand_dir();
     let shift = get_shift(direction, edge_buffer);
@@ -569,6 +599,7 @@ fn spawn_posvel(side_buffer: f64, edge_buffer: f64) -> (V2, V2) {
     let pos = center() + direction.mul_per(center()) + buffer;
     (pos + shift, direction.negate())
 }
+
 fn spawn_posvel_from(side: i32, side_buffer: f64, edge_buffer: f64) -> (V2, V2) {
     let direction = num_to_side(side);
     let shift = get_shift(direction, edge_buffer);
@@ -576,24 +607,29 @@ fn spawn_posvel_from(side: i32, side_buffer: f64, edge_buffer: f64) -> (V2, V2) 
     let pos = center() + direction.mul_per(center()) + buffer;
     (pos + shift, direction.negate())
 }
+
 fn get_shift(dir: V2, edge_buffer: f64) -> V2 {
     let rot_dir = dir.rotate_once();
     let shift_range = rot_dir.mul_per(center()).len() - edge_buffer;
     rot_dir * (rand(shift_range * 2.00) - shift_range)
 }
+
 fn draw_rec(pos: V2, w: i32, h: i32, color: Color) {
     debug_assert!(w % 2 == 0);
     debug_assert!(h % 2 == 0);
     let (half_w, half_h) = (w / 2, h / 2);
     draw_rectangle(pos.x() as f32 - half_w as f32, pos.y() as f32 - half_h as f32, w as f32, h as f32, color);
 }
+
 fn draw_rec_top_left(pos: V2, w: i32, h: i32, color: Color) {
     draw_rectangle(pos.x() as f32, pos.y() as f32, w as f32, h as f32, color);
 }
+
 fn copy_texture(texture: &Texture2D, pos: V2) {
     texture.set_filter(FilterMode::Nearest);
     draw_texture(texture, pos.x() as f32 - texture.width() * 0.50, pos.y() as f32 - texture.height() * 0.50, WHITE);
 }
+
 fn copy_with_rotation(texture: &Texture2D, pos: V2, rotation: f64) {
     texture.set_filter(FilterMode::Nearest);
     draw_texture_ex(texture, pos.x() as f32 - texture.width() * 0.50, pos.y() as f32 - texture.height() * 0.50, WHITE, DrawTextureParams {
