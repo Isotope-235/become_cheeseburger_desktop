@@ -374,7 +374,9 @@ impl State {
                 let ref mut cheese = self.cheese;
                 if cheese.bhv.hp < 1e-10 {
                     let V2(x, y) = center();
-                    cheese.pos = V2(rand(x), rand(y)) + center() * 0.50;
+                    let maybe_pos = V2(rand(x), rand(y)) + center() * 0.50;
+                    let to_player = self.burger.pos - maybe_pos;
+                    cheese.pos = V2(rand(x), rand(y)) + center() * 0.50 + to_player.normal() * -25.00;
                     cheese.bhv.hp = 1.00;
                 }
             };
