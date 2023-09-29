@@ -26,8 +26,8 @@ impl Onhit for Pos<HealthPack> {
     fn self_effect_onhit(&self) -> Effect {
         Effect { damage: 1.00 }
     }
-    fn state_effect_onhit(&self) -> StateEffect {
-        let particles = Particle::from_center(6, rand(1.00), self.pos, 4.00, 0.00, 0.20, 20.00, HEART_RED);
+    fn state_effect_onhit(&self, sprite_manager: &SpriteLoader) -> StateEffect {
+        let particles = Particle::from_center(6, rand(1.00), self.pos, 4.00, 0.00, 0.20, 20.00, *sprite_manager.color("heart"));
         StateEffect { particles, ..StateEffect::default() }
     }
 }
