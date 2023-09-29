@@ -25,6 +25,10 @@ impl Onhit for Pos<HealthPack> {
     fn self_effect_onhit(&self) -> Effect {
         Effect { damage: 1.00 }
     }
+    fn state_effect_onhit(&self) -> StateEffect {
+        let particles = Particle::from_center(6, rand(1.00), self.pos, 4.00, 0.00, 0.20, 20.00, RED);
+        StateEffect { particles, ..StateEffect::default() }
+    }
 }
 impl TakeEffect for Pos<HealthPack> {
     fn takes_effect(&mut self, effect: &Effect) {
