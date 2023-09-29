@@ -23,6 +23,8 @@ mod pos;
 use crate::pos::*;
 mod vector;
 use crate::vector::*;
+mod particle;
+use crate::particle::*;
 
 use macroquad::prelude::*;
 use macroquad_canvas::Canvas2D;
@@ -68,6 +70,7 @@ fn window_conf() -> Conf {
 }
 struct Sprites {
     burger: Texture2D,
+    cheese: Texture2D,
     burger_invuln: Texture2D,
     bullet: Texture2D,
     slug: Texture2D,
@@ -112,6 +115,7 @@ async fn main() {
     // sprites
     let sprites = Sprites {
         burger: load_texture("burger.png").await.unwrap(),
+        cheese: load_texture("cheese.png").await.unwrap(),
         burger_invuln: load_texture("burger_invuln.png").await.unwrap(),
         bullet: load_texture("bullet.png").await.unwrap(),
         flak: load_texture("flak.png").await.unwrap(),
@@ -202,6 +206,7 @@ struct State {
     flak_counter: f64,
     flaks: Vec<Pos<Flak>>,
     flak_children: Vec<Pos<FlakChild>>,
+    particles: Vec<Pos<Particle>>,
 }
 impl State {
     fn progress(&mut self, input: &Input, dt: f64) -> i32 {
@@ -319,6 +324,7 @@ impl State {
             update_all_pos(&mut self.health_packs, dt);
             update_all_pos(&mut self.flaks, dt);
             update_all_pos(&mut self.flak_children, dt);
+            update_all_pos(&mut self.particles, dt);
 
             // inter-unitary logic
             let burger_circle = self.burger.hitcircle();
@@ -341,9 +347,10 @@ impl State {
                 self.burger.takes_effect(&burger_effect);
             }
             state_effect.freeze += burger_effect.damage.max(0.00);
-            let StateEffect { score: added_score, freeze } = state_effect;
+            let StateEffect { score: added_score, freeze, particles } = state_effect;
             score += added_score;
             self.freeze += freeze;
+            self.particles.extend(particles);
             if self.freeze > 0.00 { // making sure that the player sees the fatal projectile
                 self.freeze = (self.freeze - dt).max(0.00);
                 continue;
@@ -402,6 +409,11 @@ impl State {
                     }
                 }
             };
+            { // particles
+                for particle in &mut self.particles {
+                    particle.vel = particle.vel * dbg!((1.00 - particle.bhv.friction.powf(dt.recip())));
+                }
+            };
 
             // remove elements
             self.bullets.retain(|b| b.age < 750.00 && b.bhv.hp > 1e-10);
@@ -411,6 +423,7 @@ impl State {
             self.health_packs.retain(|hp| hp.age < 500.00 && hp.bhv.hp > 1e-10);
             self.flaks.retain(|f| f.will_live());
             self.flak_children.retain(|c| c.age < 300.00 && c.bhv.hp > 1e-10);
+            self.particles.retain(|p| p.age <= p.bhv.lifetime);
 
             // up difficulty
             self.difficulty += 0.10 * dt;
@@ -425,7 +438,7 @@ impl State {
         };
         copy_texture(b_sprite, self.burger.pos);
         // cheese
-        draw_rec(self.cheese.pos, 6, 6, YELLOW);
+        copy_texture(&sprites.cheese, self.cheese.pos);
         // health packs
         for health_pack in &self.health_packs {
             draw_rec(health_pack.pos, 6, 6, Color::from_rgba(55, 255, 55, 255));
@@ -464,6 +477,11 @@ impl State {
         // flak children
         for flak_child in &self.flak_children {
             copy_texture(&sprites.flak_child, flak_child.pos);
+        }
+        // particles
+        for particle in &self.particles {
+            let (w, h) = (2, 2);
+            draw_rec(particle.pos, w, h, particle.bhv.color);
         }
         // health bar
         let h = 4;
@@ -507,6 +525,7 @@ impl State {
             flak_counter: 0.00,
             flaks: Vec::new(),
             flak_children: Vec::new(),
+            particles: Vec::new(),
         }
     }
 }

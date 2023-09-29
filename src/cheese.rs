@@ -18,7 +18,7 @@ impl Cheese {
 
 impl Hitbox for Pos<Cheese> {
     fn hitcircle(&self) -> Circle {
-        Circle::new(self.pos, 5.00)
+        Circle::new(self.pos, 7.00)
     }
 }
 impl Onhit for Pos<Cheese> {
@@ -27,7 +27,7 @@ impl Onhit for Pos<Cheese> {
     }
 
     fn state_effect_onhit(&self) -> StateEffect {
-        StateEffect { score: 100, ..StateEffect::default() }
+        StateEffect { score: 100, particles: Particle::from_center(5, rand(1.00), self.pos, 4.00, 0.00, 0.05, 20.00, YELLOW), ..StateEffect::default() }
     }
 }
 impl TakeEffect for Pos<Cheese> {

@@ -59,18 +59,20 @@ impl Default for Effect {
 }
 pub struct StateEffect {
     pub score: i32,
-    pub freeze: f64
+    pub freeze: f64,
+    pub particles: Vec<Pos<Particle>>,
 }
 impl Default for StateEffect {
     fn default() -> Self {
-        StateEffect { score: 0, freeze: 0.00 }
+        StateEffect { score: 0, freeze: 0.00, particles: Vec::new() }
     }
 }
 impl AddAssign<StateEffect> for StateEffect {
     fn add_assign(&mut self, rhs: StateEffect) {
-        let StateEffect { score, freeze } = rhs;
+        let StateEffect { score, freeze, particles } = rhs;
         self.score += score;
         self.freeze += freeze;
+        self.particles.extend(particles);
     }
 }
 impl AddAssign<Effect> for Effect {
