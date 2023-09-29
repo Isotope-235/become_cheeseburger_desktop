@@ -122,7 +122,7 @@ async fn main() {
             115..=124 |
             139..=148 |
             235..=244 => break 'fps mean,
-            _ => if attempts > 3 { panic!() } else { continue; }
+            _ => if attempts > 3 { panic!("unable to find stable fps") } else { continue; }
         }
     };
     // skip reading until here to avoid brain damage
