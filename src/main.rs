@@ -76,6 +76,7 @@ struct Sprites {
     slug: Texture2D,
     flak: Texture2D,
     flak_child: Texture2D,
+    heart: Texture2D,
 }
 #[macroquad::main(window_conf())]
 async fn main() {
@@ -121,6 +122,7 @@ async fn main() {
         flak: load_texture("flak.png").await.unwrap(),
         slug: load_texture("slug.png").await.unwrap(),
         flak_child: load_texture("flak_child.png").await.unwrap(),
+        heart: load_texture("heart.png").await.unwrap(),
     };
 
     // state init
@@ -411,7 +413,7 @@ impl State {
             };
             { // particles
                 for particle in &mut self.particles {
-                    particle.vel = particle.vel * dbg!((1.00 - particle.bhv.friction.powf(dt.recip())));
+                    particle.vel = particle.vel * (1.00 - particle.bhv.friction).powf(dt);
                 }
             };
 
@@ -441,7 +443,7 @@ impl State {
         copy_texture(&sprites.cheese, self.cheese.pos);
         // health packs
         for health_pack in &self.health_packs {
-            draw_rec(health_pack.pos, 6, 6, Color::from_rgba(55, 255, 55, 255));
+            copy_texture(&sprites.heart, health_pack.pos);
         }
         // bullets
         for bullet in &self.bullets {

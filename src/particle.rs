@@ -18,7 +18,7 @@ impl Particle {
         let mut output = Vec::with_capacity(number);
         for i in 0..number {
             let angle = 2.00 * PI * (offset + (i as f64) / (number as f64));
-            let vel = V2::from(angle) * vel;
+            let vel = V2::from(angle) *  (vel * 0.90 + rand(vel * 0.20));
             let acc = V2::from(angle) * acc;
             output.push(Particle::new(pos, vel, acc, fric, rand(lifetime), color));
         }
