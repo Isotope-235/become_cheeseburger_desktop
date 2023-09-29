@@ -7,17 +7,6 @@ use lib::*;
 use macroquad::prelude::*;
 use macroquad_canvas::Canvas2D;
 
-fn window_conf() -> Conf {
-    Conf {
-        window_title: TITLE.to_string(),
-        window_width: (center().x() * 2.00 * scale()) as i32,
-        window_height: (center().y() * 2.00 * scale()) as i32,
-        sample_count: 0,
-        window_resizable: false,
-        ..Default::default()
-    }
-}
-
 #[macroquad::main(window_conf())]
 async fn main() {
     // disgusting
@@ -315,9 +304,13 @@ impl State {
                 let ref mut cheese = self.cheese;
                 if cheese.bhv.hp < 1e-10 {
                     let V2(x, y) = center();
-                    let maybe_pos = V2(rand(x), rand(y)) + center() * 0.50;
-                    let to_player = self.burger.pos - maybe_pos;
-                    cheese.pos = V2(rand(x), rand(y)) + center() * 0.50 + to_player.normal() * -25.00;
+                    let new_pos = loop {
+                        let maybe_pos = V2(rand(x), rand(y)) + center() * 0.50;
+                        if (self.burger.pos - maybe_pos).len() > 16.00 {
+                            break maybe_pos;
+                        }
+                    };
+                    cheese.pos = new_pos;
                     cheese.bhv.hp = 1.00;
                 }
             };
@@ -475,18 +468,7 @@ impl State {
     }
 }
 
-pub trait Counter {
-    fn revolve(&mut self, delta: f64, dt: f64) -> i32;
-}
 
-impl Counter for f64 {
-    fn revolve(&mut self, delta: f64, dt: f64) -> i32 {
-        *self = *self + delta * dt;
-        let times = *self as i32 / 100;
-        *self = *self % 100.00;
-        times
-    }
-}
 
 fn num_to_side(num: i32) -> V2 {
     match num % 4 {
@@ -498,9 +480,7 @@ fn num_to_side(num: i32) -> V2 {
     }
 }
 
-fn get_rand_dir() -> V2 {
-    num_to_side(rrange(4))
-}
+
 
 fn spawn_posvel(side_buffer: f64, edge_buffer: f64) -> (V2, V2) {
     let direction = get_rand_dir();
@@ -522,29 +502,4 @@ fn get_shift(dir: V2, edge_buffer: f64) -> V2 {
     let rot_dir = dir.rotate_once();
     let shift_range = rot_dir.mul_per(center()).len() - edge_buffer;
     rot_dir * (rand(shift_range * 2.00) - shift_range)
-}
-
-fn draw_rec(pos: V2, w: i32, h: i32, color: Color) {
-    debug_assert!(w % 2 == 0);
-    debug_assert!(h % 2 == 0);
-    let (half_w, half_h) = (w / 2, h / 2);
-    draw_rectangle(pos.x() as f32 - half_w as f32, pos.y() as f32 - half_h as f32, w as f32, h as f32, color);
-}
-
-fn draw_rec_top_left(pos: V2, w: i32, h: i32, color: Color) {
-    draw_rectangle(pos.x() as f32, pos.y() as f32, w as f32, h as f32, color);
-}
-
-fn copy_texture(texture: &Texture2D, pos: V2) {
-    texture.set_filter(FilterMode::Nearest);
-    draw_texture(texture, pos.x() as f32 - texture.width() * 0.50, pos.y() as f32 - texture.height() * 0.50, WHITE);
-}
-
-fn copy_with_rotation(texture: &Texture2D, pos: V2, rotation: f64) {
-    texture.set_filter(FilterMode::Nearest);
-    draw_texture_ex(texture, pos.x() as f32 - texture.width() * 0.50, pos.y() as f32 - texture.height() * 0.50, WHITE, DrawTextureParams {
-        dest_size: None,
-        rotation: rotation as f32,
-        ..Default::default()
-    });
 }

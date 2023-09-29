@@ -6,3 +6,5 @@ pub mod score_funcs;
 pub use score_funcs::*;
 pub mod prob;
 pub use prob::*;
+pub mod counter;
+pub use counter::*;
