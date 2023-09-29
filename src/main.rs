@@ -24,7 +24,11 @@ use crate::pos::*;
 mod vector;
 use crate::vector::*;
 mod particle;
+mod sprites;
+use crate::sprites::*;
+
 use crate::particle::*;
+
 
 use macroquad::prelude::*;
 use macroquad_canvas::Canvas2D;
@@ -113,6 +117,10 @@ async fn main() {
     set_camera(&camera);
     let mut canvas = Canvas2D::new((center().x() * 2.00) as f32, (center().y() * 2.00) as f32);
 
+    let mut sprite_manager = SpriteLoader::new();
+
+    let future = sprite_manager.load_many(vec!["burger", "cheese", "burger_invuln", "bullet"]);
+
     // sprites
     let sprites = Sprites {
         burger: load_texture("burger.png").await.unwrap(),
@@ -145,6 +153,8 @@ async fn main() {
     }
     dbg!(num);
     // we do a little bit of trolling
+
+    future.await;
 
     // main game loop
     loop {
