@@ -1,5 +1,6 @@
 //#![windows_subsystem = "windows"]
 pub mod input;
+use std::collections::HashMap;
 use std::f64::consts::PI;
 
 use input::Input;
@@ -142,7 +143,6 @@ async fn main() {
         num *= growth
     }
     dbg!(num);
-    // we do a little bit of trolling
 
     // main game loop
     loop {
@@ -514,7 +514,7 @@ impl State {
             score: 0,
             freeze: 0.00,
             burger: Player::new(center()),
-            cheese: Cheese::new(center() - V2(4.00, 4.00)),
+            cheese: Cheese::new(center() - V2(0.00, 20.00)),
             bullet_counter: 0.00,
             bullets: Vec::new(),
             slug_counter: 0.00,
