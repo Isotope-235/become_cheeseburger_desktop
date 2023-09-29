@@ -25,15 +25,13 @@ mod vector;
 use crate::vector::*;
 mod particle;
 use crate::particle::*;
+mod constants;
+use crate::constants::*;
 
 use macroquad::prelude::*;
 use macroquad_canvas::Canvas2D;
 
-const BG: Color = color_u8!(55, 55, 55, 255);
-const BGD: Color = color_u8!(255, 55, 55, 255);
-const TITLE: &'static str = "Limited Alpha v0.2.0 - Become Cheeseburger: Desktop Edition";
-const ITERATIONS: i32 = 5;
-const DT: f64 = 1.00 / ITERATIONS as f64;
+
 
 fn rand(x: f64) -> f64 {
     rand::gen_range(0.00, x)
@@ -164,7 +162,7 @@ async fn main() {
 
         // draw calls
         set_camera(&canvas.camera);
-        clear_background(if state.freeze > 0.00 {BGD} else {BG});
+        clear_background(if state.freeze > 0.00 {BG_ON_DAMAGE} else {BG});
         state.draw(&sprites);
         let score_text = fill_leading_zeroes(state.score);
         let mut score_chars = score_text.chars();
