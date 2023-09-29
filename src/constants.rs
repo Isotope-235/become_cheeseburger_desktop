@@ -1,7 +1,5 @@
 use macroquad::prelude::*;
 
-
-
 pub const TITLE: &'static str = "Limited Alpha v0.2.0 - Become Cheeseburger: Desktop Edition";
 pub const ITERATIONS: i32 = 5;
 pub const DT: f64 = 1.00 / ITERATIONS as f64;

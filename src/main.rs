@@ -1,6 +1,7 @@
 //#![windows_subsystem = "windows"]
 pub mod input;
-use std::collections::HashMap;
+mod convenience;
+use convenience::*;
 use std::f64::consts::PI;
 
 use input::Input;
@@ -111,7 +112,7 @@ async fn main() {
     camera.zoom = vec2(camera.zoom.x, camera.zoom.y * -1.00);
     set_camera(&camera);
     let mut canvas = Canvas2D::new((center().x() * 2.00) as f32, (center().y() * 2.00) as f32);
-
+    
     // sprites
     let sprites = Sprites {
         burger: load_texture("burger.png").await.unwrap(),
@@ -404,7 +405,7 @@ impl State {
                     if !flak.will_live() {
                         let number = 8;
                         for i in 0..number {
-                            let dir = i as f64 * PI * 2.00 / number as f64;
+                            let dir = (i as f64).as_radians() / number as f64;
                             let child = FlakChild::new(flak.pos, V2::ZERO, V2::from(dir) * 0.01);
                             self.flak_children.push(child);
                         }
