@@ -122,7 +122,7 @@ async fn main() {
             115..=124 |
             139..=148 |
             235..=244 => break 'fps mean,
-            _ => if attempts > 3 { panic!() } else { continue; }
+            _ => if attempts > 3 { panic!("unable to find stable fps") } else { continue; }
         }
     };
     // skip reading until here to avoid brain damage
@@ -138,13 +138,13 @@ async fn main() {
 
     sprite_manager.load_many(vec![
         ("burger", Color::from_hex(0x000000)),
-        ("cheese", Color::from_hex(0x000000)),
+        ("cheese", Color::from_rgba(255, 221, 86, 255)),
         ("burger_invuln", Color::from_hex(0x000000)),
         ("bullet", Color::from_hex(0x000000)),
         ("flak", Color::from_hex(0x000000)),
         ("slug", Color::from_hex(0x000000)),
         ("flak_child", Color::from_hex(0x000000)),
-        ("heart", Color::from_hex(0x000000)),
+        ("heart", Color::from_rgba(221, 16, 85, 255)),
     ]).await;
 
     // state init
@@ -178,7 +178,7 @@ async fn main() {
             d: is_key_down(KeyCode::D),
             space: is_key_down(KeyCode::Space),
         };
-        let score_change = state.progress(&input, dt);
+        let score_change = state.progress(&input, dt, &sprite_manager);
         if score_change > 0 {
             state.score += score_change;
             // score_txt = render_score(state.score, &joystix, &texture_creator);
@@ -234,7 +234,7 @@ struct State {
 }
 
 impl State {
-    fn progress(&mut self, input: &Input, dt: f64) -> i32 {
+    fn progress(&mut self, input: &Input, dt: f64, sprite_loader: &SpriteLoader) -> i32 {
         let mut score = 0;
         for _ in 0..ITERATIONS as usize {
             if self.freeze > 0.00 {
@@ -358,16 +358,16 @@ impl State {
             if self.cheese.hitcircle().is_hitting(&burger_circle) {
                 burger_effect += self.cheese.target_effect_onhit();
                 self.cheese.takes_effect(&self.cheese.self_effect_onhit());
-                state_effect += self.cheese.state_effect_onhit();
+                state_effect += self.cheese.state_effect_onhit(&sprite_loader);
             };
-            do_all_hits(&mut self.health_packs, &mut state_effect, &burger_circle, &mut burger_effect);
+            do_all_hits(&mut self.health_packs, &mut state_effect, &burger_circle, &mut burger_effect, &sprite_loader);
 
             if self.burger.is_targetable() {
-                do_all_hits(&mut self.bullets, &mut state_effect, &burger_circle, &mut burger_effect);
-                do_all_hits(&mut self.slugs, &mut state_effect, &burger_circle, &mut burger_effect);
-                do_all_hits(&mut self.lasers, &mut state_effect, &burger_circle, &mut burger_effect);
-                do_all_hits(&mut self.flaks, &mut state_effect, &burger_circle, &mut burger_effect);
-                do_all_hits(&mut self.flak_children, &mut state_effect, &burger_circle, &mut burger_effect);
+                do_all_hits(&mut self.bullets, &mut state_effect, &burger_circle, &mut burger_effect, &sprite_loader);
+                do_all_hits(&mut self.slugs, &mut state_effect, &burger_circle, &mut burger_effect, &sprite_loader);
+                do_all_hits(&mut self.lasers, &mut state_effect, &burger_circle, &mut burger_effect, &sprite_loader);
+                do_all_hits(&mut self.flaks, &mut state_effect, &burger_circle, &mut burger_effect, &sprite_loader);
+                do_all_hits(&mut self.flak_children, &mut state_effect, &burger_circle, &mut burger_effect, &sprite_loader);
                 self.burger.takes_effect(&burger_effect);
             }
             state_effect.freeze += burger_effect.damage.max(0.00);
@@ -460,7 +460,7 @@ impl State {
         // burger
         let b_sprite = match self.burger.bhv.invuln > 0.00 {
             false => sprite_loader.texture("burger"),
-            true => sprite_loader.texture("burder_invuln"),
+            true => sprite_loader.texture("burger_invuln"),
         };
         copy_texture(b_sprite, self.burger.pos);
         // cheese

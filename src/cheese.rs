@@ -26,8 +26,8 @@ impl Onhit for Pos<Cheese> {
         Effect { damage: 1.00, ..Effect::default() }
     }
 
-    fn state_effect_onhit(&self) -> StateEffect {
-        StateEffect { score: 100, particles: Particle::from_center(5, rand(1.00), self.pos, 4.00, 0.00, 0.33, 20.00, CHEESE_YELLOW), ..StateEffect::default() }
+    fn state_effect_onhit(&self, sprite_manager: &SpriteLoader) -> StateEffect {
+        StateEffect { score: 100, particles: Particle::from_center(5, rand(1.00), self.pos, 4.00, 0.00, 0.33, 20.00, *sprite_manager.color("cheese")), ..StateEffect::default() }
     }
 }
 impl TakeEffect for Pos<Cheese> {
