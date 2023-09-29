@@ -360,7 +360,7 @@ impl State {
             // special update behaviour
             { // burger
                 let ref mut burger = self.burger;
-                burger.vel = input.dir().normal() * (0.55) * dt + burger.vel * 0.675f64.powf(dt);
+                burger.vel = input.dir().normal() * 0.55 * dt + burger.vel * 0.675f64.powf(dt);
                 burger.bhv.invuln = (burger.bhv.invuln - dt).max(0.00);
                 burger.bhv.dash_charge = (burger.bhv.dash_charge + 0.01 * dt).min(1.00);
                 burger.bhv.hp = burger.bhv.hp.min(burger.max_hp());
