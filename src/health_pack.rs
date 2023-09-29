@@ -1,4 +1,5 @@
-use crate::*;
+use crate::{*, constants::HEART_RED};
+
 pub struct HealthPack {
     pub hp: f64
 }
