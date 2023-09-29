@@ -1,7 +1,5 @@
 //#![windows_subsystem = "windows"]
 pub mod input;
-mod convenience;
-use convenience::*;
 use std::f64::consts::PI;
 
 use input::Input;
@@ -27,13 +25,15 @@ mod vector;
 use crate::vector::*;
 mod particle;
 use crate::particle::*;
-mod constants;
-use crate::constants::*;
 
 use macroquad::prelude::*;
 use macroquad_canvas::Canvas2D;
 
-
+const BG: Color = color_u8!(55, 55, 55, 255);
+const BGD: Color = color_u8!(255, 55, 55, 255);
+const TITLE: &'static str = "Limited Alpha v0.2.0 - Become Cheeseburger: Desktop Edition";
+const ITERATIONS: i32 = 5;
+const DT: f64 = 1.00 / ITERATIONS as f64;
 
 fn rand(x: f64) -> f64 {
     rand::gen_range(0.00, x)
@@ -112,7 +112,7 @@ async fn main() {
     camera.zoom = vec2(camera.zoom.x, camera.zoom.y * -1.00);
     set_camera(&camera);
     let mut canvas = Canvas2D::new((center().x() * 2.00) as f32, (center().y() * 2.00) as f32);
-    
+
     // sprites
     let sprites = Sprites {
         burger: load_texture("burger.png").await.unwrap(),
@@ -144,6 +144,7 @@ async fn main() {
         num *= growth
     }
     dbg!(num);
+    // we do a little bit of trolling
 
     // main game loop
     loop {
@@ -163,7 +164,7 @@ async fn main() {
 
         // draw calls
         set_camera(&canvas.camera);
-        clear_background(if state.freeze > 0.00 {BG_ON_DAMAGE} else {BG});
+        clear_background(if state.freeze > 0.00 {BGD} else {BG});
         state.draw(&sprites);
         let score_text = fill_leading_zeroes(state.score);
         let mut score_chars = score_text.chars();
@@ -361,7 +362,7 @@ impl State {
             // special update behaviour
             { // burger
                 let ref mut burger = self.burger;
-                burger.vel = input.dir().normal() * 0.55 * dt + burger.vel * 0.675f64.powf(dt);
+                burger.vel = input.dir().normal() * (0.55) * dt + burger.vel * 0.675f64.powf(dt);
                 burger.bhv.invuln = (burger.bhv.invuln - dt).max(0.00);
                 burger.bhv.dash_charge = (burger.bhv.dash_charge + 0.01 * dt).min(1.00);
                 burger.bhv.hp = burger.bhv.hp.min(burger.max_hp());
@@ -405,7 +406,7 @@ impl State {
                     if !flak.will_live() {
                         let number = 8;
                         for i in 0..number {
-                            let dir = (i as f64).as_radians() / number as f64;
+                            let dir = i as f64 * PI * 2.00 / number as f64;
                             let child = FlakChild::new(flak.pos, V2::ZERO, V2::from(dir) * 0.01);
                             self.flak_children.push(child);
                         }
@@ -515,7 +516,7 @@ impl State {
             score: 0,
             freeze: 0.00,
             burger: Player::new(center()),
-            cheese: Cheese::new(center() - V2(0.00, 20.00)),
+            cheese: Cheese::new(center() - V2(4.00, 4.00)),
             bullet_counter: 0.00,
             bullets: Vec::new(),
             slug_counter: 0.00,
