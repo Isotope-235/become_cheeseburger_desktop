@@ -10,34 +10,13 @@ pub mod library;
 
 #[macroquad::main(window_conf())]
 async fn main() {
-    // disgusting
-    let mut attempts = 0;
-    let fps = 'fps: loop {
-        attempts += 1;
-        let mut frames = Vec::new();
-        for _ in 0..16 {
-            clear_background(BG);
-            next_frame().await;
-            frames.push(get_fps());
-        }
-        let mut adjusted: Vec<_> = frames.iter().skip(8).collect();
-        adjusted.sort_unstable();
-        let mean = *adjusted[7];
-        println!("Targeted framerate: {mean}");
-        match mean {
-            25..=34 |
-            55..=64 |
-            85..=94 |
-            115..=124 |
-            139..=148 |
-            235..=244 => break 'fps mean,
-            _ => if attempts > 3 { panic!("unable to find stable fps") } else { continue; }
-        }
-    };
-    // skip reading until here to avoid brain damage
+
+    let fps = find_fps().await;
+    println!("Targeted framerate: {fps}");
+
     let dt = DT * 60.00 / fps as f64;
     let joystix = load_ttf_font("joystix.otf").await.unwrap();
-    // camera
+
     let mut camera = Camera2D::from_display_rect(Rect::new(0.00, 0.00, (center().x() * 2.00) as f32, (center().y() * 2.00) as f32));
     camera.zoom = vec2(camera.zoom.x, camera.zoom.y * -1.00);
     set_camera(&camera);
@@ -46,13 +25,13 @@ async fn main() {
     let mut sprite_manager = SpriteLoader::new();
 
     sprite_manager.load_many(vec![
-        ("burger", Color::from_hex(0x000000)),
+        ("burger", Color::default()),
         ("cheese", Color::from_rgba(255, 221, 86, 255)),
-        ("burger_invuln", Color::from_hex(0x000000)),
-        ("bullet", Color::from_hex(0x000000)),
-        ("flak", Color::from_hex(0x000000)),
-        ("slug", Color::from_hex(0x000000)),
-        ("flak_child", Color::from_hex(0x000000)),
+        ("burger_invuln", Color::default()),
+        ("bullet", Color::default()),
+        ("flak", Color::default()),
+        ("slug", Color::default()),
+        ("flak_child", Color::default()),
         ("heart", Color::from_rgba(221, 16, 85, 255)),
     ]).await;
 
@@ -68,14 +47,6 @@ async fn main() {
         color: YELLOW,
         ..Default::default()
     };
-    let mut num = 1.00;
-    let iters = 13;
-    let growth = 2.00f64.powf(1.00 / iters as f64);
-    for _ in 0..iters {
-        num *= growth
-    }
-    dbg!(num);
-    // we do a little bit of trolling
 
     // main game loop
     loop {
@@ -108,7 +79,6 @@ async fn main() {
 
         // game should only end after freeze frames are rendered, so this goes after draw calls
         if state.game_is_over() {
-            // score_txt = render_score(0, &joystix, &texture_creator);
             state = State::reset()
         };
 
