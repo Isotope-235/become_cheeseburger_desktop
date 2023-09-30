@@ -6,10 +6,8 @@ pub const ITERATIONS: i32 = 5;
 pub const DT: f64 = 1.00 / ITERATIONS as f64;
 
 // Colors
-pub const HEART_RED: Color = color_u8!(221, 16, 85, 255);
 pub const BG: Color = color_u8!(55, 55, 55, 255);
 pub const BG_ON_DAMAGE: Color = color_u8!(255, 55, 55, 255);
-pub const CHEESE_YELLOW: Color = color_u8!(255, 221, 86, 255);
 
 pub fn center() -> V2 {
     V2(80.00, 60.00)
