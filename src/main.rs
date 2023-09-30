@@ -1,11 +1,12 @@
-//#![windows_subsystem = "windows"]
-pub mod library;
-
 use std::f64::consts::PI;
-use library::*;
 
 use macroquad::prelude::*;
 use macroquad_canvas::Canvas2D;
+
+use library::*;
+
+//#![windows_subsystem = "windows"]
+pub mod library;
 
 #[macroquad::main(window_conf())]
 async fn main() {
@@ -97,11 +98,9 @@ async fn main() {
         clear_background(if state.freeze > 0.00 { BG_ON_DAMAGE } else { BG });
         state.draw(&sprite_manager);
         let score_text = fill_leading_zeroes(state.score);
-        let mut score_chars = score_text.chars();
-        let mut i = 0;
-        while let Some(c) = score_chars.next() {
+        let score_chars = score_text.chars();
+        for (i, c) in score_chars.enumerate() {
             draw_text_ex(&c.to_owned().to_string(), 1.00 + i as f32 * 8.00, 9.00, text_params.clone());
-            i += 1;
         };
         set_default_camera();
         canvas.get_texture_mut().set_filter(FilterMode::Nearest);
@@ -150,21 +149,21 @@ impl State {
                 continue;
             }
             // data saved for perf
-            let diffscale = self.difficulty * 0.01;
+            let diff_scale = self.difficulty * 0.01;
             //
 
             // spawn_logic
 
             // bullets
-            let times = self.bullet_counter.revolve(1.10 + 0.25 * diffscale, dt);
+            let times = self.bullet_counter.revolve(1.10 + 0.25 * diff_scale, dt);
 
             for _ in 0..times {
                 let side = rrange(4);
-                let snake_ch = diffscale * 0.25;
+                let snake_ch = diff_scale * 0.25;
                 if chance(snake_ch / (1.00 + snake_ch)) {
                     let direction = num_to_side(side);
                     let shift = get_shift(direction, 4.00);
-                    for i in 0..((2.00 + diffscale) as i32) {
+                    for i in 0..((2.00 + diff_scale) as i32) {
                         let delay = i as f64 * 10.00;
                         let (pos, vel) = {
                             let side_buffer = 4.00 + delay;
@@ -180,9 +179,9 @@ impl State {
                         self.bullets.push(bullet);
                     }
                 } else {
-                    for i in 0..((1.00 + diffscale * 2.00) as i32) {
+                    for i in 0..((1.00 + diff_scale * 2.00) as i32) {
                         let delay = i as f64 * 10.00;
-                        let (pos, vel) = spawn_posvel_from(side, 4.00 + delay, 4.00);
+                        let (pos, vel) = spawn_pos_vel_from(side, 4.00 + delay, 4.00);
                         let bullet = Bullet::new(
                             pos,
                             vel * 1.25,
@@ -196,10 +195,10 @@ impl State {
             // cheeses
 
             // slugs
-            let times = self.slug_counter.revolve(0.125 + 0.025 * diffscale, dt);
+            let times = self.slug_counter.revolve(0.125 + 0.025 * diff_scale, dt);
 
             for _ in 0..times {
-                let (pos, vel) = spawn_posvel(10.00, 10.00);
+                let (pos, vel) = spawn_pos_vel(10.00, 10.00);
                 let slug = Slug::new(
                     pos,
                     vel * 0.50,
@@ -208,10 +207,10 @@ impl State {
             }
 
             // warnings
-            let times = self.warning_counter.revolve(0.15 + 0.10 * diffscale, dt);
+            let times = self.warning_counter.revolve(0.15 + 0.10 * diff_scale, dt);
 
-            for i in 0..(times * diffscale as i32) {
-                let (mut pos, dir) = spawn_posvel(-12.00, 12.00);
+            for i in 0..(times * diff_scale as i32) {
+                let (mut pos, dir) = spawn_pos_vel(-12.00, 12.00);
                 // move laser so it targets player
                 let shift = rand(30.00) - 15.00;
                 if dir.x().abs() < 1e-10 {
@@ -226,7 +225,7 @@ impl State {
             let times = self.health_packs_counter.revolve(0.10 * (self.burger.missing_hp() - (self.health_packs.len() * 2) as f64).max(0.00).min(8.00), dt);
 
             for _ in 0..times {
-                let (pos, vel) = spawn_posvel(10.00, 12.00);
+                let (pos, vel) = spawn_pos_vel(10.00, 12.00);
                 let health_pack = HealthPack::new(
                     pos,
                     vel * 0.30,
@@ -234,10 +233,10 @@ impl State {
                 self.health_packs.push(health_pack);
             }
 
-            let times = self.flak_counter.revolve(0.10 + 0.02 * diffscale, dt);
+            let times = self.flak_counter.revolve(0.10 + 0.02 * diff_scale, dt);
 
             for _ in 0..times {
-                let (pos, vel) = spawn_posvel(4.00, 4.00);
+                let (pos, vel) = spawn_pos_vel(4.00, 4.00);
                 let flak = Frag::new(
                     pos,
                     vel * 0.50,
@@ -259,23 +258,23 @@ impl State {
             update_all_pos(&mut self.particles, dt);
 
             // inter-unitary logic
-            let burger_circle = self.burger.hitcircle();
+            let burger_circle = self.burger.hit_circle();
             let mut state_effect = StateEffect::default();
             let mut burger_effect = Effect::default();
 
-            if self.cheese.hitcircle().is_hitting(&burger_circle) {
-                burger_effect += self.cheese.target_effect_onhit();
-                self.cheese.takes_effect(&self.cheese.self_effect_onhit());
-                state_effect += self.cheese.state_effect_onhit(&sprite_loader);
+            if self.cheese.hit_circle().is_hitting(&burger_circle) {
+                burger_effect += self.cheese.target_effect_on_hit();
+                self.cheese.takes_effect(&self.cheese.self_effect_on_hit());
+                state_effect += self.cheese.state_effect_on_hit(sprite_loader);
             };
-            do_all_hits(&mut self.health_packs, &mut state_effect, &burger_circle, &mut burger_effect, &sprite_loader);
+            do_all_hits(&mut self.health_packs, &mut state_effect, &burger_circle, &mut burger_effect, sprite_loader);
 
             if self.burger.is_targetable() {
-                do_all_hits(&mut self.bullets, &mut state_effect, &burger_circle, &mut burger_effect, &sprite_loader);
-                do_all_hits(&mut self.slugs, &mut state_effect, &burger_circle, &mut burger_effect, &sprite_loader);
-                do_all_hits(&mut self.lasers, &mut state_effect, &burger_circle, &mut burger_effect, &sprite_loader);
-                do_all_hits(&mut self.flaks, &mut state_effect, &burger_circle, &mut burger_effect, &sprite_loader);
-                do_all_hits(&mut self.flak_children, &mut state_effect, &burger_circle, &mut burger_effect, &sprite_loader);
+                do_all_hits(&mut self.bullets, &mut state_effect, &burger_circle, &mut burger_effect, sprite_loader);
+                do_all_hits(&mut self.slugs, &mut state_effect, &burger_circle, &mut burger_effect, sprite_loader);
+                do_all_hits(&mut self.lasers, &mut state_effect, &burger_circle, &mut burger_effect, sprite_loader);
+                do_all_hits(&mut self.flaks, &mut state_effect, &burger_circle, &mut burger_effect, sprite_loader);
+                do_all_hits(&mut self.flak_children, &mut state_effect, &burger_circle, &mut burger_effect, sprite_loader);
                 self.burger.takes_effect(&burger_effect);
             }
             state_effect.freeze += burger_effect.damage.max(0.00);
@@ -291,7 +290,7 @@ impl State {
 
             // special update behaviour
             { // burger
-                let ref mut burger = self.burger;
+                let burger = &mut self.burger;
                 burger.vel = input.dir().normal() * (0.55) * dt + burger.vel * 0.675f64.powf(dt);
                 burger.bhv.invuln = (burger.bhv.invuln - dt).max(0.00);
                 burger.bhv.dash_charge = (burger.bhv.dash_charge + 0.01 * dt).min(1.00);
@@ -301,7 +300,7 @@ impl State {
                 }
             };
             { // cheese
-                let ref mut cheese = self.cheese;
+                let cheese = &mut self.cheese;
                 if cheese.bhv.hp < 1e-10 {
                     let V2(x, y) = center();
                     let new_pos = loop {
@@ -376,18 +375,18 @@ impl State {
         };
         copy_texture(b_sprite, self.burger.pos);
         // cheese
-        copy_texture(&sprite_loader.texture("cheese"), self.cheese.pos);
+        copy_texture(sprite_loader.texture("cheese"), self.cheese.pos);
         // health packs
         for health_pack in &self.health_packs {
-            copy_texture(&sprite_loader.texture("heart"), health_pack.pos);
+            copy_texture(sprite_loader.texture("heart"), health_pack.pos);
         }
         // bullets
         for bullet in &self.bullets {
-            copy_texture(&sprite_loader.texture("bullet"), bullet.pos);
+            copy_texture(sprite_loader.texture("bullet"), bullet.pos);
         }
         // slugs
         for slug in &self.slugs {
-            copy_with_rotation(&sprite_loader.texture("slug"), slug.pos, slug.vel.angle() + PI * 0.50);
+            copy_with_rotation(sprite_loader.texture("slug"), slug.pos, slug.vel.angle() + PI * 0.50);
         }
         // warnings
         for warning in &self.warnings {
@@ -410,11 +409,11 @@ impl State {
         }
         // flak
         for flak in &self.flaks {
-            copy_texture(&sprite_loader.texture("flak"), flak.pos);
+            copy_texture(sprite_loader.texture("flak"), flak.pos);
         }
         // flak children
         for flak_child in &self.flak_children {
-            copy_texture(&sprite_loader.texture("flak_child"), flak_child.pos);
+            copy_texture(sprite_loader.texture("flak_child"), flak_child.pos);
         }
         // particles
         for particle in &self.particles {
@@ -469,7 +468,6 @@ impl State {
 }
 
 
-
 fn num_to_side(num: i32) -> V2 {
     match num % 4 {
         1 => V2(1.00, 0.00),
@@ -481,8 +479,7 @@ fn num_to_side(num: i32) -> V2 {
 }
 
 
-
-fn spawn_posvel(side_buffer: f64, edge_buffer: f64) -> (V2, V2) {
+fn spawn_pos_vel(side_buffer: f64, edge_buffer: f64) -> (V2, V2) {
     let direction = get_rand_dir();
     let shift = get_shift(direction, edge_buffer);
     let buffer = direction * side_buffer;
@@ -490,7 +487,7 @@ fn spawn_posvel(side_buffer: f64, edge_buffer: f64) -> (V2, V2) {
     (pos + shift, direction.negate())
 }
 
-fn spawn_posvel_from(side: i32, side_buffer: f64, edge_buffer: f64) -> (V2, V2) {
+fn spawn_pos_vel_from(side: i32, side_buffer: f64, edge_buffer: f64) -> (V2, V2) {
     let direction = num_to_side(side);
     let shift = get_shift(direction, edge_buffer);
     let buffer = direction * side_buffer;

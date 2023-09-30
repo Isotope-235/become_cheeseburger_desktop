@@ -11,9 +11,9 @@ pub struct Pos<T> {
 }
 impl<T> Pos<T> {
     pub fn update_pos(&mut self, dt: f64) {
-        self.vel = self.vel + self.acc * dt;
-        self.pos = self.pos + self.vel * dt;
-        self.age = self.age + 1.00 * dt;
+        self.vel += self.acc * dt;
+        self.pos += self.vel * dt;
+        self.age += 1.00 * dt;
     }
 }
 impl<T: Default> Default for Pos<T> {
@@ -26,24 +26,25 @@ pub fn update_all_pos<T>(items: &mut Vec<Pos<T>>, dt: f64) {
         item.update_pos(dt)
     }
 }
-pub fn do_all_hits<T: Hitbox + Onhit + TakeEffect>(items: &mut Vec<T>, state_effect_accumulator: &mut StateEffect, burger_circle: &Circle, burger_accumulator: &mut Effect, sprite_manager: &SpriteLoader) {
+pub fn do_all_hits<T: HitBox + OnHit + TakeEffect>(items: &mut Vec<T>, state_effect_accumulator: &mut StateEffect, burger_circle: &Circle, burger_accumulator: &mut Effect, sprite_manager: &SpriteLoader) {
     for item in items {
-        if item.hitcircle().is_hitting(&burger_circle) {
-            *burger_accumulator += item.target_effect_onhit();
-            item.takes_effect(&item.self_effect_onhit());
-            *state_effect_accumulator += item.state_effect_onhit(sprite_manager);
+        if item.hit_circle().is_hitting(burger_circle) {
+            *burger_accumulator += item.target_effect_on_hit();
+            item.takes_effect(&item.self_effect_on_hit());
+            *state_effect_accumulator += item.state_effect_on_hit(sprite_manager);
         }
     }
 }
 
-pub trait Onhit : Sized {
-    fn target_effect_onhit(&self) -> Effect {
+pub trait OnHit: Sized {
+    fn target_effect_on_hit(&self) -> Effect {
         Effect::default()
     }
-    fn self_effect_onhit(&self) -> Effect {
+    fn self_effect_on_hit(&self) -> Effect {
         Effect::default()
     }
-    fn state_effect_onhit(&self, sprite_manager: &SpriteLoader) -> StateEffect {
+    //noinspection RsLiveness
+    fn state_effect_on_hit(&self, sprite_manager: &SpriteLoader) -> StateEffect {
         StateEffect::default()
     }
 }
@@ -83,8 +84,8 @@ impl AddAssign<Effect> for Effect {
     }
 }
 
-pub trait Hitbox : Sized {
-    fn hitcircle(&self) -> Circle;
+pub trait HitBox: Sized {
+    fn hit_circle(&self) -> Circle;
 }
 pub struct Circle {
     pos: V2,

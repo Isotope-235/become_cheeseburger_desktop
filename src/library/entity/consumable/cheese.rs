@@ -16,17 +16,17 @@ impl Cheese {
     }
 }
 
-impl Hitbox for Pos<Cheese> {
-    fn hitcircle(&self) -> Circle {
-        Circle::new(self.pos, 7.00)
+impl HitBox for Pos<Cheese> {
+    fn hit_circle(&self) -> pos::Circle {
+        pos::Circle::new(self.pos, 7.00)
     }
 }
-impl Onhit for Pos<Cheese> {
-    fn self_effect_onhit(&self) -> Effect {
-        Effect { damage: 1.00, ..Effect::default() }
+impl OnHit for Pos<Cheese> {
+    fn self_effect_on_hit(&self) -> Effect {
+        Effect { damage: 1.00 }
     }
 
-    fn state_effect_onhit(&self, sprite_manager: &SpriteLoader) -> StateEffect {
+    fn state_effect_on_hit(&self, sprite_manager: &SpriteLoader) -> StateEffect {
         StateEffect { score: 100, particles: Particle::from_center(5, rand(1.00), self.pos, 4.00, 0.00, 0.33, 20.00, *sprite_manager.color("cheese")), ..StateEffect::default() }
     }
 }

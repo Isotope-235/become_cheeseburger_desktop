@@ -6,9 +6,9 @@ pub struct Player {
     pub dash_charge: f64,
 }
 
-impl Hitbox for Pos<Player> {
-    fn hitcircle(&self) -> Circle {
-        Circle::new(self.pos, 2.00)
+impl HitBox for Pos<Player> {
+    fn hit_circle(&self) -> pos::Circle {
+        pos::Circle::new(self.pos, 2.00)
     }
 }
 
@@ -26,10 +26,10 @@ impl Pos<Player> {
         let bounds = center() * 2.00;
         let V2(x, y) = self.pos;
         if x < 0.00 || x > bounds.0 {
-            self.vel.0 = self.vel.0 * -1.00
+            self.vel.0 *= -1.00
         }
         if y < 0.00 || y > bounds.1 {
-            self.vel.1 = self.vel.1 * -1.00
+            self.vel.1 *= -1.00
         }
         self.pos.0 = self.pos.0.max(0.00).min(bounds.0);
         self.pos.1 = self.pos.1.max(0.00).min(bounds.1);
@@ -39,9 +39,9 @@ impl Pos<Player> {
     }
     pub fn dash(&mut self, input: &Input) {
         let charge_used = self.bhv.dash_charge;
-        self.vel = self.vel + input.dir().normal() * charge_used * 7.00;
+        self.vel += input.dir().normal() * charge_used * 7.00;
         self.bhv.invuln = charge_used * 15.00;
-        self.bhv.dash_charge = self.bhv.dash_charge - charge_used;
+        self.bhv.dash_charge -= charge_used;
     }
     pub fn can_dash(&self) -> bool {
         self.bhv.dash_charge >= 1.00

@@ -3,9 +3,9 @@ use crate::*;
 pub struct HealthPack {
     pub hp: f64
 }
-impl Hitbox for Pos<HealthPack>{
-    fn hitcircle(&self) -> Circle {
-        Circle::new(self.pos, 5.00)
+impl HitBox for Pos<HealthPack>{
+    fn hit_circle(&self) -> pos::Circle {
+        pos::Circle::new(self.pos, 5.00)
     }
 }
 impl HealthPack {
@@ -18,15 +18,15 @@ impl Default for HealthPack {
         HealthPack { hp: 1.00 }
     }    
 }
-impl Onhit for Pos<HealthPack> {
-    fn target_effect_onhit(&self) -> Effect {
+impl OnHit for Pos<HealthPack> {
+    fn target_effect_on_hit(&self) -> Effect {
         Effect { damage: -2.00 }
     }
 
-    fn self_effect_onhit(&self) -> Effect {
+    fn self_effect_on_hit(&self) -> Effect {
         Effect { damage: 1.00 }
     }
-    fn state_effect_onhit(&self, sprite_manager: &SpriteLoader) -> StateEffect {
+    fn state_effect_on_hit(&self, sprite_manager: &SpriteLoader) -> StateEffect {
         let particles = Particle::from_center(6, rand(1.00), self.pos, 4.00, 0.00, 0.20, 20.00, *sprite_manager.color("heart"));
         StateEffect { particles, ..StateEffect::default() }
     }

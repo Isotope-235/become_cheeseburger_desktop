@@ -4,9 +4,9 @@ pub trait Counter {
 
 impl Counter for f64 {
     fn revolve(&mut self, delta: f64, dt: f64) -> i32 {
-        *self = *self + delta * dt;
+        *self += delta * dt;
         let times = *self as i32 / 100;
-        *self = *self % 100.00;
+        *self %= 100.00;
         times
     }
 }

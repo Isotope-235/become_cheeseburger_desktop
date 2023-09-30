@@ -3,9 +3,9 @@ use crate::*;
 pub struct Slug {
     pub hp: f64
 }
-impl Hitbox for Pos<Slug> {
-    fn hitcircle(&self) -> Circle {
-        Circle::new(self.pos, 10.00)
+impl HitBox for Pos<Slug> {
+    fn hit_circle(&self) -> pos::Circle {
+        pos::Circle::new(self.pos, 10.00)
     }
 }
 impl Slug {
@@ -18,13 +18,13 @@ impl Default for Slug {
         Slug { hp: 7.00 }
     }
 }
-impl Onhit for Pos<Slug> {
-    fn target_effect_onhit(&self) -> Effect {
+impl OnHit for Pos<Slug> {
+    fn target_effect_on_hit(&self) -> Effect {
         Effect { damage: self.bhv.hp }
     }
 
-    fn self_effect_onhit(&self) -> Effect {
-        self.target_effect_onhit()
+    fn self_effect_on_hit(&self) -> Effect {
+        self.target_effect_on_hit()
     }
 }
 impl TakeEffect for Pos<Slug> {

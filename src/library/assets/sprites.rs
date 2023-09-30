@@ -20,6 +20,12 @@ impl From<(&str, Color)> for PathColor {
     }
 }
 
+impl Default for SpriteLoader {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 
 impl SpriteLoader {
     pub fn new() -> Self {

@@ -3,9 +3,9 @@ use crate::*;
 pub struct Frag {
     hp: f64
 }
-impl Hitbox for Pos<Frag> {
-    fn hitcircle(&self) -> Circle {
-        Circle::new(self.pos, 7.00)
+impl HitBox for Pos<Frag> {
+    fn hit_circle(&self) -> pos::Circle {
+        pos::Circle::new(self.pos, 7.00)
     }
 }
 impl Frag {
@@ -23,13 +23,13 @@ impl Pos<Frag> {
         self.bhv.hp > 1e-10 && self.age < 200.00
     }
 }
-impl Onhit for Pos<Frag> {
-    fn target_effect_onhit(&self) -> Effect {
+impl OnHit for Pos<Frag> {
+    fn target_effect_on_hit(&self) -> Effect {
         Effect { damage: self.bhv.hp }
     }
 
-    fn self_effect_onhit(&self) -> Effect {
-        self.target_effect_onhit()
+    fn self_effect_on_hit(&self) -> Effect {
+        self.target_effect_on_hit()
     }
 }
 impl TakeEffect for Pos<Frag> {
@@ -41,9 +41,9 @@ impl TakeEffect for Pos<Frag> {
 pub struct FlakChild {
     pub hp: f64
 }
-impl Hitbox for Pos<FlakChild> {
-    fn hitcircle(&self) -> Circle {
-        Circle::new(self.pos, 4.00)
+impl HitBox for Pos<FlakChild> {
+    fn hit_circle(&self) -> pos::Circle {
+        pos::Circle::new(self.pos, 4.00)
     }
 }
 impl FlakChild {
@@ -56,13 +56,13 @@ impl Default for FlakChild {
         FlakChild { hp: 2.00 }
     }
 }
-impl Onhit for Pos<FlakChild> {
-    fn target_effect_onhit(&self) -> Effect {
+impl OnHit for Pos<FlakChild> {
+    fn target_effect_on_hit(&self) -> Effect {
         Effect { damage: self.bhv.hp }
     }
 
-    fn self_effect_onhit(&self) -> Effect {
-        self.target_effect_onhit()
+    fn self_effect_on_hit(&self) -> Effect {
+        self.target_effect_on_hit()
     }
 }
 impl TakeEffect for Pos<FlakChild> {
