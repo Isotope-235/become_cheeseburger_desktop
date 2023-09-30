@@ -1,8 +1,8 @@
 //#![windows_subsystem = "windows"]
-pub mod lib;
+pub mod library;
 
 use std::f64::consts::PI;
-use lib::*;
+use library::*;
 
 use macroquad::prelude::*;
 use macroquad_canvas::Canvas2D;
