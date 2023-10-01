@@ -10,7 +10,6 @@ pub mod library;
 
 #[macroquad::main(window_conf())]
 async fn main() {
-
     let fps = find_fps().await;
     println!("Targeted framerate: {fps}");
 
@@ -22,28 +21,30 @@ async fn main() {
     set_camera(&camera);
     let mut canvas = Canvas2D::new((center().x() * 2.00) as f32, (center().y() * 2.00) as f32);
 
-    let mut sprite_manager = SpriteLoader::new();
+    let mut asset_loader = AssetLoader::new();
 
-    sprite_manager.load_many(vec![
-        ("burger", Color::default()),
-        ("cheese", Color::from_rgba(255, 221, 86, 255)),
-        ("burger_invuln", Color::default()),
-        ("bullet", Color::default()),
-        ("flak", Color::default()),
-        ("slug", Color::default()),
-        ("flak_child", Color::default()),
-        ("heart", Color::from_rgba(221, 16, 85, 255)),
-    ]).await;
+    asset_loader.load_sprites(
+        vec![
+            ("burger", Color::default()),
+            ("cheese", Color::from_rgba(255, 221, 86, 255)),
+            ("burger_invuln", Color::default()),
+            ("bullet", Color::default()),
+            ("flak", Color::default()),
+            ("slug", Color::default()),
+            ("flak_child", Color::default()),
+            ("heart", Color::from_rgba(221, 16, 85, 255)),
+        ]
+    ).await;
 
-    let mut sound_manager = SoundLoader::new();
-
-    sound_manager.load_many(vec![
-        SoundConfig {
-            volume: 1.0,
-            looped: false,
-            id: "explosion",
-        }
-    ]).await;
+    asset_loader.load_sounds(
+        vec![
+            "explosion",
+            "heal",
+            "laser",
+            "damage",
+            "dash"
+        ]
+    ).await;
 
     // state init
     let mut state = State::reset();
@@ -68,7 +69,7 @@ async fn main() {
             d: is_key_down(KeyCode::D),
             space: is_key_down(KeyCode::Space),
         };
-        let score_change = state.progress(&input, dt, &sprite_manager);
+        let score_change = state.progress(&input, dt, &asset_loader);
         if score_change > 0 {
             state.score += score_change;
             // score_txt = render_score(state.score, &joystix, &texture_creator);
@@ -77,7 +78,7 @@ async fn main() {
         // draw calls
         set_camera(&canvas.camera);
         clear_background(if state.freeze > 0.00 { BG_ON_DAMAGE } else { BG });
-        state.draw(&sprite_manager);
+        state.draw(&asset_loader);
         let score_text = fill_leading_zeroes(state.score);
         let score_chars = score_text.chars();
         for (i, c) in score_chars.enumerate() {
@@ -116,12 +117,12 @@ struct State {
     health_packs: Vec<Pos<HealthPack>>,
     flak_counter: f64,
     flaks: Vec<Pos<Frag>>,
-    flak_children: Vec<Pos<FlakChild>>,
+    flak_children: Vec<Pos<FragChild>>,
     particles: Vec<Pos<Particle>>,
 }
 
 impl State {
-    fn progress(&mut self, input: &Input, dt: f64, sprite_loader: &SpriteLoader) -> i32 {
+    fn progress(&mut self, input: &Input, dt: f64, asset_loader: &AssetLoader) -> i32 {
         let mut score = 0;
         for _ in 0..ITERATIONS as usize {
             if self.freeze > 0.00 {
@@ -245,16 +246,16 @@ impl State {
             if self.cheese.hit_circle().is_hitting(&burger_circle) {
                 burger_effect += self.cheese.target_effect_on_hit();
                 self.cheese.takes_effect(&self.cheese.self_effect_on_hit());
-                state_effect += self.cheese.state_effect_on_hit(sprite_loader);
+                state_effect += self.cheese.state_effect_on_hit(asset_loader);
             };
-            do_all_hits(&mut self.health_packs, &mut state_effect, &burger_circle, &mut burger_effect, sprite_loader);
+            do_all_hits(&mut self.health_packs, &mut state_effect, &burger_circle, &mut burger_effect, asset_loader);
 
             if self.burger.is_targetable() {
-                do_all_hits(&mut self.bullets, &mut state_effect, &burger_circle, &mut burger_effect, sprite_loader);
-                do_all_hits(&mut self.slugs, &mut state_effect, &burger_circle, &mut burger_effect, sprite_loader);
-                do_all_hits(&mut self.lasers, &mut state_effect, &burger_circle, &mut burger_effect, sprite_loader);
-                do_all_hits(&mut self.flaks, &mut state_effect, &burger_circle, &mut burger_effect, sprite_loader);
-                do_all_hits(&mut self.flak_children, &mut state_effect, &burger_circle, &mut burger_effect, sprite_loader);
+                do_all_hits(&mut self.bullets, &mut state_effect, &burger_circle, &mut burger_effect, asset_loader);
+                do_all_hits(&mut self.slugs, &mut state_effect, &burger_circle, &mut burger_effect, asset_loader);
+                do_all_hits(&mut self.lasers, &mut state_effect, &burger_circle, &mut burger_effect, asset_loader);
+                do_all_hits(&mut self.flaks, &mut state_effect, &burger_circle, &mut burger_effect, asset_loader);
+                do_all_hits(&mut self.flak_children, &mut state_effect, &burger_circle, &mut burger_effect, asset_loader);
                 self.burger.takes_effect(&burger_effect);
             }
             state_effect.freeze += burger_effect.damage.max(0.00);
@@ -276,7 +277,7 @@ impl State {
                 burger.bhv.dash_charge = (burger.bhv.dash_charge + 0.01 * dt).min(1.00);
                 burger.bhv.hp = burger.bhv.hp.min(burger.max_hp());
                 if input.space && burger.can_dash() && input.dir().len() > 0.00 {
-                    burger.dash(input);
+                    burger.dash(input, asset_loader);
                 }
             };
             { // cheese
@@ -320,7 +321,7 @@ impl State {
                         let number = 8;
                         for i in 0..number {
                             let dir = (i as f64).as_radians() / number as f64;
-                            let child = FlakChild::new(flak.pos, Vector2::ZERO, Vector2::from(dir) * 0.01);
+                            let child = FragChild::new(flak.pos, Vector2::ZERO, Vector2::from(dir) * 0.01);
                             self.flak_children.push(child);
                         }
                     }
@@ -347,26 +348,26 @@ impl State {
         };
         score
     }
-    fn draw(&self, sprite_loader: &SpriteLoader) {
+    fn draw(&self, asset_loader: &AssetLoader) {
         // burger
         let b_sprite = match self.burger.bhv.invuln > 0.00 {
-            false => sprite_loader.texture("burger"),
-            true => sprite_loader.texture("burger_invuln"),
+            false => asset_loader.texture("burger"),
+            true => asset_loader.texture("burger_invuln"),
         };
         copy_texture(b_sprite, self.burger.pos);
         // cheese
-        copy_texture(sprite_loader.texture("cheese"), self.cheese.pos);
+        copy_texture(asset_loader.texture("cheese"), self.cheese.pos);
         // health packs
         for health_pack in &self.health_packs {
-            copy_texture(sprite_loader.texture("heart"), health_pack.pos);
+            copy_texture(asset_loader.texture("heart"), health_pack.pos);
         }
         // bullets
         for bullet in &self.bullets {
-            copy_texture(sprite_loader.texture("bullet"), bullet.pos);
+            copy_texture(asset_loader.texture("bullet"), bullet.pos);
         }
         // slugs
         for slug in &self.slugs {
-            copy_with_rotation(sprite_loader.texture("slug"), slug.pos, slug.vel.angle() + PI * 0.50);
+            copy_with_rotation(asset_loader.texture("slug"), slug.pos, slug.vel.angle() + PI * 0.50);
         }
         // warnings
         for warning in &self.warnings {
@@ -389,11 +390,11 @@ impl State {
         }
         // flak
         for flak in &self.flaks {
-            copy_texture(sprite_loader.texture("flak"), flak.pos);
+            copy_texture(asset_loader.texture("flak"), flak.pos);
         }
         // flak children
         for flak_child in &self.flak_children {
-            copy_texture(sprite_loader.texture("flak_child"), flak_child.pos);
+            copy_texture(asset_loader.texture("flak_child"), flak_child.pos);
         }
         // particles
         for particle in &self.particles {

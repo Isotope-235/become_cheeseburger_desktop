@@ -26,8 +26,9 @@ impl OnHit for Pos<Cheese> {
         Effect { damage: 1.00 }
     }
 
-    fn state_effect_on_hit(&self, sprite_manager: &SpriteLoader) -> StateEffect {
-        StateEffect { score: 100, particles: Particle::from_center(5, rand(1.00), self.pos, 4.00, 0.00, 0.33, 20.00, *sprite_manager.color("cheese")), ..StateEffect::default() }
+    fn state_effect_on_hit(&self, asset_loader: &AssetLoader) -> StateEffect {
+        asset_loader.play_sound("heal"); // TODO: cheese sound
+        StateEffect { score: 100, particles: Particle::from_center(5, rand(1.00), self.pos, 4.00, 0.00, 0.33, 20.00, *asset_loader.color("cheese")), ..StateEffect::default() }
     }
 }
 impl TakeEffect for Pos<Cheese> {

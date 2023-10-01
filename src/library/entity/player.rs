@@ -37,7 +37,8 @@ impl Pos<Player> {
     pub fn max_hp(&self) -> f64 {
         8.00
     }
-    pub fn dash(&mut self, input: &Input) {
+    pub fn dash(&mut self, input: &Input, asset_loader: &AssetLoader) {
+        asset_loader.play_sound("dash");
         let charge_used = self.bhv.dash_charge;
         self.vel += input.dir().normal() * charge_used * 7.00;
         self.bhv.invuln = charge_used * 15.00;

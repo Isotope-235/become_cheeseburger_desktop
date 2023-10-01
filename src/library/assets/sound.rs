@@ -10,6 +10,31 @@ pub struct SoundConfig {
     pub id: &'static str,
 }
 
+impl From<&'static str> for SoundConfig {
+    fn from(value: &'static str) -> Self {
+        SoundConfig::from_name(value)
+    }
+}
+
+impl SoundConfig {
+    pub fn from_name(name: &'static str) -> Self {
+        Self {
+            id: name,
+            ..Default::default()
+        }
+    }
+}
+
+impl Default for SoundConfig {
+    fn default() -> Self {
+        Self {
+            volume: 1.0,
+            looped: false,
+            id: "",
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct SoundLoader(HashMap<String, SoundConfig>, HashMap<String, Vec<Sound>>);
 
@@ -19,41 +44,9 @@ impl SoundLoader {
                     HashMap::new())
     }
 
-    /// Loads a vector of sound configurations into this [SoundLoader],
-    /// making the sounds loaded available for playing.
-    ///
-    /// Reference a sound by its ID, which is the name of the folder within assets/sound
-    /// that contains the sound variations. Sound loader picks up all sound files within.
-    ///
-    /// **Supported file types: .wav, .ogg, .flac, .mp3**
-    ///
-    /// # Example
-    /// ## Folder structure
-    /// ```text
-    /// 📂assets
-    ///  ↳ sounds
-    ///    ↳ explosion
-    ///      ↳ 🔈explosion1.wav
-    ///      ↳ 🔈explosion2.wav
-    /// ```
-    /// ## Code
-    /// ```
-    /// let mut sound_loader = SoundLoader::new();
-    ///
-    /// sound_loader.load_many(vec![
-    ///    SoundConfig {
-    ///       id: "explosion"
-    ///       volume: 1.0,
-    ///       looped: false,
-    ///    },
-    /// ]);
-    ///
-    /// // Plays explosion1.wav or explosion2.wav randomly
-    /// sound_loader.play("explosion");
-    ///
-    /// ```
-    pub async fn load_many(&mut self, sound_configs: Vec<SoundConfig>) {
-        for sound_config in sound_configs {
+    pub async fn load_many<T: Into<SoundConfig>>(&mut self, sound_configs: Vec<T>) {
+        for sc in sound_configs {
+            let sound_config = sc.into();
             let paths = fs::read_dir(format!("assets/sounds/{}", sound_config.id)).unwrap_or_else
             (|err| panic!("Invalid sound id argument! Path: assets/sounds/{}", sound_config.id));
 

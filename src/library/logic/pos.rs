@@ -32,12 +32,13 @@ pub fn update_all_pos<T>(items: &mut Vec<Pos<T>>, dt: f64) {
     }
 }
 
-pub fn do_all_hits<T: HitBox + OnHit + TakeEffect>(items: &mut Vec<T>, state_effect_accumulator: &mut StateEffect, burger_circle: &Circle, burger_accumulator: &mut Effect, sprite_manager: &SpriteLoader) {
+pub fn do_all_hits<T: HitBox + OnHit + TakeEffect>(items: &mut Vec<T>, state_effect_accumulator:
+&mut StateEffect, burger_circle: &Circle, burger_accumulator: &mut Effect, asset_manager: &AssetLoader) {
     for item in items {
         if item.hit_circle().is_hitting(burger_circle) {
             *burger_accumulator += item.target_effect_on_hit();
             item.takes_effect(&item.self_effect_on_hit());
-            *state_effect_accumulator += item.state_effect_on_hit(sprite_manager);
+            *state_effect_accumulator += item.state_effect_on_hit(asset_manager);
         }
     }
 }
@@ -50,7 +51,7 @@ pub trait OnHit: Sized {
         Effect::default()
     }
     //noinspection RsLiveness
-    fn state_effect_on_hit(&self, sprite_manager: &SpriteLoader) -> StateEffect {
+    fn state_effect_on_hit(&self, asset_manager: &AssetLoader) -> StateEffect {
         StateEffect::default()
     }
 }

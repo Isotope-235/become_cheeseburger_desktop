@@ -38,25 +38,25 @@ impl TakeEffect for Pos<Frag> {
         self.bhv.hp -= damage
     }
 }
-pub struct FlakChild {
+pub struct FragChild {
     pub hp: f64
 }
-impl HitBox for Pos<FlakChild> {
+impl HitBox for Pos<FragChild> {
     fn hit_circle(&self) -> pos::Circle {
         pos::Circle::new(self.pos, 4.00)
     }
 }
-impl FlakChild {
-    pub fn new(pos: Vector2, vel: Vector2, acc: Vector2) -> Pos<FlakChild> {
+impl FragChild {
+    pub fn new(pos: Vector2, vel: Vector2, acc: Vector2) -> Pos<FragChild> {
         Pos { pos, vel, acc, ..Pos::default() }
     }
 }
-impl Default for FlakChild {
+impl Default for FragChild {
     fn default() -> Self {
-        FlakChild { hp: 2.00 }
+        FragChild { hp: 2.00 }
     }
 }
-impl OnHit for Pos<FlakChild> {
+impl OnHit for Pos<FragChild> {
     fn target_effect_on_hit(&self) -> Effect {
         Effect { damage: self.bhv.hp }
     }
@@ -65,7 +65,7 @@ impl OnHit for Pos<FlakChild> {
         self.target_effect_on_hit()
     }
 }
-impl TakeEffect for Pos<FlakChild> {
+impl TakeEffect for Pos<FragChild> {
     fn takes_effect(&mut self, effect: &Effect) {
         let Effect { damage, .. } = effect;
         self.bhv.hp -= damage;
