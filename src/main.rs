@@ -35,6 +35,16 @@ async fn main() {
         ("heart", Color::from_rgba(221, 16, 85, 255)),
     ]).await;
 
+    let mut sound_manager = SoundLoader::new();
+
+    sound_manager.load_many(vec![
+        SoundConfig {
+            volume: 1.0,
+            looped: false,
+            id: "explosion",
+        }
+    ]).await;
+
     // state init
     let mut state = State::reset();
 
