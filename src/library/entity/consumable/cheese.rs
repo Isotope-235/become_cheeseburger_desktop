@@ -3,11 +3,11 @@ pub struct Cheese {
     pub hp: f64
 }
 impl Cheese {
-    pub fn new(pos: V2) -> Pos<Cheese> {
+    pub fn new(pos: Vector2) -> Pos<Cheese> {
         Pos { 
             pos,
-            vel: V2::ZERO,
-            acc: V2::ZERO,
+            vel: Vector2::ZERO,
+            acc: Vector2::ZERO,
             age: 0.00,
             bhv: Cheese {
                 hp: 1.00,

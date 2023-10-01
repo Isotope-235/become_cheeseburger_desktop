@@ -9,7 +9,7 @@ impl HitBox for Pos<HealthPack>{
     }
 }
 impl HealthPack {
-    pub fn new(pos: V2, vel: V2) -> Pos<Self> {
+    pub fn new(pos: Vector2, vel: Vector2) -> Pos<Self> {
         Pos { pos, vel, ..Pos::default() }
     }
 }

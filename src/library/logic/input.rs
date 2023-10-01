@@ -1,4 +1,4 @@
-use crate::vector::V2;
+use crate::vector::Vector2;
 
 pub struct Input {
     pub w: bool,
@@ -11,8 +11,8 @@ impl Input {
     pub fn init() -> Input {
         Input { w: false, a: false, s: false, d: false, space: false }
     }
-    pub fn dir(&self) -> V2 {
+    pub fn dir(&self) -> Vector2 {
         let Input { w, a, s, d, ..} = *self;
-        V2(d as i32 as f64 - a as i32 as f64, s as i32 as f64 - w as i32 as f64)
+        Vector2(d as i32 as f64 - a as i32 as f64, s as i32 as f64 - w as i32 as f64)
     }
 }

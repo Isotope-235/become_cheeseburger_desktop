@@ -9,7 +9,7 @@ impl HitBox for Pos<Slug> {
     }
 }
 impl Slug {
-    pub fn new(pos: V2, vel: V2) -> Pos<Slug> {
+    pub fn new(pos: Vector2, vel: Vector2) -> Pos<Slug> {
         Pos { pos, vel, ..Pos::default() }
     }
 }

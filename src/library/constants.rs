@@ -9,8 +9,8 @@ pub const DT: f64 = 1.00 / ITERATIONS as f64;
 pub const BG: Color = color_u8!(55, 55, 55, 255);
 pub const BG_ON_DAMAGE: Color = color_u8!(255, 55, 55, 255);
 
-pub fn center() -> V2 {
-    V2(80.00, 60.00)
+pub fn center() -> Vector2 {
+    Vector2(80.00, 60.00)
 }
 
 pub fn scale() -> f64 {

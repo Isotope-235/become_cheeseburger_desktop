@@ -272,9 +272,9 @@ impl State {
             { // cheese
                 let cheese = &mut self.cheese;
                 if cheese.bhv.hp < 1e-10 {
-                    let V2(x, y) = center();
+                    let Vector2(x, y) = center();
                     let new_pos = loop {
-                        let maybe_pos = V2(rand(x), rand(y)) + center() * 0.50;
+                        let maybe_pos = Vector2(rand(x), rand(y)) + center() * 0.50;
                         if (self.burger.pos - maybe_pos).len() > 16.00 {
                             break maybe_pos;
                         }
@@ -310,7 +310,7 @@ impl State {
                         let number = 8;
                         for i in 0..number {
                             let dir = (i as f64).as_radians() / number as f64;
-                            let child = FlakChild::new(flak.pos, V2::ZERO, V2::from(dir) * 0.01);
+                            let child = FlakChild::new(flak.pos, Vector2::ZERO, Vector2::from(dir) * 0.01);
                             self.flak_children.push(child);
                         }
                     }
@@ -397,7 +397,7 @@ impl State {
         let from_bot = h + 2;
         let mw = mhp * 8.00;
         let window_height = center().y() * 2.00;
-        let hp_pos = V2(2.00, window_height - from_bot as f64);
+        let hp_pos = Vector2(2.00, window_height - from_bot as f64);
         draw_rec_top_left(hp_pos, mw as i32, h, Color::from_rgba(155, 155, 155, 255));
         draw_rec_top_left(hp_pos, w.max(0.00) as i32, h, Color::from_rgba(255, 105, 105, 255));
         // dash bar
@@ -408,7 +408,7 @@ impl State {
             true => Color::from_rgba(255, 255, 255, 255),
             false => Color::from_rgba(55, 155, 255, 255),
         };
-        draw_rec_top_left(V2(2.00, window_height - dash_from_bot as f64), w as i32, h, clr);
+        draw_rec_top_left(Vector2(2.00, window_height - dash_from_bot as f64), w as i32, h, clr);
     }
     fn game_is_over(&self) -> bool {
         !self.burger.is_alive() && self.freeze.abs() < 1e-10
@@ -418,8 +418,8 @@ impl State {
             difficulty: 100.00,
             score: 0,
             freeze: 0.00,
-            burger: Player::new(center() + V2(0.00, 12.00)),
-            cheese: Cheese::new(center() - V2(0.00, 12.00)),
+            burger: Player::new(center() + Vector2(0.00, 12.00)),
+            cheese: Cheese::new(center() - Vector2(0.00, 12.00)),
             bullet_counter: 0.00,
             bullets: Vec::new(),
             slug_counter: 0.00,
@@ -438,18 +438,18 @@ impl State {
 }
 
 
-fn num_to_side(num: i32) -> V2 {
+fn num_to_side(num: i32) -> Vector2 {
     match num % 4 {
-        1 => V2(1.00, 0.00),
-        2 => V2(-1.00, 0.00),
-        3 => V2(0.00, 1.00),
-        0 => V2(0.00, -1.00),
+        1 => Vector2(1.00, 0.00),
+        2 => Vector2(-1.00, 0.00),
+        3 => Vector2(0.00, 1.00),
+        0 => Vector2(0.00, -1.00),
         _ => panic!("dear god")
     }
 }
 
 
-fn spawn_pos_vel(side_buffer: f64, edge_buffer: f64) -> (V2, V2) {
+fn spawn_pos_vel(side_buffer: f64, edge_buffer: f64) -> (Vector2, Vector2) {
     let direction = get_rand_dir();
     let shift = get_shift(direction, edge_buffer);
     let buffer = direction * side_buffer;
@@ -457,7 +457,7 @@ fn spawn_pos_vel(side_buffer: f64, edge_buffer: f64) -> (V2, V2) {
     (pos + shift, direction.negate())
 }
 
-fn spawn_pos_vel_from(side: i32, side_buffer: f64, edge_buffer: f64) -> (V2, V2) {
+fn spawn_pos_vel_from(side: i32, side_buffer: f64, edge_buffer: f64) -> (Vector2, Vector2) {
     let direction = num_to_side(side);
     let shift = get_shift(direction, edge_buffer);
     let buffer = direction * side_buffer;
@@ -465,7 +465,7 @@ fn spawn_pos_vel_from(side: i32, side_buffer: f64, edge_buffer: f64) -> (V2, V2)
     (pos + shift, direction.negate())
 }
 
-fn get_shift(dir: V2, edge_buffer: f64) -> V2 {
+fn get_shift(dir: Vector2, edge_buffer: f64) -> Vector2 {
     let rot_dir = dir.rotate_once();
     let shift_range = rot_dir.mul_per(center()).len() - edge_buffer;
     rot_dir * (rand(shift_range * 2.00) - shift_range)

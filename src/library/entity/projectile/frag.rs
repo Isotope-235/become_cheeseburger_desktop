@@ -9,7 +9,7 @@ impl HitBox for Pos<Frag> {
     }
 }
 impl Frag {
-    pub fn new(pos: V2, vel: V2) -> Pos<Frag> {
+    pub fn new(pos: Vector2, vel: Vector2) -> Pos<Frag> {
         Pos { pos, vel, ..Pos::default() }
     }
 }
@@ -47,7 +47,7 @@ impl HitBox for Pos<FlakChild> {
     }
 }
 impl FlakChild {
-    pub fn new(pos: V2, vel: V2, acc: V2) -> Pos<FlakChild> {
+    pub fn new(pos: Vector2, vel: Vector2, acc: Vector2) -> Pos<FlakChild> {
         Pos { pos, vel, acc, ..Pos::default() }
     }
 }

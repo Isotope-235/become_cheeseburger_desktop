@@ -13,8 +13,8 @@ impl HitBox for Pos<Player> {
 }
 
 impl Player {
-    pub fn new(pos: V2) -> Pos<Self> {
-        Pos { pos, vel: V2::ZERO, acc: V2::ZERO, age: 0.00, bhv: Player { hp: 8.00, invuln: 0.00, dash_charge: 1.00 } }
+    pub fn new(pos: Vector2) -> Pos<Self> {
+        Pos { pos, vel: Vector2::ZERO, acc: Vector2::ZERO, age: 0.00, bhv: Player { hp: 8.00, invuln: 0.00, dash_charge: 1.00 } }
     }
 }
 
@@ -24,7 +24,7 @@ impl Pos<Player> {
     }
     pub fn stays_in_bounds(&mut self) {
         let bounds = center() * 2.00;
-        let V2(x, y) = self.pos;
+        let Vector2(x, y) = self.pos;
         if x < 0.00 || x > bounds.0 {
             self.vel.0 *= -1.00
         }

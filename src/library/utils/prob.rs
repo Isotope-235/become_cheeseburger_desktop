@@ -12,6 +12,6 @@ pub fn chance(x: f64) -> bool {
     rand(1.00) < x
 }
 
-pub fn get_rand_dir() -> V2 {
+pub fn get_rand_dir() -> Vector2 {
     num_to_side(rrange(4))
 }

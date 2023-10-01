@@ -11,7 +11,7 @@ impl HitBox for Pos<Laser> {
 }
 
 impl Laser {
-    pub fn new(pos: V2, vel: V2) -> Pos<Laser> {
+    pub fn new(pos: Vector2, vel: Vector2) -> Pos<Laser> {
         Pos { pos, vel, ..Pos::default() }
     }
 }

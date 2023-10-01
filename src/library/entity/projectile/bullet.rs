@@ -8,8 +8,8 @@ impl HitBox for Pos<Bullet>{
     }
 }
 impl Bullet {
-    pub fn new(pos: V2, vel: V2, extra_lifetime: f64) -> Pos<Self> {
-        Pos { pos, vel, acc: V2::ZERO, age: -extra_lifetime, bhv: Bullet { hp: 3.00 } }
+    pub fn new(pos: Vector2, vel: Vector2, extra_lifetime: f64) -> Pos<Self> {
+        Pos { pos, vel, acc: Vector2::ZERO, age: -extra_lifetime, bhv: Bullet { hp: 3.00 } }
     }
 }
 impl OnHit for Pos<Bullet> {
