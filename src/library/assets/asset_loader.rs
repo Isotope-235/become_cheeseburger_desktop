@@ -1,14 +1,24 @@
 use macroquad::{
     color::Color,
-    texture::Texture2D
+    texture::Texture2D,
 };
-use super::sprites::*;
-use super::sound::*;
 
+use super::sound::*;
+use super::sprites::*;
+
+/// Helps loading all assets into the game with some handy util functions
+///
+/// Load sprites or sounds using the [load_sprites](AssetLoader::load_sprites) and [load_sounds](AssetLoader::load_sounds) functions.
 #[derive(Debug)]
 pub struct AssetLoader {
     sprites: SpriteLoader,
     sounds: SoundLoader,
+}
+
+impl Default for AssetLoader {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl AssetLoader {
