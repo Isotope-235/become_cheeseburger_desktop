@@ -48,7 +48,7 @@ impl SoundLoader {
         for sc in sound_configs {
             let sound_config = sc.into();
             let paths = fs::read_dir(format!("assets/sounds/{}", sound_config.id)).unwrap_or_else
-            (|err| panic!("Invalid sound id argument! Path: assets/sounds/{}", sound_config.id));
+            (|_err| panic!("Invalid sound id argument! Path: assets/sounds/{}", sound_config.id));
 
             // Find all sound variations and save them
             let mut sound_variations: Vec<Sound> = Vec::new();
@@ -87,9 +87,9 @@ impl SoundLoader {
         let sound_variations = self.1.get(id).unwrap_or_else(|| panic!("Invalid \
         sound id '{}' for playing", id));
 
-        let sound = &sound_variations.choose(&mut rand::thread_rng()).unwrap();
+        let sound = sound_variations.choose(&mut rand::thread_rng()).expect("Expected non-empty sound variations.");
 
-        dbg!("Playing sound: {}", sound);
+        println!("Playing sound: {:?}", sound);
 
         play_sound(sound, PlaySoundParams {
             looped: sound_config.looped,

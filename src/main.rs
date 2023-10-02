@@ -1,3 +1,4 @@
+//#![windows_subsystem = "windows"]
 use std::f64::consts::PI;
 
 use macroquad::prelude::*;
@@ -5,7 +6,6 @@ use macroquad_canvas::Canvas2D;
 
 use library::*;
 
-//#![windows_subsystem = "windows"]
 pub mod library;
 
 #[macroquad::main(window_conf())]
