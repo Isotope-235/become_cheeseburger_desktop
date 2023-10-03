@@ -28,7 +28,7 @@ impl SoundConfig {
 impl Default for SoundConfig {
     fn default() -> Self {
         Self {
-            volume: 1.0,
+            volume: 0.25,
             looped: false,
             id: "",
         }
