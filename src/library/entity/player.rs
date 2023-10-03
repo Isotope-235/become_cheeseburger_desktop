@@ -54,10 +54,3 @@ impl Pos<Player> {
         self.max_hp() - self.bhv.hp
     }
 }
-
-impl TakeEffect for Pos<Player> {
-    fn takes_effect(&mut self, effect: &Effect) {
-        let Effect { damage, .. } = effect;
-        self.bhv.hp -= damage;
-    }
-}
