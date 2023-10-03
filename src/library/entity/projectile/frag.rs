@@ -24,12 +24,13 @@ impl Pos<Frag> {
     }
 }
 impl OnHit for Pos<Frag> {
-    fn target_effect_on_hit(&self) -> Effect {
-        Effect { damage: self.bhv.hp }
-    }
 
     fn self_effect_on_hit(&self) -> Effect {
-        self.target_effect_on_hit()
+        Effect { damage: self.bhv.hp }
+    }
+    #[allow(unused_variables)]
+    fn effect_on_hit(&self, asset_manager: &AssetLoader) -> StateEffect {
+        StateEffect { burger_damage: self.bhv.hp, ..Default::default() }
     }
 }
 impl TakeEffect for Pos<Frag> {
@@ -57,12 +58,13 @@ impl Default for FragChild {
     }
 }
 impl OnHit for Pos<FragChild> {
-    fn target_effect_on_hit(&self) -> Effect {
-        Effect { damage: self.bhv.hp }
-    }
 
     fn self_effect_on_hit(&self) -> Effect {
-        self.target_effect_on_hit()
+        Effect { damage: self.bhv.hp }
+    }
+    #[allow(unused_variables)]
+    fn effect_on_hit(&self, asset_manager: &AssetLoader) -> StateEffect {
+        StateEffect { burger_damage: self.bhv.hp, ..Default::default() }
     }
 }
 impl TakeEffect for Pos<FragChild> {

@@ -33,25 +33,21 @@ pub fn update_all_pos<T>(items: &mut Vec<Pos<T>>, dt: f64) {
 }
 
 pub fn do_all_hits<T: HitBox + OnHit + TakeEffect>(items: &mut Vec<T>, state_effect_accumulator:
-&mut StateEffect, burger_circle: &Circle, burger_accumulator: &mut Effect, asset_manager: &AssetLoader) {
+&mut StateEffect, burger_circle: &Circle, asset_manager: &AssetLoader) {
     for item in items {
         if item.hit_circle().is_hitting(burger_circle) {
-            *burger_accumulator += item.target_effect_on_hit();
+            *state_effect_accumulator += item.effect_on_hit(asset_manager);
             item.takes_effect(&item.self_effect_on_hit());
-            *state_effect_accumulator += item.state_effect_on_hit(asset_manager);
         }
     }
 }
 
 pub trait OnHit: Sized {
-    fn target_effect_on_hit(&self) -> Effect {
-        Effect::default()
-    }
     fn self_effect_on_hit(&self) -> Effect {
         Effect::default()
     }
     //noinspection RsLiveness
-    fn state_effect_on_hit(&self, asset_manager: &AssetLoader) -> StateEffect {
+    fn effect_on_hit(&self, asset_manager: &AssetLoader) -> StateEffect {
         StateEffect::default()
     }
 }
@@ -71,6 +67,7 @@ impl Default for Effect {
 }
 
 pub struct StateEffect {
+    pub burger_damage: f64,
     pub score: i32,
     pub freeze: f64,
     pub particles: Vec<Pos<Particle>>,
@@ -78,13 +75,14 @@ pub struct StateEffect {
 
 impl Default for StateEffect {
     fn default() -> Self {
-        StateEffect { score: 0, freeze: 0.00, particles: Vec::new() }
+        StateEffect { score: 0, freeze: 0.00, particles: Vec::new(), burger_damage: 0.00 }
     }
 }
 
 impl AddAssign<StateEffect> for StateEffect {
     fn add_assign(&mut self, rhs: StateEffect) {
-        let StateEffect { score, freeze, particles } = rhs;
+        let StateEffect { score, freeze, particles, burger_damage } = rhs;
+        self.burger_damage += burger_damage;
         self.score += score;
         self.freeze += freeze;
         self.particles.extend(particles);

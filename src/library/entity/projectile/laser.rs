@@ -23,12 +23,13 @@ impl Default for Laser {
 }
 
 impl OnHit for Pos<Laser> {
-    fn target_effect_on_hit(&self) -> Effect {
-        Effect { damage: self.bhv.hp }
-    }
 
     fn self_effect_on_hit(&self) -> Effect {
-        self.target_effect_on_hit()
+        Effect { damage: self.bhv.hp }
+    }
+    #[allow(unused_variables)]
+    fn effect_on_hit(&self, asset_manager: &AssetLoader) -> StateEffect {
+        StateEffect { burger_damage: self.bhv.hp, ..Default::default() }
     }
 }
 

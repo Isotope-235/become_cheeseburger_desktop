@@ -19,17 +19,13 @@ impl Default for HealthPack {
     }    
 }
 impl OnHit for Pos<HealthPack> {
-    fn target_effect_on_hit(&self) -> Effect {
-        Effect { damage: -2.00 }
-    }
-
     fn self_effect_on_hit(&self) -> Effect {
         Effect { damage: 1.00 }
     }
-    fn state_effect_on_hit(&self, asset_loader: &AssetLoader) -> StateEffect {
+    fn effect_on_hit(&self, asset_loader: &AssetLoader) -> StateEffect {
         asset_loader.play_sound("heal");
         let particles = Particle::from_center(6, rand(1.00), self.pos, 4.00, 0.00, 0.20, 20.00, *asset_loader.color("heart"));
-        StateEffect { particles, ..StateEffect::default() }
+        StateEffect { burger_damage: -2.00, particles, ..StateEffect::default() }
     }
 }
 impl TakeEffect for Pos<HealthPack> {

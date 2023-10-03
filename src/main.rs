@@ -241,25 +241,26 @@ impl State {
             // inter-unitary logic
             let burger_circle = self.burger.hit_circle();
             let mut state_effect = StateEffect::default();
-            let mut burger_effect = Effect::default();
 
             if self.cheese.hit_circle().is_hitting(&burger_circle) {
-                burger_effect += self.cheese.target_effect_on_hit();
                 self.cheese.takes_effect(&self.cheese.self_effect_on_hit());
-                state_effect += self.cheese.state_effect_on_hit(asset_loader);
+                state_effect += self.cheese.effect_on_hit(asset_loader);
             };
-            do_all_hits(&mut self.health_packs, &mut state_effect, &burger_circle, &mut burger_effect, asset_loader);
+            do_all_hits(&mut self.health_packs, &mut state_effect, &burger_circle, asset_loader);
 
             if self.burger.is_targetable() {
-                do_all_hits(&mut self.bullets, &mut state_effect, &burger_circle, &mut burger_effect, asset_loader);
-                do_all_hits(&mut self.slugs, &mut state_effect, &burger_circle, &mut burger_effect, asset_loader);
-                do_all_hits(&mut self.lasers, &mut state_effect, &burger_circle, &mut burger_effect, asset_loader);
-                do_all_hits(&mut self.flaks, &mut state_effect, &burger_circle, &mut burger_effect, asset_loader);
-                do_all_hits(&mut self.flak_children, &mut state_effect, &burger_circle, &mut burger_effect, asset_loader);
-                self.burger.takes_effect(&burger_effect);
+                do_all_hits(&mut self.bullets, &mut state_effect, &burger_circle, asset_loader);
+                do_all_hits(&mut self.slugs, &mut state_effect, &burger_circle, asset_loader);
+                do_all_hits(&mut self.lasers, &mut state_effect, &burger_circle, asset_loader);
+                do_all_hits(&mut self.flaks, &mut state_effect, &burger_circle, asset_loader);
+                do_all_hits(&mut self.flak_children, &mut state_effect, &burger_circle, asset_loader);
             }
-            state_effect.freeze += burger_effect.damage.max(0.00);
-            let StateEffect { score: added_score, freeze, particles } = state_effect;
+            state_effect.freeze += state_effect.burger_damage.max(0.00);
+            let StateEffect { score: added_score, freeze, particles, burger_damage } = state_effect;
+            if burger_damage > 0.00 {
+                dbg!();
+            }
+            self.burger.takes_effect(&Effect { damage: burger_damage });
             score += added_score;
             self.freeze += freeze;
             self.particles.extend(particles);
