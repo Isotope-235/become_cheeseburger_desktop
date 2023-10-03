@@ -1,6 +1,7 @@
 use std::ops::Add;
 use std::ops::AddAssign;
 use std::ops::Mul;
+use std::ops::MulAssign;
 use std::ops::Sub;
 
 /// A 2D vector with `f64` components.
@@ -138,24 +139,29 @@ impl Vector2 {
     }
 }
 
-impl AddAssign<Self> for Vector2 {
+impl AddAssign for Vector2 {
     fn add_assign(&mut self, rhs: Self) {
         let Vector2(ox, oy) = rhs;
         self.0 += ox;
         self.1 += oy;
     }
 }
+impl MulAssign<f64> for Vector2 {
+    fn mul_assign(&mut self, rhs: f64) {
+        *self = *self * rhs;
+    }
+}
 
-impl Add<Vector2> for Vector2 {
-    type Output = Vector2;
+impl Add for Vector2 {
+    type Output = Self;
 
     fn add(self, rhs: Vector2) -> Self::Output {
         Vector2(self.0 + rhs.0, self.1 + rhs.1)
     }
 }
 
-impl Sub<Vector2> for Vector2 {
-    type Output = Vector2;
+impl Sub for Vector2 {
+    type Output = Self;
 
     fn sub(self, rhs: Vector2) -> Self::Output {
         let Vector2(sx, sy) = self;
@@ -165,7 +171,7 @@ impl Sub<Vector2> for Vector2 {
 }
 
 impl Mul<f64> for Vector2 {
-    type Output = Vector2;
+    type Output = Self;
 
     fn mul(self, rhs: f64) -> Self::Output {
         Vector2(self.0 * rhs, self.1 * rhs)

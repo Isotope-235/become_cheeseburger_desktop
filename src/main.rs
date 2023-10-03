@@ -329,7 +329,7 @@ impl State {
             };
             { // particles
                 for particle in &mut self.particles {
-                    particle.vel = particle.vel * (1.00 - particle.bhv.friction).powf(dt);
+                    particle.vel *= (1.00 - particle.bhv.friction).powf(dt);
                 }
             };
 
