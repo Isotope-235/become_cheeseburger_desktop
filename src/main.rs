@@ -123,7 +123,7 @@ struct State {
 impl State {
     fn progress(&mut self, input: &Input, dt: f64, asset_loader: &AssetLoader) -> i32 {
         let mut score = 0;
-        for _ in 0..ITERATIONS as usize {
+        for _ in 0..ITERATIONS {
             if self.freeze > 0.00 {
                 self.freeze = (self.freeze - dt).max(0.00);
                 continue;
