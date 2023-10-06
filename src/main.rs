@@ -257,8 +257,10 @@ impl State {
             }
             state_effect.freeze += state_effect.burger_damage.max(0.00);
             let StateEffect { score: added_score, freeze, particles, burger_damage } = state_effect;
-            
-            self.burger.takes_effect(&Effect { damage: burger_damage });
+            if burger_damage > 0.00 {
+                asset_loader.play_sound("damage")
+            }
+            self.burger.bhv.hp -= burger_damage;
             score += added_score;
             self.freeze += freeze;
             self.particles.extend(particles);
