@@ -84,6 +84,13 @@ async fn main() {
         for (i, c) in score_chars.enumerate() {
             draw_text_ex(&c.to_owned().to_string(), 1.00 + i as f32 * 8.00, 9.00, text_params.clone());
         };
+        let last_score_text = fill_leading_zeroes(00000);
+        let score_chars = last_score_text.chars();
+        for (i, c) in score_chars.enumerate() {
+            let mut parameters = text_params.clone();
+            parameters.font_size = 40;
+            draw_text_ex(&c.to_owned().to_string(), 1.00 + i as f32 * 6.00, 18.00, parameters);
+        };
         set_default_camera();
         canvas.get_texture_mut().set_filter(FilterMode::Nearest);
         canvas.draw();
@@ -306,6 +313,7 @@ impl State {
                     if !warning.will_live() {
                         let dir = warning.dir();
                         let laser = Laser::new(warning.pos - dir * 40.00, dir * 7.00);
+                        asset_loader.play_sound("laser");
                         self.lasers.push(laser);
                     }
                 }
