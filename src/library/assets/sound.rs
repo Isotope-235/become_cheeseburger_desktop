@@ -82,14 +82,13 @@ impl SoundLoader {
     /// // ... load sounds using SoundLoader::load_many() ...
     /// sound_loader.play("sound_id");
     pub fn play(&self, id: &str) {
-        let sound_config = self.0.get(id).unwrap_or_else(|| panic!("Invalid sound id '{}' for playing", id));
+        let error_msg = format!("Invalid sound id '{}' for playing.", id);
+        
+        let sound_config = self.0.get(id).expect(&error_msg);
 
-        let sound_variations = self.1.get(id).unwrap_or_else(|| panic!("Invalid \
-        sound id '{}' for playing", id));
+        let sound_variations = self.1.get(id).expect(&error_msg);
 
         let sound = sound_variations.choose(&mut rand::thread_rng()).expect("Expected non-empty sound variations.");
-
-        println!("Playing sound: {:?}", sound);
 
         play_sound(sound, PlaySoundParams {
             looped: sound_config.looped,

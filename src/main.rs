@@ -100,23 +100,22 @@ async fn main() {
     }
 }
 
+pub struct Units<T> {
+    pub s: Vec<T>,
+    pub counter: f64
+}
 struct State {
     difficulty: f64,
     score: i32,
     freeze: f64,
     burger: Pos<Player>,
     cheese: Pos<Cheese>,
-    bullet_counter: f64,
-    bullets: Vec<Pos<Bullet>>,
-    slug_counter: f64,
-    slugs: Vec<Pos<Slug>>,
-    warning_counter: f64,
-    warnings: Vec<Pos<Warning>>,
+    bullet: Units<Pos<Bullet>>,
+    slug: Units<Pos<Slug>>,
+    warning: Units<Pos<Warning>>,
     lasers: Vec<Pos<Laser>>,
-    health_packs_counter: f64,
-    health_packs: Vec<Pos<HealthPack>>,
-    flak_counter: f64,
-    flaks: Vec<Pos<Frag>>,
+    health_pack: Units<Pos<HealthPack>>,
+    flak: Units<Pos<Frag>>,
     flak_children: Vec<Pos<FragChild>>,
     particles: Vec<Pos<Particle>>,
 }
@@ -136,7 +135,7 @@ impl State {
             // spawn_logic
 
             // bullets
-            let times = self.bullet_counter.revolve(1.10 + 0.25 * diff_scale, dt);
+            let times = self.bullet.counter.revolve(1.10 + 0.25 * diff_scale, dt);
 
             for _ in 0..times {
                 let side = rrange(4);
@@ -157,7 +156,7 @@ impl State {
                             vel * 1.25,
                             delay,
                         );
-                        self.bullets.push(bullet);
+                        self.bullet.s.push(bullet);
                     }
                 } else {
                     for i in 0..((1.00 + diff_scale * 2.00) as i32) {
@@ -168,7 +167,7 @@ impl State {
                             vel * 1.25,
                             delay,
                         );
-                        self.bullets.push(bullet);
+                        self.bullet.s.push(bullet);
                     }
                 }
             }
@@ -176,7 +175,7 @@ impl State {
             // cheeses
 
             // slugs
-            let times = self.slug_counter.revolve(0.125 + 0.025 * diff_scale, dt);
+            let times = self.slug.counter.revolve(0.125 + 0.025 * diff_scale, dt);
 
             for _ in 0..times {
                 let (pos, vel) = spawn_pos_vel(10.00, 10.00);
@@ -184,11 +183,11 @@ impl State {
                     pos,
                     vel * 0.50,
                 );
-                self.slugs.push(slug);
+                self.slug.s.push(slug);
             }
 
             // warnings
-            let times = self.warning_counter.revolve(0.15 + 0.10 * diff_scale, dt);
+            let times = self.warning.counter.revolve(0.15 + 0.10 * diff_scale, dt);
 
             for i in 0..(times * diff_scale as i32) {
                 let (mut pos, dir) = spawn_pos_vel(-12.00, 12.00);
@@ -199,11 +198,11 @@ impl State {
                 } else {
                     pos.1 = self.burger.pos.y() + shift;
                 }
-                self.warnings.push(Warning::new(pos, dir, i as f64 * (15.00)));
+                self.warning.s.push(Warning::new(pos, dir, i as f64 * (15.00)));
             }
 
             // health packs
-            let times = self.health_packs_counter.revolve(0.10 * (self.burger.missing_hp() - (self.health_packs.len() * 2) as f64).max(0.00).min(8.00), dt);
+            let times = self.health_pack.counter.revolve(0.10 * (self.burger.missing_hp() - (self.health_pack.s.len() * 2) as f64).max(0.00).min(8.00), dt);
 
             for _ in 0..times {
                 let (pos, vel) = spawn_pos_vel(10.00, 12.00);
@@ -211,10 +210,10 @@ impl State {
                     pos,
                     vel * 0.30,
                 );
-                self.health_packs.push(health_pack);
+                self.health_pack.s.push(health_pack);
             }
 
-            let times = self.flak_counter.revolve(0.10 + 0.02 * diff_scale, dt);
+            let times = self.flak.counter.revolve(0.10 + 0.02 * diff_scale, dt);
 
             for _ in 0..times {
                 let (pos, vel) = spawn_pos_vel(4.00, 4.00);
@@ -222,19 +221,20 @@ impl State {
                     pos,
                     vel * 0.50,
                 );
-                self.flaks.push(flak);
+                self.flak.s.push(flak);
             }
+            
 
             // movement logic
             self.burger.update_pos(dt);
             self.burger.stays_in_bounds();
             self.cheese.update_pos(dt);
-            update_all_pos(&mut self.bullets, dt);
-            update_all_pos(&mut self.slugs, dt);
-            update_all_pos(&mut self.warnings, dt);
+            update_all_pos(&mut self.bullet.s, dt);
+            update_all_pos(&mut self.slug.s, dt);
+            update_all_pos(&mut self.warning.s, dt);
             update_all_pos(&mut self.lasers, dt);
-            update_all_pos(&mut self.health_packs, dt);
-            update_all_pos(&mut self.flaks, dt);
+            update_all_pos(&mut self.health_pack.s, dt);
+            update_all_pos(&mut self.flak.s, dt);
             update_all_pos(&mut self.flak_children, dt);
             update_all_pos(&mut self.particles, dt);
 
@@ -246,20 +246,18 @@ impl State {
                 self.cheese.takes_effect(&self.cheese.self_effect_on_hit());
                 state_effect += self.cheese.effect_on_hit(asset_loader);
             };
-            do_all_hits(&mut self.health_packs, &mut state_effect, &burger_circle, asset_loader);
+            do_all_hits(&mut self.health_pack.s, &mut state_effect, &burger_circle, asset_loader);
 
             if self.burger.is_targetable() {
-                do_all_hits(&mut self.bullets, &mut state_effect, &burger_circle, asset_loader);
-                do_all_hits(&mut self.slugs, &mut state_effect, &burger_circle, asset_loader);
+                do_all_hits(&mut self.bullet.s, &mut state_effect, &burger_circle, asset_loader);
+                do_all_hits(&mut self.slug.s, &mut state_effect, &burger_circle, asset_loader);
                 do_all_hits(&mut self.lasers, &mut state_effect, &burger_circle, asset_loader);
-                do_all_hits(&mut self.flaks, &mut state_effect, &burger_circle, asset_loader);
+                do_all_hits(&mut self.flak.s, &mut state_effect, &burger_circle, asset_loader);
                 do_all_hits(&mut self.flak_children, &mut state_effect, &burger_circle, asset_loader);
             }
             state_effect.freeze += state_effect.burger_damage.max(0.00);
             let StateEffect { score: added_score, freeze, particles, burger_damage } = state_effect;
-            if burger_damage > 0.00 {
-                dbg!();
-            }
+            
             self.burger.takes_effect(&Effect { damage: burger_damage });
             score += added_score;
             self.freeze += freeze;
@@ -301,8 +299,8 @@ impl State {
             { // slugs
                 // nothing for now
             };
-            { // warnings
-                for warning in &self.warnings {
+            { // warning.s
+                for warning in &self.warning.s {
                     if !warning.will_live() {
                         let dir = warning.dir();
                         let laser = Laser::new(warning.pos - dir * 40.00, dir * 7.00);
@@ -316,8 +314,8 @@ impl State {
             { // health packs
                 // nothing for now
             };
-            { // flaks
-                for flak in &self.flaks {
+            { // flak.s
+                for flak in &self.flak.s {
                     if !flak.will_live() {
                         let number = 8;
                         for i in 0..number {
@@ -335,12 +333,12 @@ impl State {
             };
 
             // remove elements
-            self.bullets.retain(|b| b.age < 750.00 && b.bhv.hp > 1e-10);
-            self.slugs.retain(|s| s.age < 1500.00 && s.bhv.hp > 1e-10);
-            self.warnings.retain(|w| w.will_live());
+            self.bullet.s.retain(|b| b.age < 750.00 && b.bhv.hp > 1e-10);
+            self.slug.s.retain(|s| s.age < 1500.00 && s.bhv.hp > 1e-10);
+            self.warning.s.retain(|w| w.will_live());
             self.lasers.retain(|l| l.age < 500.00 && l.bhv.hp > 1e-10);
-            self.health_packs.retain(|hp| hp.age < 500.00 && hp.bhv.hp > 1e-10);
-            self.flaks.retain(|f| f.will_live());
+            self.health_pack.s.retain(|hp| hp.age < 500.00 && hp.bhv.hp > 1e-10);
+            self.flak.s.retain(|f| f.will_live());
             self.flak_children.retain(|c| c.age < 300.00 && c.bhv.hp > 1e-10);
             self.particles.retain(|p| p.age <= p.bhv.lifetime);
 
@@ -359,19 +357,19 @@ impl State {
         // cheese
         copy_texture(asset_loader.texture("cheese"), self.cheese.pos);
         // health packs
-        for health_pack in &self.health_packs {
+        for health_pack in &self.health_pack.s {
             copy_texture(asset_loader.texture("heart"), health_pack.pos);
         }
         // bullets
-        for bullet in &self.bullets {
+        for bullet in &self.bullet.s {
             copy_texture(asset_loader.texture("bullet"), bullet.pos);
         }
         // slugs
-        for slug in &self.slugs {
+        for slug in &self.slug.s {
             copy_with_rotation(asset_loader.texture("slug"), slug.pos, slug.vel.angle() + PI * 0.50);
         }
-        // warnings
-        for warning in &self.warnings {
+        // warning.s
+        for warning in &self.warning.s {
             if warning.is_visible() {
                 let dur = 6.00;
                 let clr = match warning.age % dur < dur * 0.50 {
@@ -390,7 +388,7 @@ impl State {
             draw_rec(laser.pos, w, h, Color::from_rgba(255, 55, 55, 255));
         }
         // flak
-        for flak in &self.flaks {
+        for flak in &self.flak.s {
             copy_texture(asset_loader.texture("flak"), flak.pos);
         }
         // flak children
@@ -432,17 +430,12 @@ impl State {
             freeze: 0.00,
             burger: Player::new(center() + Vector2(0.00, 12.00)),
             cheese: Cheese::new(center() - Vector2(0.00, 12.00)),
-            bullet_counter: 0.00,
-            bullets: Vec::new(),
-            slug_counter: 0.00,
-            slugs: Vec::new(),
-            warning_counter: 0.00,
-            warnings: Vec::new(),
+            bullet: Units { s: Vec::new(), counter: 0.00 },
+            slug: Units { s: Vec::new(), counter: 0.00 },
+            warning: Units { s: Vec::new(), counter: 0.00 },
             lasers: Vec::new(),
-            health_packs_counter: 0.00,
-            health_packs: Vec::new(),
-            flak_counter: 0.00,
-            flaks: Vec::new(),
+            health_pack: Units { s: Vec::new(), counter: 0.00 },
+            flak: Units { s: Vec::new(), counter: 0.00 },
             flak_children: Vec::new(),
             particles: Vec::new(),
         }
