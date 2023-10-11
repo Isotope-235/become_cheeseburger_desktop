@@ -2,14 +2,13 @@
 
 use std::ops::AddAssign;
 
-
 use crate::*;
 pub struct Pos<T> {
     pub pos: Vector2,
     pub vel: Vector2,
     pub acc: Vector2,
     pub age: f64,
-    pub bhv: T
+    pub bhv: T,
 }
 
 impl<T> Pos<T> {
@@ -22,19 +21,28 @@ impl<T> Pos<T> {
 
 impl<T: Default> Default for Pos<T> {
     fn default() -> Self {
-        Self { pos: center(), vel: Vector2::ZERO, acc: Vector2::ZERO, age: 0.00, bhv: T::default() }
+        Self {
+            pos: center(),
+            vel: Vector2::ZERO,
+            acc: Vector2::ZERO,
+            age: 0.00,
+            bhv: T::default(),
+        }
     }
 }
 
 pub fn update_all_pos<T>(items: &mut Vec<Pos<T>>, dt: f64) {
-    
     for item in items {
         item.update_pos(dt)
     }
 }
 
-pub fn do_all_hits<T: HitBox + OnHit + TakeEffect>(items: &mut Vec<T>, state_effect_accumulator:
-&mut StateEffect, burger_circle: &Circle, asset_manager: &AssetLoader) {
+pub fn do_all_hits<T: HitBox + OnHit + TakeEffect>(
+    items: &mut Vec<T>,
+    state_effect_accumulator: &mut StateEffect,
+    burger_circle: &Circle,
+    asset_manager: &AssetLoader,
+) {
     for item in items {
         if item.hit_circle().is_hitting(burger_circle) {
             *state_effect_accumulator += item.effect_on_hit(asset_manager);
@@ -58,7 +66,7 @@ pub trait TakeEffect {
 }
 
 pub struct Effect {
-    pub damage: f64
+    pub damage: f64,
 }
 
 impl Default for Effect {
@@ -76,13 +84,23 @@ pub struct StateEffect {
 
 impl Default for StateEffect {
     fn default() -> Self {
-        StateEffect { score: 0, freeze: 0.00, particles: Vec::new(), burger_damage: 0.00 }
+        StateEffect {
+            score: 0,
+            freeze: 0.00,
+            particles: Vec::new(),
+            burger_damage: 0.00,
+        }
     }
 }
 
 impl AddAssign<StateEffect> for StateEffect {
     fn add_assign(&mut self, rhs: StateEffect) {
-        let StateEffect { score, freeze, particles, burger_damage } = rhs;
+        let StateEffect {
+            score,
+            freeze,
+            particles,
+            burger_damage,
+        } = rhs;
         self.burger_damage += burger_damage;
         self.score += score;
         self.freeze += freeze;
@@ -103,7 +121,7 @@ pub trait HitBox: Sized {
 
 pub struct Circle {
     pos: Vector2,
-    rad: f64
+    rad: f64,
 }
 
 impl Circle {

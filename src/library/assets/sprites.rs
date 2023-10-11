@@ -26,7 +26,6 @@ impl Default for SpriteLoader {
     }
 }
 
-
 impl SpriteLoader {
     pub fn new() -> Self {
         SpriteLoader(HashMap::new())
@@ -38,22 +37,32 @@ impl SpriteLoader {
             let full_path = format!("assets/sprites/{}.png", path_color.0);
             let texture = load_texture(&full_path).await;
 
-            let t = texture.unwrap_or_else(
-                |_err| panic!("Invalid sprite name argument! Path: {}", full_path)
-            );
+            let t = texture
+                .unwrap_or_else(|_err| panic!("Invalid sprite name argument! Path: {}", full_path));
 
-            self.0.insert(path_color.0, Sprite {
-                color: path_color.1,
-                texture: t,
-            });
+            self.0.insert(
+                path_color.0,
+                Sprite {
+                    color: path_color.1,
+                    texture: t,
+                },
+            );
         }
     }
 
     pub fn texture(&self, path: &str) -> &Texture2D {
-        &self.0.get(path).unwrap_or_else(|| panic!("Invalid path '{}' for texture", path)).texture
+        &self
+            .0
+            .get(path)
+            .unwrap_or_else(|| panic!("Invalid path '{}' for texture", path))
+            .texture
     }
 
     pub fn color(&self, path: &str) -> &Color {
-        &self.0.get(path).unwrap_or_else(|| panic!("Invalid path '{}' for color", path)).color
+        &self
+            .0
+            .get(path)
+            .unwrap_or_else(|| panic!("Invalid path '{}' for color", path))
+            .color
     }
 }

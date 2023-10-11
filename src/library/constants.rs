@@ -1,5 +1,5 @@
-use macroquad::prelude::*;
 use crate::*;
+use macroquad::prelude::*;
 
 pub const TITLE: &str = "Limited Alpha v0.2.0 - Become Cheeseburger: Desktop Edition";
 pub const ITERATIONS: i32 = 5;

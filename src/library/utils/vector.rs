@@ -21,17 +21,17 @@ impl From<(f64, f64)> for Vector2 {
 
 impl Vector2 {
     /// The null vector.
-    /// 
+    ///
     /// ## Example
-    /// 
+    ///
     /// ```
     /// assert_eq!(Vector2::ZERO, Vector2(0.00, 0.00));
     /// ```
     pub const ZERO: Vector2 = Vector2(0.00, 0.00);
     /// Returns the length of the vector *before* applying the square root.
-    /// 
+    ///
     /// ## Example
-    /// 
+    ///
     /// ```
     /// let v = Vector2(1.00, 1.00);
     /// assert_eq!(v.square_len(), 2.00);
@@ -41,9 +41,9 @@ impl Vector2 {
         x.powi(2) + y.powi(2)
     }
     /// Returns the length of the vector. Equivalent to `self.square_len().sqrt()`.
-    /// 
+    ///
     /// ## Example
-    /// 
+    ///
     /// ```
     /// let v = Vector2(1.00, 1.00);
     /// assert_eq!(v.len(), 2.00f64.sqrt());
@@ -62,7 +62,7 @@ impl Vector2 {
         }
     }
     /// Returns the angle of the vector in radians.
-    /// 
+    ///
     /// This method uses the `atan2` implementation, and will therefore always respect the signs of the components.
     pub fn angle(self) -> f64 {
         let Vector2(x, y) = self;
@@ -79,9 +79,9 @@ impl Vector2 {
         Vector2(y, x)
     }
     /// Returns the vector rotated 90 degrees counter-clockwise.
-    /// 
+    ///
     /// ## Example
-    /// 
+    ///
     /// ```
     /// let v = Vector2(0.00, 1.00);
     /// assert_eq!(v.rotate_once(), Vector2(-1.00, 0.00));
@@ -91,9 +91,9 @@ impl Vector2 {
         Vector2(-y, x)
     }
     /// Returns the x component of the vector.
-    /// 
+    ///
     /// ## Example
-    /// 
+    ///
     /// ```
     /// let v = Vector2(1.00, 2.00);
     /// assert_eq!(v.x(), 1.00);
@@ -102,9 +102,9 @@ impl Vector2 {
         self.0
     }
     /// Returns the y component of the vector.
-    /// 
+    ///
     /// ## Example
-    /// 
+    ///
     /// ```
     /// let v = Vector2(1.00, 2.00);
     /// assert_eq!(v.y(), 2.00);
@@ -122,11 +122,11 @@ impl Vector2 {
         }
     }
     /// Returns the vector multiplied component-wise by the given vector.
-    /// 
+    ///
     /// Should not be confused with the dot product.
-    /// 
+    ///
     /// ## Example
-    /// 
+    ///
     /// ```
     /// let v1 = Vector2(1.00, 2.00);
     /// let v2 = Vector2(-1.00, 2.00);

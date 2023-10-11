@@ -14,7 +14,17 @@ impl HitBox for Pos<Player> {
 
 impl Player {
     pub fn new(pos: Vector2) -> Pos<Self> {
-        Pos { pos, vel: Vector2::ZERO, acc: Vector2::ZERO, age: 0.00, bhv: Player { hp: 8.00, invuln: 0.00, dash_charge: 1.00 } }
+        Pos {
+            pos,
+            vel: Vector2::ZERO,
+            acc: Vector2::ZERO,
+            age: 0.00,
+            bhv: Player {
+                hp: 8.00,
+                invuln: 0.00,
+                dash_charge: 1.00,
+            },
+        }
     }
 }
 

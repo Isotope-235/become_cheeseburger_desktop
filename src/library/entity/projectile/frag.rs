@@ -1,7 +1,7 @@
 use crate::*;
 
 pub struct Frag {
-    hp: f64
+    hp: f64,
 }
 impl HitBox for Pos<Frag> {
     fn hit_circle(&self) -> pos::Circle {
@@ -10,7 +10,11 @@ impl HitBox for Pos<Frag> {
 }
 impl Frag {
     pub fn new(pos: Vector2, vel: Vector2) -> Pos<Frag> {
-        Pos { pos, vel, ..Pos::default() }
+        Pos {
+            pos,
+            vel,
+            ..Pos::default()
+        }
     }
 }
 impl Default for Frag {
@@ -24,13 +28,17 @@ impl Pos<Frag> {
     }
 }
 impl OnHit for Pos<Frag> {
-
     fn self_effect_on_hit(&self) -> Effect {
-        Effect { damage: self.bhv.hp }
+        Effect {
+            damage: self.bhv.hp,
+        }
     }
     #[allow(unused_variables)]
     fn effect_on_hit(&self, asset_manager: &AssetLoader) -> StateEffect {
-        StateEffect { burger_damage: self.bhv.hp, ..Default::default() }
+        StateEffect {
+            burger_damage: self.bhv.hp,
+            ..Default::default()
+        }
     }
 }
 impl TakeEffect for Pos<Frag> {
@@ -40,7 +48,7 @@ impl TakeEffect for Pos<Frag> {
     }
 }
 pub struct FragChild {
-    pub hp: f64
+    pub hp: f64,
 }
 impl HitBox for Pos<FragChild> {
     fn hit_circle(&self) -> pos::Circle {
@@ -49,7 +57,12 @@ impl HitBox for Pos<FragChild> {
 }
 impl FragChild {
     pub fn new(pos: Vector2, vel: Vector2, acc: Vector2) -> Pos<FragChild> {
-        Pos { pos, vel, acc, ..Pos::default() }
+        Pos {
+            pos,
+            vel,
+            acc,
+            ..Pos::default()
+        }
     }
 }
 impl Default for FragChild {
@@ -58,13 +71,17 @@ impl Default for FragChild {
     }
 }
 impl OnHit for Pos<FragChild> {
-
     fn self_effect_on_hit(&self) -> Effect {
-        Effect { damage: self.bhv.hp }
+        Effect {
+            damage: self.bhv.hp,
+        }
     }
     #[allow(unused_variables)]
     fn effect_on_hit(&self, asset_manager: &AssetLoader) -> StateEffect {
-        StateEffect { burger_damage: self.bhv.hp, ..Default::default() }
+        StateEffect {
+            burger_damage: self.bhv.hp,
+            ..Default::default()
+        }
     }
 }
 impl TakeEffect for Pos<FragChild> {

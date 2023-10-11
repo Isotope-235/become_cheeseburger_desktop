@@ -1,7 +1,7 @@
 use crate::*;
 
 pub struct Slug {
-    pub hp: f64
+    pub hp: f64,
 }
 impl HitBox for Pos<Slug> {
     fn hit_circle(&self) -> pos::Circle {
@@ -10,7 +10,11 @@ impl HitBox for Pos<Slug> {
 }
 impl Slug {
     pub fn new(pos: Vector2, vel: Vector2) -> Pos<Slug> {
-        Pos { pos, vel, ..Pos::default() }
+        Pos {
+            pos,
+            vel,
+            ..Pos::default()
+        }
     }
 }
 impl Default for Slug {
@@ -19,13 +23,17 @@ impl Default for Slug {
     }
 }
 impl OnHit for Pos<Slug> {
-
     fn self_effect_on_hit(&self) -> Effect {
-        Effect { damage: self.bhv.hp }
+        Effect {
+            damage: self.bhv.hp,
+        }
     }
     #[allow(unused_variables)]
     fn effect_on_hit(&self, asset_manager: &AssetLoader) -> StateEffect {
-        StateEffect { burger_damage: self.bhv.hp, ..Default::default() }
+        StateEffect {
+            burger_damage: self.bhv.hp,
+            ..Default::default()
+        }
     }
 }
 impl TakeEffect for Pos<Slug> {

@@ -2,17 +2,24 @@ use crate::*;
 
 pub struct Warning {
     dir: Vector2,
-    pub delay: f64
+    pub delay: f64,
 }
 
 impl Warning {
     pub fn new(pos: Vector2, dir: Vector2, delay: f64) -> Pos<Warning> {
-        Pos { pos, bhv: Warning { dir, delay }, ..Pos::default() }
+        Pos {
+            pos,
+            bhv: Warning { dir, delay },
+            ..Pos::default()
+        }
     }
 }
 impl Default for Warning {
     fn default() -> Self {
-        Warning { dir: Vector2::ZERO, delay: 0.00 }
+        Warning {
+            dir: Vector2::ZERO,
+            delay: 0.00,
+        }
     }
 }
 impl Pos<Warning> {

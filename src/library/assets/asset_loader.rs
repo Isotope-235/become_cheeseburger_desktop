@@ -1,7 +1,4 @@
-use macroquad::{
-    color::Color,
-    texture::Texture2D,
-};
+use macroquad::{color::Color, texture::Texture2D};
 
 use super::sound::*;
 use super::sprites::*;

@@ -12,7 +12,11 @@ impl HitBox for Pos<Laser> {
 
 impl Laser {
     pub fn new(pos: Vector2, vel: Vector2) -> Pos<Laser> {
-        Pos { pos, vel, ..Pos::default() }
+        Pos {
+            pos,
+            vel,
+            ..Pos::default()
+        }
     }
 }
 
@@ -23,13 +27,17 @@ impl Default for Laser {
 }
 
 impl OnHit for Pos<Laser> {
-
     fn self_effect_on_hit(&self) -> Effect {
-        Effect { damage: self.bhv.hp }
+        Effect {
+            damage: self.bhv.hp,
+        }
     }
     #[allow(unused_variables)]
     fn effect_on_hit(&self, asset_manager: &AssetLoader) -> StateEffect {
-        StateEffect { burger_damage: self.bhv.hp, ..Default::default() }
+        StateEffect {
+            burger_damage: self.bhv.hp,
+            ..Default::default()
+        }
     }
 }
 
