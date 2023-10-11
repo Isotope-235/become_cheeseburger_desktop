@@ -37,15 +37,21 @@ pub fn update_all_pos<T>(items: &mut Vec<Pos<T>>, dt: f64) {
     }
 }
 
-pub fn do_all_hits<T: HitBox + OnHit + TakeEffect>(
-    items: &mut Vec<T>,
-    state_effect_accumulator: &mut StateEffect,
-    burger_circle: &Circle,
-    asset_manager: &AssetLoader,
-) {
+pub struct HitInfo<'a> {
+    pub state_effect_accumulator: &'a mut StateEffect,
+    pub burger_circle: &'a Circle,
+    pub asset_manager: &'a AssetLoader,
+}
+
+pub fn do_all_hits<T: HitBox + OnHit + TakeEffect>(items: &mut Vec<T>, hit_info: &mut HitInfo) {
+    let HitInfo {
+        state_effect_accumulator,
+        burger_circle,
+        asset_manager,
+    } = hit_info;
     for item in items {
-        if item.hit_circle().is_hitting(burger_circle) {
-            *state_effect_accumulator += item.effect_on_hit(asset_manager);
+        if item.hit_circle().is_hitting(hit_info.burger_circle) {
+            **state_effect_accumulator += item.effect_on_hit(hit_info.asset_manager);
             item.takes_effect(&item.self_effect_on_hit());
         }
     }

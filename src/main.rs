@@ -135,9 +135,10 @@ struct State {
     warning: Units<Pos<Warning>>,
     lasers: Vec<Pos<Laser>>,
     health_pack: Units<Pos<HealthPack>>,
-    flak: Units<Pos<Frag>>,
+    frag: Units<Pos<Frag>>,
     flak_children: Vec<Pos<FragChild>>,
     particles: Vec<Pos<Particle>>,
+    cross_counter: f64,
 }
 
 impl State {
@@ -226,12 +227,32 @@ impl State {
                 self.health_pack.s.push(health_pack);
             }
 
-            let times = self.flak.counter.revolve(0.10 + 0.02 * diff_scale, dt);
+            // frag
+            let times = self.frag.counter.revolve(0.10 + 0.02 * diff_scale, dt);
 
             for _ in 0..times {
                 let (pos, vel) = spawn_pos_vel(4.00, 4.00);
-                let flak = Frag::new(pos, vel * 0.50);
-                self.flak.s.push(flak);
+                let frag = Frag::new(pos, vel * 0.50);
+                self.frag.s.push(frag);
+            }
+
+            let times = self
+                .cross_counter
+                .revolve((-0.50 + 0.25 * diff_scale).max(0.00), dt);
+
+            for _ in 0..times {
+                for i in 0..4 {
+                    let starting_point = screen().mul_per(num_to_corner(i));
+                    let direction = center() - starting_point;
+                    let vel = direction.normal();
+                    for ii in 0..3 {
+                        self.bullet.s.push(Bullet::new(
+                            starting_point - vel * 10.00 * ii as f64,
+                            vel * 1.75,
+                            0.00,
+                        ))
+                    }
+                }
             }
 
             // movement logic
@@ -243,7 +264,7 @@ impl State {
             update_all_pos(&mut self.warning.s, dt);
             update_all_pos(&mut self.lasers, dt);
             update_all_pos(&mut self.health_pack.s, dt);
-            update_all_pos(&mut self.flak.s, dt);
+            update_all_pos(&mut self.frag.s, dt);
             update_all_pos(&mut self.flak_children, dt);
             update_all_pos(&mut self.particles, dt);
 
@@ -255,44 +276,18 @@ impl State {
                 self.cheese.takes_effect(&self.cheese.self_effect_on_hit());
                 state_effect += self.cheese.effect_on_hit(asset_loader);
             };
-            do_all_hits(
-                &mut self.health_pack.s,
-                &mut state_effect,
-                &burger_circle,
-                asset_loader,
-            );
-
+            let hit_info = &mut HitInfo {
+                state_effect_accumulator: &mut state_effect,
+                burger_circle: &burger_circle,
+                asset_manager: asset_loader,
+            };
+            do_all_hits(&mut self.health_pack.s, hit_info);
             if self.burger.is_targetable() {
-                do_all_hits(
-                    &mut self.bullet.s,
-                    &mut state_effect,
-                    &burger_circle,
-                    asset_loader,
-                );
-                do_all_hits(
-                    &mut self.slug.s,
-                    &mut state_effect,
-                    &burger_circle,
-                    asset_loader,
-                );
-                do_all_hits(
-                    &mut self.lasers,
-                    &mut state_effect,
-                    &burger_circle,
-                    asset_loader,
-                );
-                do_all_hits(
-                    &mut self.flak.s,
-                    &mut state_effect,
-                    &burger_circle,
-                    asset_loader,
-                );
-                do_all_hits(
-                    &mut self.flak_children,
-                    &mut state_effect,
-                    &burger_circle,
-                    asset_loader,
-                );
+                do_all_hits(&mut self.bullet.s, hit_info);
+                do_all_hits(&mut self.slug.s, hit_info);
+                do_all_hits(&mut self.lasers, hit_info);
+                do_all_hits(&mut self.frag.s, hit_info);
+                do_all_hits(&mut self.flak_children, hit_info);
             }
             state_effect.freeze += state_effect.burger_damage.max(0.00);
             let StateEffect {
@@ -366,7 +361,7 @@ impl State {
             };
             {
                 // flak.s
-                for flak in &self.flak.s {
+                for flak in &self.frag.s {
                     if !flak.will_live() {
                         let number = 8;
                         for i in 0..number {
@@ -393,7 +388,7 @@ impl State {
             self.health_pack
                 .s
                 .retain(|hp| hp.age < 500.00 && hp.bhv.hp > 1e-10);
-            self.flak.s.retain(|f| f.will_live());
+            self.frag.s.retain(|f| f.will_live());
             self.flak_children
                 .retain(|c| c.age < 300.00 && c.bhv.hp > 1e-10);
             self.particles.retain(|p| p.age <= p.bhv.lifetime);
@@ -448,7 +443,7 @@ impl State {
             draw_rec(laser.pos, w, h, Color::from_rgba(255, 55, 55, 255));
         }
         // flak
-        for flak in &self.flak.s {
+        for flak in &self.frag.s {
             copy_texture(asset_loader.texture("flak"), flak.pos);
         }
         // flak children
@@ -517,13 +512,24 @@ impl State {
                 s: Vec::new(),
                 counter: 0.00,
             },
-            flak: Units {
+            frag: Units {
                 s: Vec::new(),
                 counter: 0.00,
             },
             flak_children: Vec::new(),
             particles: Vec::new(),
+            cross_counter: 0.00,
         }
+    }
+}
+
+fn num_to_corner(num: i32) -> Vector2 {
+    match num % 4 {
+        1 => Vector2(0.00, 0.00),
+        2 => Vector2(1.00, 0.00),
+        3 => Vector2(1.00, 1.00),
+        0 => Vector2(0.00, 1.00),
+        _ => panic!("dear god"),
     }
 }
 
