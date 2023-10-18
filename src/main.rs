@@ -1,7 +1,7 @@
 //#![windows_subsystem = "windows"]
 use std::f64::consts::PI;
 
-use macroquad::prelude::*;
+use macroquad::{prelude::*, rand::ChooseRandom};
 use macroquad_canvas::Canvas2D;
 
 use library::*;
@@ -136,7 +136,7 @@ struct State {
     lasers: Vec<Pos<Laser>>,
     health_pack: Units<Pos<HealthPack>>,
     frag: Units<Pos<Frag>>,
-    flak_children: Vec<Pos<FragChild>>,
+    frag_children: Vec<Pos<FragChild>>,
     particles: Vec<Pos<Particle>>,
     cross_counter: f64,
 }
@@ -238,7 +238,7 @@ impl State {
 
             let times = self
                 .cross_counter
-                .revolve((-0.50 + 0.25 * diff_scale).max(0.00), dt);
+                .revolve((-0.25 + 0.135 * diff_scale).max(0.00), dt);
 
             for _ in 0..times {
                 for i in 0..4 {
@@ -265,7 +265,7 @@ impl State {
             update_all_pos(&mut self.lasers, dt);
             update_all_pos(&mut self.health_pack.s, dt);
             update_all_pos(&mut self.frag.s, dt);
-            update_all_pos(&mut self.flak_children, dt);
+            update_all_pos(&mut self.frag_children, dt);
             update_all_pos(&mut self.particles, dt);
 
             // inter-unitary logic
@@ -287,22 +287,12 @@ impl State {
                 do_all_hits(&mut self.slug.s, hit_info);
                 do_all_hits(&mut self.lasers, hit_info);
                 do_all_hits(&mut self.frag.s, hit_info);
-                do_all_hits(&mut self.flak_children, hit_info);
+                do_all_hits(&mut self.frag_children, hit_info);
             }
-            state_effect.freeze += state_effect.burger_damage.max(0.00);
-            let StateEffect {
-                score: added_score,
-                freeze,
-                particles,
-                burger_damage,
-            } = state_effect;
-            if burger_damage > 0.00 {
+            if state_effect.burger_damage > 0.00 {
                 asset_loader.play_sound("damage")
             }
-            self.burger.bhv.hp -= burger_damage;
-            score += added_score;
-            self.freeze += freeze;
-            self.particles.extend(particles);
+            self.takes_effect(state_effect, &mut score);
             if self.freeze > 0.00 {
                 // making sure that the player sees the fatal projectile
                 self.freeze = (self.freeze - dt).max(0.00);
@@ -360,18 +350,21 @@ impl State {
                  // nothing for now
             };
             {
-                // flak.s
-                for flak in &self.frag.s {
-                    if !flak.will_live() {
+                // frags
+                for frak in &self.frag.s {
+                    if !frak.will_live() {
                         let number = 8;
                         for i in 0..number {
                             let dir = (i as f64).as_radians() / number as f64;
                             let child =
-                                FragChild::new(flak.pos, Vector2::ZERO, Vector2::from(dir) * 0.01);
-                            self.flak_children.push(child);
+                                FragChild::new(frak.pos, Vector2::ZERO, Vector2::from(dir) * 0.01);
+                            self.frag_children.push(child);
                         }
                     }
                 }
+            };
+            { // frag children
+                self.frag_children.shuffle();
             };
             {
                 // particles
@@ -389,7 +382,7 @@ impl State {
                 .s
                 .retain(|hp| hp.age < 500.00 && hp.bhv.hp > 1e-10);
             self.frag.s.retain(|f| f.will_live());
-            self.flak_children
+            self.frag_children
                 .retain(|c| c.age < 300.00 && c.bhv.hp > 1e-10);
             self.particles.retain(|p| p.age <= p.bhv.lifetime);
 
@@ -447,7 +440,7 @@ impl State {
             copy_texture(asset_loader.texture("flak"), flak.pos);
         }
         // flak children
-        for flak_child in &self.flak_children {
+        for flak_child in &self.frag_children {
             copy_texture(asset_loader.texture("flak_child"), flak_child.pos);
         }
         // particles
@@ -516,10 +509,16 @@ impl State {
                 s: Vec::new(),
                 counter: 0.00,
             },
-            flak_children: Vec::new(),
+            frag_children: Vec::new(),
             particles: Vec::new(),
             cross_counter: 0.00,
         }
+    }
+    fn takes_effect(&mut self, effect: StateEffect, score_accumulator: &mut i32) {
+        *score_accumulator += effect.score;
+        self.freeze += effect.freeze + effect.burger_damage.max(0.00);
+        self.burger.bhv.hp -= effect.burger_damage;
+        self.particles.extend(effect.particles);
     }
 }
 
