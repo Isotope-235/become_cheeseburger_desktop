@@ -225,7 +225,7 @@ impl State {
 
             for _ in 0..times {
                 for i in 0..4 {
-                    let starting_point = CENTER.mul_per(num_to_corner(i));
+                    let starting_point = SCREEN.mul_per(num_to_corner(i));
                     let direction = CENTER - starting_point;
                     let vel = direction.normal();
                     for ii in 0..3 {
