@@ -1,6 +1,6 @@
 //#![windows_subsystem = "windows"]
 
-use std::{f64::consts::PI, cell::Cell};
+use std::f64::consts::PI;
 
 use macroquad::{prelude::*, rand::ChooseRandom};
 use macroquad_canvas::Canvas2D;
@@ -23,13 +23,13 @@ async fn main() {
     let mut camera = Camera2D::from_display_rect(Rect::new(
         0.00,
         0.00,
-        (CENTER.x() * 2.00) as f32,
-        (CENTER.y() * 2.00) as f32,
+        SCREEN_X as f32,
+        SCREEN_Y as f32,
     ));
     camera.zoom = vec2(camera.zoom.x, camera.zoom.y * -1.00);
     set_camera(&camera);
 
-    let mut canvas = Canvas2D::new((CENTER.x() * 2.00) as f32, (CENTER.y() * 2.00) as f32);
+    let mut canvas = Canvas2D::new(SCREEN_X as f32, SCREEN_Y as f32);
     canvas.get_texture_mut().set_filter(FilterMode::Nearest);
 
     // asset loading
@@ -437,7 +437,7 @@ impl State {
         let w = self.burger.bhv.hp * 8.00;
         let from_bot = h + 2;
         let mw = mhp * 8.00;
-        let window_height = CENTER.y() * 2.00;
+        let window_height = CENTER_Y * 2.00;
         let hp_pos = Vector2(2.00, window_height - from_bot as f64);
         draw_rec_top_left(hp_pos, mw as i32, h, Color::from_rgba(155, 155, 155, 255));
         draw_rec_top_left(
