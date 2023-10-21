@@ -45,7 +45,7 @@ impl AssetLoader {
     ///
     /// asset_loader.texture("sprite_id"); // Returns a Texture2D
     /// ```
-    pub async fn load_sprites<T: Into<PathColor>>(&mut self, sprite_paths: Vec<T>) -> &mut Self {
+    pub async fn load_sprites(&mut self, sprite_paths: Vec<impl IntoPathColor>) -> &mut Self {
         self.sprites.load_many(sprite_paths).await;
         self
     }

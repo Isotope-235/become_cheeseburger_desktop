@@ -13,17 +13,19 @@ pub struct Sprite {
 #[derive(Debug)]
 pub struct SpriteLoader(HashMap<String, Sprite>);
 
-pub struct PathColor(pub String, pub Color);
+pub trait IntoPathColor {
+    fn into(self) -> (String, Color);
+}
 
-impl From<(&str, Color)> for PathColor {
-    fn from(value: (&str, Color)) -> Self {
-        PathColor(value.0.to_string(), value.1)
+impl IntoPathColor for (&str, Color) {
+    fn into(self) -> (String, Color) {
+        (self.0.to_string(), self.1)
     }
 }
 
-impl From<&str> for PathColor {
-    fn from(value: &str) -> Self {
-        PathColor(value.to_string(), Color::default())
+impl IntoPathColor for &str {
+    fn into(self) -> (String, Color) {
+        (self.to_string(), Color::default())
     }
 }
 
@@ -38,20 +40,18 @@ impl SpriteLoader {
         SpriteLoader(HashMap::new())
     }
 
-    pub async fn load_many(&mut self, paths: Vec<impl Into<PathColor>>) {
+    pub async fn load_many(&mut self, paths: Vec<impl IntoPathColor>) {
         for pc in paths {
-            let path_color = pc.into();
-            let full_path = format!("assets/sprites/{}.png", path_color.0);
-            let texture = load_texture(&full_path).await;
+            let (path, color) = pc.into();
+            let full_path = format!("assets/sprites/{}.png", path);
 
-            let t = texture
-                .unwrap_or_else(|_err| panic!("Invalid sprite name argument! Path: {}", full_path));
+            let texture = load_texture(&full_path).await.unwrap_or_else(|_err| panic!("Invalid sprite name argument! Path: {}", full_path));
 
             self.0.insert(
-                path_color.0,
+                path,
                 Sprite {
-                    color: path_color.1,
-                    texture: t,
+                    color,
+                    texture,
                 },
             );
         }

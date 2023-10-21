@@ -46,8 +46,7 @@ async fn main() {
         .load_sprites(vec![
             ("cheese", Color::from_rgba(255, 221, 86, 255)),
             ("heart", Color::from_rgba(221, 16, 85, 255)),
-        ]).await;
-    asset_loader
+        ]).await
         .load_sounds(vec!["explosion", "heal", "laser", "damage", "dash"])
         .await;
 
