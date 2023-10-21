@@ -30,7 +30,9 @@ impl AssetLoader {
     /// making the sprites loaded available for rendering the [Texture2D]s
     ///
     /// This function also allows assigning a color for each sprite, facilitating particle
-    /// effects and such
+    /// effects and such.
+    /// 
+    /// It returns a reference to itself to facilitate chain calls.
     ///
     /// ## Example
     /// ```
@@ -43,8 +45,9 @@ impl AssetLoader {
     ///
     /// asset_loader.texture("sprite_id"); // Returns a Texture2D
     /// ```
-    pub async fn load_sprites<T: Into<PathColor>>(&mut self, sprite_paths: Vec<T>) {
+    pub async fn load_sprites<T: Into<PathColor>>(&mut self, sprite_paths: Vec<T>) -> &mut Self {
         self.sprites.load_many(sprite_paths).await;
+        self
     }
 
     /// Loads a vector of sound configurations into this [AssetLoader],
@@ -80,8 +83,9 @@ impl AssetLoader {
     /// asset_loader.play_sound("explosion");
     ///
     /// ```
-    pub async fn load_sounds<T: Into<SoundConfig>>(&mut self, sound_configs: Vec<T>) {
+    pub async fn load_sounds<T: Into<SoundConfig>>(&mut self, sound_configs: Vec<T>) -> &mut Self {
         self.sounds.load_many(sound_configs).await;
+        self
     }
 
     /// Plays a sound with a given ID.

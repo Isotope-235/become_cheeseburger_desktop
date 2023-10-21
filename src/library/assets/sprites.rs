@@ -1,3 +1,4 @@
+
 use std::collections::HashMap;
 
 use macroquad::color::Color;
@@ -20,6 +21,12 @@ impl From<(&str, Color)> for PathColor {
     }
 }
 
+impl From<&str> for PathColor {
+    fn from(value: &str) -> Self {
+        PathColor(value.to_string(), Color::default())
+    }
+}
+
 impl Default for SpriteLoader {
     fn default() -> Self {
         Self::new()
@@ -31,7 +38,7 @@ impl SpriteLoader {
         SpriteLoader(HashMap::new())
     }
 
-    pub async fn load_many<T: Into<PathColor>>(&mut self, paths: Vec<T>) {
+    pub async fn load_many(&mut self, paths: Vec<impl Into<PathColor>>) {
         for pc in paths {
             let path_color = pc.into();
             let full_path = format!("assets/sprites/{}.png", path_color.0);

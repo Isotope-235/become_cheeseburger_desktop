@@ -1,4 +1,5 @@
 //#![windows_subsystem = "windows"]
+
 use std::f64::consts::PI;
 
 use macroquad::{prelude::*, rand::ChooseRandom};
@@ -30,16 +31,17 @@ async fn main() {
 
     asset_loader
         .load_sprites(vec![
-            ("burger", Color::default()),
+            "burger",
+            "burger_invuln",
+            "bullet",
+            "flak",
+            "slug",
+            "flak_child",
+        ]).await
+        .load_sprites(vec![
             ("cheese", Color::from_rgba(255, 221, 86, 255)),
-            ("burger_invuln", Color::default()),
-            ("bullet", Color::default()),
-            ("flak", Color::default()),
-            ("slug", Color::default()),
-            ("flak_child", Color::default()),
             ("heart", Color::from_rgba(221, 16, 85, 255)),
-        ])
-        .await;
+        ]).await;
 
     asset_loader
         .load_sounds(vec!["explosion", "heal", "laser", "damage", "dash"])
@@ -90,18 +92,6 @@ async fn main() {
                 1.00 + i as f32 * 8.00,
                 9.00,
                 text_params.clone(),
-            );
-        }
-        let last_score_text = fill_leading_zeroes(00000);
-        let score_chars = last_score_text.chars();
-        for (i, c) in score_chars.enumerate() {
-            let mut parameters = text_params.clone();
-            parameters.font_size = 40;
-            draw_text_ex(
-                &c.to_owned().to_string(),
-                1.00 + i as f32 * 6.00,
-                18.00,
-                parameters,
             );
         }
         set_default_camera();
