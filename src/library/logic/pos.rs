@@ -22,7 +22,7 @@ impl<T> Pos<T> {
 impl<T: Default> Default for Pos<T> {
     fn default() -> Self {
         Self {
-            pos: center(),
+            pos: CENTER,
             vel: Vector2::ZERO,
             acc: Vector2::ZERO,
             age: 0.00,

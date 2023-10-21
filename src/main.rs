@@ -1,6 +1,6 @@
 //#![windows_subsystem = "windows"]
 
-use std::f64::consts::PI;
+use std::{f64::consts::PI, cell::Cell};
 
 use macroquad::{prelude::*, rand::ChooseRandom};
 use macroquad_canvas::Canvas2D;
@@ -11,24 +11,29 @@ pub mod library;
 
 #[macroquad::main(window_conf())]
 async fn main() {
+    
+    // get fps via cringe
     let fps = find_fps().await;
     println!("Targeted framerate: {fps}");
 
+    // fps-based timestep
     let dt = DT * 60.00 / fps as f64;
-    let joystix = load_ttf_font("joystix.otf").await.unwrap();
-
+    
+    // pixel perfection
     let mut camera = Camera2D::from_display_rect(Rect::new(
         0.00,
         0.00,
-        (center().x() * 2.00) as f32,
-        (center().y() * 2.00) as f32,
+        (CENTER.x() * 2.00) as f32,
+        (CENTER.y() * 2.00) as f32,
     ));
     camera.zoom = vec2(camera.zoom.x, camera.zoom.y * -1.00);
     set_camera(&camera);
-    let mut canvas = Canvas2D::new((center().x() * 2.00) as f32, (center().y() * 2.00) as f32);
 
+    let mut canvas = Canvas2D::new((CENTER.x() * 2.00) as f32, (CENTER.y() * 2.00) as f32);
+    canvas.get_texture_mut().set_filter(FilterMode::Nearest);
+
+    // asset loading
     let mut asset_loader = AssetLoader::new();
-
     asset_loader
         .load_sprites(vec![
             "burger",
@@ -42,39 +47,27 @@ async fn main() {
             ("cheese", Color::from_rgba(255, 221, 86, 255)),
             ("heart", Color::from_rgba(221, 16, 85, 255)),
         ]).await;
-
     asset_loader
         .load_sounds(vec!["explosion", "heal", "laser", "damage", "dash"])
         .await;
 
+    let joystix = load_ttf_font("joystix.otf").await.unwrap();
+
     // state init
     let mut state = State::reset();
 
-    // once-tests
+    // tests
     let text_params = TextParams {
         font: Some(&joystix),
-        font_size: 80,
-        font_scale: 0.125,
-        font_scale_aspect: 1.00,
-        color: YELLOW,
-        ..Default::default()
+        ..SCORE_TEXT_PARAMS
     };
 
     // main game loop
     loop {
         // get inputs for this frame
-        let input = Input {
-            w: is_key_down(KeyCode::W),
-            a: is_key_down(KeyCode::A),
-            s: is_key_down(KeyCode::S),
-            d: is_key_down(KeyCode::D),
-            space: is_key_down(KeyCode::Space),
-        };
-        let score_change = state.progress(&input, dt, &asset_loader);
-        if score_change > 0 {
-            state.score += score_change;
-            // score_txt = render_score(state.score, &joystix, &texture_creator);
-        }
+        let input = Input::get();
+        state.progress(&input, dt, &asset_loader);
+        state.score += state.score_last_frame;
 
         // draw calls
         set_camera(&canvas.camera);
@@ -95,7 +88,6 @@ async fn main() {
             );
         }
         set_default_camera();
-        canvas.get_texture_mut().set_filter(FilterMode::Nearest);
         canvas.draw();
 
         // game should only end after freeze frames are rendered, so this goes after draw calls
@@ -117,6 +109,7 @@ pub struct Units<T> {
 struct State {
     difficulty: f64,
     score: i32,
+    score_last_frame: i32,
     freeze: f64,
     burger: Pos<Player>,
     cheese: Pos<Cheese>,
@@ -132,7 +125,7 @@ struct State {
 }
 
 impl State {
-    fn progress(&mut self, input: &Input, dt: f64, asset_loader: &AssetLoader) -> i32 {
+    fn progress(&mut self, input: &Input, dt: f64, asset_loader: &AssetLoader) {
         let mut score = 0;
         for _ in 0..ITERATIONS {
             if self.freeze > 0.00 {
@@ -159,7 +152,7 @@ impl State {
                         let (pos, vel) = {
                             let side_buffer = 4.00 + delay;
                             let buffer = direction * side_buffer;
-                            let pos = center() + direction.mul_per(center()) + buffer;
+                            let pos = CENTER + direction.mul_per(CENTER) + buffer;
                             (pos + shift, direction.negate())
                         };
                         let bullet = Bullet::new(pos, vel * 1.25, delay);
@@ -232,8 +225,8 @@ impl State {
 
             for _ in 0..times {
                 for i in 0..4 {
-                    let starting_point = screen().mul_per(num_to_corner(i));
-                    let direction = center() - starting_point;
+                    let starting_point = CENTER.mul_per(num_to_corner(i));
+                    let direction = CENTER - starting_point;
                     let vel = direction.normal();
                     for ii in 0..3 {
                         self.bullet.s.push(Bullet::new(
@@ -305,9 +298,9 @@ impl State {
                 // cheese
                 let cheese = &mut self.cheese;
                 if cheese.bhv.hp < 1e-10 {
-                    let Vector2(x, y) = center();
+                    let Vector2(x, y) = CENTER;
                     let new_pos = loop {
-                        let maybe_pos = Vector2(rand(x), rand(y)) + center() * 0.50;
+                        let maybe_pos = Vector2(rand(x), rand(y)) + CENTER * 0.50;
                         if (self.burger.pos - maybe_pos).len() > 16.00 {
                             break maybe_pos;
                         }
@@ -379,7 +372,7 @@ impl State {
             // up difficulty
             self.difficulty += 0.10 * dt;
         }
-        score
+        self.score_last_frame = score
     }
     fn draw(&self, asset_loader: &AssetLoader) {
         // burger
@@ -444,7 +437,7 @@ impl State {
         let w = self.burger.bhv.hp * 8.00;
         let from_bot = h + 2;
         let mw = mhp * 8.00;
-        let window_height = center().y() * 2.00;
+        let window_height = CENTER.y() * 2.00;
         let hp_pos = Vector2(2.00, window_height - from_bot as f64);
         draw_rec_top_left(hp_pos, mw as i32, h, Color::from_rgba(155, 155, 155, 255));
         draw_rec_top_left(
@@ -475,9 +468,10 @@ impl State {
         State {
             difficulty: 100.00,
             score: 0,
+            score_last_frame: 0,
             freeze: 0.00,
-            burger: Player::new(center() + Vector2(0.00, 12.00)),
-            cheese: Cheese::new(center() - Vector2(0.00, 12.00)),
+            burger: Player::new(CENTER + Vector2(0.00, 12.00)),
+            cheese: Cheese::new(CENTER - Vector2(0.00, 12.00)),
             bullet: Units {
                 s: Vec::new(),
                 counter: 0.00,
@@ -534,22 +528,23 @@ fn num_to_side(num: i32) -> Vector2 {
 
 fn spawn_pos_vel(side_buffer: f64, edge_buffer: f64) -> (Vector2, Vector2) {
     let direction = get_rand_dir();
-    let shift = get_shift(direction, edge_buffer);
-    let buffer = direction * side_buffer;
-    let pos = center() + direction.mul_per(center()) + buffer;
-    (pos + shift, direction.negate())
+    pos_vel(direction, edge_buffer, side_buffer)
 }
 
 fn spawn_pos_vel_from(side: i32, side_buffer: f64, edge_buffer: f64) -> (Vector2, Vector2) {
     let direction = num_to_side(side);
+    pos_vel(direction, edge_buffer, side_buffer)
+}
+
+fn pos_vel(direction: Vector2, edge_buffer: f64, side_buffer: f64) -> (Vector2, Vector2) {
     let shift = get_shift(direction, edge_buffer);
     let buffer = direction * side_buffer;
-    let pos = center() + direction.mul_per(center()) + buffer;
+    let pos = CENTER + direction.mul_per(CENTER) + buffer;
     (pos + shift, direction.negate())
 }
 
 fn get_shift(dir: Vector2, edge_buffer: f64) -> Vector2 {
     let rot_dir = dir.rotate_once();
-    let shift_range = rot_dir.mul_per(center()).len() - edge_buffer;
+    let shift_range = rot_dir.mul_per(CENTER).len() - edge_buffer;
     rot_dir * (rand(shift_range * 2.00) - shift_range)
 }

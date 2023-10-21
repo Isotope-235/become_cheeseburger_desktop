@@ -33,7 +33,7 @@ impl Pos<Player> {
         self.bhv.hp > 1e-10
     }
     pub fn stays_in_bounds(&mut self) {
-        let bounds = center() * 2.00;
+        let bounds = CENTER * 2.00;
         let Vector2(x, y) = self.pos;
         if x < 0.00 || x > bounds.0 {
             self.vel.0 *= -1.00

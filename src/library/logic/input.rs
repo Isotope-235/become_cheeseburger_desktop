@@ -1,3 +1,5 @@
+use macroquad::prelude::*;
+
 use crate::vector::Vector2;
 
 pub struct Input {
@@ -8,13 +10,13 @@ pub struct Input {
     pub space: bool,
 }
 impl Input {
-    pub fn init() -> Input {
+    pub fn get() -> Input {
         Input {
-            w: false,
-            a: false,
-            s: false,
-            d: false,
-            space: false,
+            w: is_key_down(KeyCode::W),
+            a: is_key_down(KeyCode::A),
+            s: is_key_down(KeyCode::S),
+            d: is_key_down(KeyCode::D),
+            space: is_key_down(KeyCode::Space),
         }
     }
     pub fn dir(&self) -> Vector2 {
