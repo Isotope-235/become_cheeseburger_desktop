@@ -261,7 +261,7 @@ impl State {
             let hit_info = &mut HitInfo {
                 state_effect_accumulator: &mut state_effect,
                 burger_circle: &burger_circle,
-                asset_manager: asset_loader,
+                asset_loader,
             };
             do_all_hits(&mut self.health_pack.s, hit_info);
             if self.burger.is_targetable() {
