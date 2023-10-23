@@ -105,6 +105,14 @@ pub struct Units<T> {
     pub s: Vec<T>,
     pub counter: f64,
 }
+impl<T> Units<T> {
+    fn new() -> Self {
+        Units {
+            s: Vec::new(),
+            counter: 0.00,
+        }
+    }
+}
 struct State {
     difficulty: f64,
     score: i32,
@@ -471,27 +479,12 @@ impl State {
             freeze: 0.00,
             burger: Player::new(CENTER + Vector2(0.00, 12.00)),
             cheese: Cheese::new(CENTER - Vector2(0.00, 12.00)),
-            bullet: Units {
-                s: Vec::new(),
-                counter: 0.00,
-            },
-            slug: Units {
-                s: Vec::new(),
-                counter: 0.00,
-            },
-            warning: Units {
-                s: Vec::new(),
-                counter: 0.00,
-            },
+            bullet: Units::new(),
+            slug: Units::new(),
+            warning: Units::new(),
             lasers: Vec::new(),
-            health_pack: Units {
-                s: Vec::new(),
-                counter: 0.00,
-            },
-            frag: Units {
-                s: Vec::new(),
-                counter: 0.00,
-            },
+            health_pack: Units::new(),
+            frag: Units::new(),
             frag_children: Vec::new(),
             particles: Vec::new(),
             cross_counter: 0.00,
