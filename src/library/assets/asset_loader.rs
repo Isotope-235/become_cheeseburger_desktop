@@ -83,7 +83,7 @@ impl AssetLoader {
     /// asset_loader.play_sound("explosion");
     ///
     /// ```
-    pub async fn load_sounds<T: Into<SoundConfig>>(&mut self, sound_configs: Vec<T>) -> &mut Self {
+    pub async fn load_sounds(&mut self, sound_configs: Vec<impl Into<SoundConfig>>) -> &mut Self {
         self.sounds.load_many(sound_configs).await;
         self
     }
