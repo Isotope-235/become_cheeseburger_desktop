@@ -1,4 +1,5 @@
 //#![windows_subsystem = "windows"]
+#![warn(clippy::pedantic)]
 
 use std::f64::consts::PI;
 
