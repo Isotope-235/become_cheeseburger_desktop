@@ -36,10 +36,10 @@ impl Pos<Player> {
         let bounds = CENTER * 2.00;
         let Vector2(x, y) = self.pos;
         if x < 0.00 || x > bounds.0 {
-            self.vel.0 *= -1.00
+            self.vel.0 *= -1.00;
         }
         if y < 0.00 || y > bounds.1 {
-            self.vel.1 *= -1.00
+            self.vel.1 *= -1.00;
         }
         self.pos.0 = self.pos.0.max(0.00).min(bounds.0);
         self.pos.1 = self.pos.1.max(0.00).min(bounds.1);

@@ -1,15 +1,15 @@
 use macroquad::{color::Color, texture::Texture2D};
 
-use super::sound::*;
-use super::sprites::*;
+use super::sound;
+use super::sprites;
 
 /// Helps loading all assets into the game with some handy util functions
 ///
 /// Load sprites or sounds using the [load_sprites](AssetLoader::load_sprites) and [load_sounds](AssetLoader::load_sounds) functions.
 #[derive(Debug)]
 pub struct AssetLoader {
-    sprites: SpriteLoader,
-    sounds: SoundLoader,
+    sprites: sprites::Loader,
+    sounds: sound::Loader,
 }
 
 impl Default for AssetLoader {
@@ -21,8 +21,8 @@ impl Default for AssetLoader {
 impl AssetLoader {
     pub fn new() -> Self {
         AssetLoader {
-            sprites: SpriteLoader::new(),
-            sounds: SoundLoader::new(),
+            sprites: sprites::Loader::new(),
+            sounds: sound::Loader::new(),
         }
     }
 
@@ -45,12 +45,12 @@ impl AssetLoader {
     ///
     /// asset_loader.texture("sprite_id"); // Returns a Texture2D
     /// ```
-    pub async fn load_sprites(&mut self, sprite_paths: Vec<impl IntoPathColor>) -> &mut Self {
+    pub async fn load_sprites(&mut self, sprite_paths: Vec<impl sprites::IntoPathColor>) -> &mut Self {
         self.sprites.load_many(sprite_paths).await;
         self
     }
 
-    /// Loads a vector of sound configurations into this [AssetLoader],
+    /// Loads a vector of sound configurations into this [`AssetLoader`],
     /// making the sounds loaded available for playing.
     ///
     /// Reference a sound by its ID, which is the name of the folder within assets/sound
@@ -83,7 +83,7 @@ impl AssetLoader {
     /// asset_loader.play_sound("explosion");
     ///
     /// ```
-    pub async fn load_sounds(&mut self, sound_configs: Vec<impl Into<SoundConfig>>) -> &mut Self {
+    pub async fn load_sounds(&mut self, sound_configs: Vec<impl Into<sound::Config>>) -> &mut Self {
         self.sounds.load_many(sound_configs).await;
         self
     }
@@ -101,7 +101,7 @@ impl AssetLoader {
         self.sounds.play(id);
     }
 
-    /// Returns a reference to the [Texture2D] for the given sprite ID.
+    /// Returns a reference to the [`Texture2D`] for the given sprite ID.
     ///
     /// ## Example
     /// ```

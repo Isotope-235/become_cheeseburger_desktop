@@ -27,6 +27,8 @@ impl Particle {
             },
         }
     }
+    /// TODO: find a better way to do this
+    #[allow(clippy::too_many_arguments)]
     pub fn from_center(
         number: usize,
         offset: f64,

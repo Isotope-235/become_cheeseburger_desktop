@@ -4,19 +4,19 @@ use std::collections::HashMap;
 use std::fs;
 
 #[derive(Debug)]
-pub struct SoundConfig {
+pub struct Config {
     pub volume: f32,
     pub looped: bool,
     pub id: &'static str,
 }
 
-impl From<&'static str> for SoundConfig {
+impl From<&'static str> for Config {
     fn from(value: &'static str) -> Self {
-        SoundConfig::from_name(value)
+        Config::from_name(value)
     }
 }
 
-impl SoundConfig {
+impl Config {
     pub fn from_name(name: &'static str) -> Self {
         Self {
             id: name,
@@ -25,7 +25,7 @@ impl SoundConfig {
     }
 }
 
-impl Default for SoundConfig {
+impl Default for Config {
     fn default() -> Self {
         Self {
             volume: 0.25,
@@ -36,14 +36,14 @@ impl Default for SoundConfig {
 }
 
 #[derive(Debug)]
-pub struct SoundLoader(HashMap<String, SoundConfig>, HashMap<String, Vec<Sound>>);
+pub struct Loader(HashMap<String, Config>, HashMap<String, Vec<Sound>>);
 
-impl SoundLoader {
+impl Loader {
     pub fn new() -> Self {
-        SoundLoader(HashMap::new(), HashMap::new())
+        Loader(HashMap::new(), HashMap::new())
     }
 
-    pub async fn load_many<T: Into<SoundConfig>>(&mut self, sound_configs: Vec<T>) {
+    pub async fn load_many<T: Into<Config>>(&mut self, sound_configs: Vec<T>) {
         for sc in sound_configs {
             let sound_config = sc.into();
             let paths =
@@ -106,7 +106,7 @@ impl SoundLoader {
     }
 }
 
-impl Default for SoundLoader {
+impl Default for Loader {
     fn default() -> Self {
         Self::new()
     }

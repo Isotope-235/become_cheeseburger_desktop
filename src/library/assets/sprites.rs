@@ -11,38 +11,38 @@ pub struct Sprite {
 }
 
 #[derive(Debug)]
-pub struct SpriteLoader(HashMap<String, Sprite>);
+pub struct Loader(HashMap<String, Sprite>);
 
 pub trait IntoPathColor : Clone {
-    fn as_path_color(self) -> (String, Color);
+    fn into_path_color(self) -> (String, Color);
 }
 
 impl IntoPathColor for (&str, Color) {
-    fn as_path_color(self) -> (String, Color) {
+    fn into_path_color(self) -> (String, Color) {
         (self.0.to_string(), self.1)
     }
 }
 
 impl IntoPathColor for &str {
-    fn as_path_color(self) -> (String, Color) {
+    fn into_path_color(self) -> (String, Color) {
         (self.to_string(), Color::default())
     }
 }
 
-impl Default for SpriteLoader {
+impl Default for Loader {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl SpriteLoader {
+impl Loader {
     pub fn new() -> Self {
-        SpriteLoader(HashMap::new())
+        Loader(HashMap::new())
     }
 
     pub async fn load_many(&mut self, paths: Vec<impl IntoPathColor>) {
         for pc in paths {
-            let (path, color) = pc.as_path_color();
+            let (path, color) = pc.into_path_color();
             let full_path = format!("assets/sprites/{}.png", path);
 
             let texture = load_texture(&full_path).await.unwrap_or_else(|_err| panic!("Invalid sprite name argument! Path: {}", full_path));

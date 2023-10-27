@@ -128,7 +128,7 @@ struct State {
     lasers: Vec<Pos<Laser>>,
     health_pack: Units<Pos<HealthPack>>,
     frag: Units<Pos<Frag>>,
-    frag_children: Vec<Pos<FragChild>>,
+    frag_children: Vec<Pos<frag::Child>>,
     particles: Vec<Pos<Particle>>,
     cross_counter: f64,
 }
@@ -299,7 +299,7 @@ impl State {
                 burger.bhv.invuln = (burger.bhv.invuln - dt).max(0.00);
                 burger.bhv.dash_charge = (burger.bhv.dash_charge + 0.01 * dt).min(1.00);
                 burger.bhv.hp = burger.bhv.hp.min(burger.max_hp());
-                if input.space && burger.can_dash() && input.dir().len() > 0.00 {
+                if input.space.is_pressed() && burger.can_dash() && input.dir().len() > 0.00 {
                     burger.dash(input, asset_loader);
                 }
             };
@@ -349,7 +349,7 @@ impl State {
                         for i in 0..number {
                             let dir = f64::from(i).as_radians() / f64::from(number);
                             let child =
-                                FragChild::new(frak.pos, Vector2::ZERO, Vector2::from(dir) * 0.01);
+                                frag::Child::new(frak.pos, Vector2::ZERO, Vector2::from(dir) * 0.01);
                             self.frag_children.push(child);
                         }
                     }
@@ -386,9 +386,9 @@ impl State {
     fn draw(&self, asset_loader: &AssetLoader) {
         // burger
         let b_sprite = if self.burger.bhv.invuln > 0.00 {
-            asset_loader.texture("burger")
-        } else {
             asset_loader.texture("burger_invuln")
+        } else {
+            asset_loader.texture("burger")
         };
         copy_texture(b_sprite, self.burger.pos);
         // cheese

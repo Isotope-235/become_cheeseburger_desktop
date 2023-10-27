@@ -39,6 +39,6 @@ impl OnHit for Pos<Slug> {
 impl TakeEffect for Pos<Slug> {
     fn takes_effect(&mut self, effect: &Effect) {
         let Effect { damage, .. } = effect;
-        self.bhv.hp -= damage
+        self.bhv.hp -= damage;
     }
 }
