@@ -197,7 +197,7 @@ mod tests {
         let v = Vector2(1.00, 2.00);
         assert_eq!(v.square_len(), 5.00);
         assert_eq!(v.len(), 5.00f64.sqrt());
-        assert_eq!(v.angle(), 1.1071487177940904);
+        assert_eq!(v.angle(), 1.107_148_717_794_090_4);
         assert_eq!(v.x(), 1.00);
         assert_eq!(v.y(), 2.00);
         let mut v = Vector2(1.00, 2.00);

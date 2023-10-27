@@ -64,7 +64,7 @@ impl Loader {
                 let sound_result = load_sound(&full_path).await;
 
                 let sound = sound_result.unwrap_or_else(|_err| {
-                    panic!("Invalid sound name argument! Path: {}", full_path)
+                    panic!("Invalid sound name argument! Path: {full_path}")
                 });
 
                 sound_variations.push(sound);
@@ -86,7 +86,7 @@ impl Loader {
     /// // ... load sounds using SoundLoader::load_many() ...
     /// sound_loader.play("sound_id");
     pub fn play(&self, id: &str) {
-        let error_msg = format!("Invalid sound id '{}' for playing.", id);
+        let error_msg = format!("Invalid sound id '{id}' for playing.");
 
         let sound_config = self.0.get(id).expect(&error_msg);
 

@@ -5,7 +5,7 @@ use super::sprites;
 
 /// Helps loading all assets into the game with some handy util functions
 ///
-/// Load sprites or sounds using the [load_sprites](AssetLoader::load_sprites) and [load_sounds](AssetLoader::load_sounds) functions.
+/// Load sprites or sounds using the [`load_sprites`](AssetLoader::load_sprites) and [`load_sounds`](AssetLoader::load_sounds) functions.
 #[derive(Debug)]
 pub struct AssetLoader {
     sprites: sprites::Loader,
@@ -26,8 +26,8 @@ impl AssetLoader {
         }
     }
 
-    /// Loads a vector of sprite paths into this [AssetLoader],
-    /// making the sprites loaded available for rendering the [Texture2D]s
+    /// Loads a vector of sprite paths into this [`AssetLoader`],
+    /// making the sprites loaded available for rendering the [`Texture2D`]s
     ///
     /// This function also allows assigning a color for each sprite, facilitating particle
     /// effects and such.

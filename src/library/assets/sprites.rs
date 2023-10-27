@@ -39,13 +39,15 @@ impl Loader {
     pub fn new() -> Self {
         Loader(HashMap::new())
     }
-
+    /// # Panics
+    /// 
+    /// Panics if no file matches any of the given file names.
     pub async fn load_many(&mut self, paths: Vec<impl IntoPathColor>) {
         for pc in paths {
             let (path, color) = pc.into_path_color();
-            let full_path = format!("assets/sprites/{}.png", path);
+            let full_path = format!("assets/sprites/{path}.png");
 
-            let texture = load_texture(&full_path).await.unwrap_or_else(|_err| panic!("Invalid sprite name argument! Path: {}", full_path));
+            let texture = load_texture(&full_path).await.unwrap_or_else(|_err| panic!("Invalid sprite name argument! Path: {full_path}"));
 
             self.0.insert(
                 path,
@@ -56,20 +58,24 @@ impl Loader {
             );
         }
     }
-
+    /// # Panics
+    /// 
+    /// Panics if the given path is invalid.
     pub fn texture(&self, path: &str) -> &Texture2D {
         &self
             .0
             .get(path)
-            .unwrap_or_else(|| panic!("Invalid path '{}' for texture", path))
+            .unwrap_or_else(|| panic!("Invalid path '{path}' for texture"))
             .texture
     }
-
+    /// # Panics
+    /// 
+    /// Panics if the given path is invalid.
     pub fn color(&self, path: &str) -> &Color {
         &self
             .0
             .get(path)
-            .unwrap_or_else(|| panic!("Invalid path '{}' for color", path))
+            .unwrap_or_else(|| panic!("Invalid path '{path}' for color"))
             .color
     }
 }
