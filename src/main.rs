@@ -1,5 +1,6 @@
 //#![windows_subsystem = "windows"]
 #![warn(clippy::pedantic)]
+#![allow(clippy::cast_possible_truncation, clippy::cast_precision_loss, clippy::wildcard_imports, clippy::must_use_candidate, clippy::too_many_lines)]
 
 use std::f64::consts::PI;
 
@@ -10,15 +11,15 @@ use library::*;
 
 pub mod library;
 
-#[macroquad::main(window_conf())]
+#[macroquad::main(window())]
 async fn main() {
     
     // get fps via cringe
-    let fps = find_fps().await;
+    let fps = fps::find().await;
     println!("Targeted framerate: {fps}");
 
     // fps-based timestep
-    let dt = DT * 60.00 / fps as f64;
+    let dt = DT * 60.00 / f64::from(fps);
     
     // pixel perfection
     let mut camera = Camera2D::from_display_rect(Rect::new(
@@ -92,7 +93,7 @@ async fn main() {
 
         // game should only end after freeze frames are rendered, so this goes after draw calls
         if state.game_is_over() {
-            state = State::reset()
+            state = State::reset();
         };
 
         // present
@@ -156,7 +157,7 @@ impl State {
                     let direction = num_to_side(side);
                     let shift = get_shift(direction, 4.00);
                     for i in 0..((2.00 + diff_scale) as i32) {
-                        let delay = i as f64 * 10.00;
+                        let delay = f64::from(i) * 10.00;
                         let (pos, vel) = {
                             let side_buffer = 4.00 + delay;
                             let buffer = direction * side_buffer;
@@ -168,7 +169,7 @@ impl State {
                     }
                 } else {
                     for i in 0..((1.00 + diff_scale * 2.00) as i32) {
-                        let delay = i as f64 * 10.00;
+                        let delay = f64::from(i) * 10.00;
                         let (pos, vel) = spawn_pos_vel_from(side, 4.00 + delay, 4.00);
                         let bullet = Bullet::new(pos, vel * 1.25, delay);
                         self.bullet.s.push(bullet);
@@ -201,7 +202,7 @@ impl State {
                 }
                 self.warning
                     .s
-                    .push(Warning::new(pos, dir, i as f64 * (15.00)));
+                    .push(Warning::new(pos, dir, f64::from(i) * (15.00)));
             }
 
             // health packs
@@ -238,10 +239,10 @@ impl State {
                     let vel = direction.normal();
                     for ii in 0..3 {
                         self.bullet.s.push(Bullet::new(
-                            starting_point - vel * 10.00 * ii as f64,
+                            starting_point - vel * 10.00 * f64::from(ii),
                             vel * 1.75,
                             0.00,
-                        ))
+                        ));
                     }
                 }
             }
@@ -250,14 +251,14 @@ impl State {
             self.burger.update_pos(dt);
             self.burger.stays_in_bounds();
             self.cheese.update_pos(dt);
-            update_all_pos(&mut self.bullet.s, dt);
-            update_all_pos(&mut self.slug.s, dt);
-            update_all_pos(&mut self.warning.s, dt);
-            update_all_pos(&mut self.lasers, dt);
-            update_all_pos(&mut self.health_pack.s, dt);
-            update_all_pos(&mut self.frag.s, dt);
-            update_all_pos(&mut self.frag_children, dt);
-            update_all_pos(&mut self.particles, dt);
+            pos::update_all(&mut self.bullet.s, dt);
+            pos::update_all(&mut self.slug.s, dt);
+            pos::update_all(&mut self.warning.s, dt);
+            pos::update_all(&mut self.lasers, dt);
+            pos::update_all(&mut self.health_pack.s, dt);
+            pos::update_all(&mut self.frag.s, dt);
+            pos::update_all(&mut self.frag_children, dt);
+            pos::update_all(&mut self.particles, dt);
 
             // inter-unitary logic
             let burger_circle = self.burger.hit_circle();
@@ -281,7 +282,7 @@ impl State {
                 do_all_hits(&mut self.frag_children, hit_info);
             }
             if state_effect.burger_damage > 0.00 {
-                asset_loader.play_sound("damage")
+                asset_loader.play_sound("damage");
             }
             self.takes_effect(state_effect, &mut score);
             if self.freeze > 0.00 {
@@ -346,7 +347,7 @@ impl State {
                     if !frak.will_live() {
                         let number = 8;
                         for i in 0..number {
-                            let dir = (i as f64).as_radians() / number as f64;
+                            let dir = f64::from(i).as_radians() / f64::from(number);
                             let child =
                                 FragChild::new(frak.pos, Vector2::ZERO, Vector2::from(dir) * 0.01);
                             self.frag_children.push(child);
@@ -367,12 +368,12 @@ impl State {
             // remove elements
             self.bullet.s.retain(|b| b.age < 750.00 && b.bhv.hp > 1e-10);
             self.slug.s.retain(|s| s.age < 1500.00 && s.bhv.hp > 1e-10);
-            self.warning.s.retain(|w| w.will_live());
+            self.warning.s.retain(Pos::<Warning>::will_live);
             self.lasers.retain(|l| l.age < 500.00 && l.bhv.hp > 1e-10);
             self.health_pack
                 .s
                 .retain(|hp| hp.age < 500.00 && hp.bhv.hp > 1e-10);
-            self.frag.s.retain(|f| f.will_live());
+            self.frag.s.retain(Pos::<Frag>::will_live);
             self.frag_children
                 .retain(|c| c.age < 300.00 && c.bhv.hp > 1e-10);
             self.particles.retain(|p| p.age <= p.bhv.lifetime);
@@ -380,13 +381,14 @@ impl State {
             // up difficulty
             self.difficulty += 0.10 * dt;
         }
-        self.score_last_frame = score
+        self.score_last_frame = score;
     }
     fn draw(&self, asset_loader: &AssetLoader) {
         // burger
-        let b_sprite = match self.burger.bhv.invuln > 0.00 {
-            false => asset_loader.texture("burger"),
-            true => asset_loader.texture("burger_invuln"),
+        let b_sprite = if self.burger.bhv.invuln > 0.00 {
+            asset_loader.texture("burger")
+        } else {
+            asset_loader.texture("burger_invuln")
         };
         copy_texture(b_sprite, self.burger.pos);
         // cheese
@@ -411,20 +413,22 @@ impl State {
         for warning in &self.warning.s {
             if warning.is_visible() {
                 let dur = 6.00;
-                let clr = match warning.age % dur < dur * 0.50 {
-                    true => Color::from_rgba(255, 55, 55, 255),
-                    false => Color::from_rgba(255, 255, 55, 255),
+                let clr = if warning.age % dur < dur * 0.50 {
+                    Color::from_rgba(255, 55, 55, 255)
+                } else {
+                    Color::from_rgba(255, 255, 55, 255)
                 };
-                draw_rec(warning.pos, 10, 10, clr)
+                draw::rec(warning.pos, 10, 10, clr);
             }
         }
         // lasers
         for laser in &self.lasers {
-            let (w, h) = match laser.vel.x().abs() > laser.vel.y().abs() {
-                true => (36, 6),
-                false => (6, 36),
+            let (w, h) = if laser.vel.x().abs() > laser.vel.y().abs() {
+                (36, 6)
+            } else {
+                (6, 36)
             };
-            draw_rec(laser.pos, w, h, Color::from_rgba(255, 55, 55, 255));
+            draw::rec(laser.pos, w, h, Color::from_rgba(255, 55, 55, 255));
         }
         // flak
         for flak in &self.frag.s {
@@ -437,7 +441,7 @@ impl State {
         // particles
         for particle in &self.particles {
             let (w, h) = (2, 2);
-            draw_rec(particle.pos, w, h, particle.bhv.color);
+            draw::rec(particle.pos, w, h, particle.bhv.color);
         }
         // health bar
         let h = 4;
@@ -446,9 +450,9 @@ impl State {
         let from_bot = h + 2;
         let mw = mhp * 8.00;
         let window_height = CENTER_Y * 2.00;
-        let hp_pos = Vector2(2.00, window_height - from_bot as f64);
-        draw_rec_top_left(hp_pos, mw as i32, h, Color::from_rgba(155, 155, 155, 255));
-        draw_rec_top_left(
+        let hp_pos = Vector2(2.00, window_height - f64::from(from_bot));
+        draw::rec_top_left(hp_pos, mw as i32, h, Color::from_rgba(155, 155, 155, 255));
+        draw::rec_top_left(
             hp_pos,
             w.max(0.00) as i32,
             h,
@@ -458,12 +462,13 @@ impl State {
         let h = 2;
         let w = self.burger.bhv.dash_charge * 8.00 * 8.00;
         let dash_from_bot = from_bot + h;
-        let clr = match self.burger.can_dash() {
-            true => Color::from_rgba(255, 255, 255, 255),
-            false => Color::from_rgba(55, 155, 255, 255),
+        let clr = if self.burger.can_dash() {
+            Color::from_rgba(255, 255, 255, 255)
+        } else {
+            Color::from_rgba(55, 155, 255, 255)
         };
-        draw_rec_top_left(
-            Vector2(2.00, window_height - dash_from_bot as f64),
+        draw::rec_top_left(
+            Vector2(2.00, window_height - f64::from(dash_from_bot)),
             w as i32,
             h,
             clr,

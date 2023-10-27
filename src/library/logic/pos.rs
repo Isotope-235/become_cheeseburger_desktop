@@ -31,9 +31,9 @@ impl<T: Default> Default for Pos<T> {
     }
 }
 
-pub fn update_all_pos<T>(items: &mut Vec<Pos<T>>, dt: f64) {
+pub fn update_all<T>(items: &mut Vec<Pos<T>>, dt: f64) {
     for item in items {
-        item.update_pos(dt)
+        item.update_pos(dt);
     }
 }
 

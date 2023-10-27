@@ -8,6 +8,6 @@ impl Radians for f64 {
 }
 impl Radians for i32 {
     fn as_radians(&self) -> f64 {
-        (*self as f64).as_radians()
+        f64::from(*self).as_radians()
     }
 }

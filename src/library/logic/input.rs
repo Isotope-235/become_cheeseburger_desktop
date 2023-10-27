@@ -21,9 +21,12 @@ impl Input {
     }
     pub fn dir(&self) -> Vector2 {
         let Input { w, a, s, d, .. } = *self;
+        fn dir(b: bool) -> f64 {
+            if b { 1.00 } else { 0.00 }
+        }
         Vector2(
-            d as i32 as f64 - a as i32 as f64,
-            s as i32 as f64 - w as i32 as f64,
+            dir(d) - dir(a),
+            dir(s) - dir(w),
         )
     }
 }

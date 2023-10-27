@@ -5,6 +5,7 @@ use std::ops::MulAssign;
 use std::ops::Sub;
 
 /// A 2D vector with `f64` components.
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, Copy)]
 pub struct Vector2(pub f64, pub f64);
 
@@ -36,6 +37,7 @@ impl Vector2 {
     /// let v = Vector2(1.00, 1.00);
     /// assert_eq!(v.square_len(), 2.00);
     /// ```
+    #[must_use]
     pub fn square_len(self) -> f64 {
         let Vector2(x, y) = self;
         x.powi(2) + y.powi(2)
@@ -48,10 +50,12 @@ impl Vector2 {
     /// let v = Vector2(1.00, 1.00);
     /// assert_eq!(v.len(), 2.00f64.sqrt());
     /// ```
+    #[must_use]
     pub fn len(self) -> f64 {
         self.square_len().sqrt()
     }
     /// Returns the equivalent vector with a length of 1. Essentially performs `self / self.len()`.
+    #[must_use]
     pub fn normal(self) -> Vector2 {
         let length = self.len();
         let Vector2(x, y) = self;
@@ -64,16 +68,19 @@ impl Vector2 {
     /// Returns the angle of the vector in radians.
     ///
     /// This method uses the `atan2` implementation, and will therefore always respect the signs of the components.
+    #[must_use]
     pub fn angle(self) -> f64 {
         let Vector2(x, y) = self;
         y.atan2(x)
     }
     /// Returns the negated vector. Equivalent to `self * -1.00`.
+    #[must_use]
     pub fn negate(self) -> Vector2 {
         let Vector2(x, y) = self;
         Vector2(-x, -y)
     }
     /// Returns the vector with its component values swapped.
+    #[must_use]
     pub fn invert(self) -> Vector2 {
         let Vector2(x, y) = self;
         Vector2(y, x)
@@ -86,6 +93,7 @@ impl Vector2 {
     /// let v = Vector2(0.00, 1.00);
     /// assert_eq!(v.rotate_once(), Vector2(-1.00, 0.00));
     /// ```
+    #[must_use]
     pub fn rotate_once(self) -> Vector2 {
         let Vector2(x, y) = self;
         Vector2(-y, x)
@@ -113,6 +121,7 @@ impl Vector2 {
         self.1
     }
     /// Returns the vector with its x component set to the given value.
+    #[must_use]
     pub fn aligned(self) -> Vector2 {
         let Vector2(x, y) = self;
         if x.abs() > y.abs() {
@@ -132,6 +141,7 @@ impl Vector2 {
     /// let v2 = Vector2(-1.00, 2.00);
     /// assert_eq!(v1.mul_per(v2), Vector2(-1.00, 4.00));
     /// ```
+    #[must_use]
     pub fn mul_per(self, rhs: Vector2) -> Vector2 {
         let Vector2(x, y) = self;
         let Vector2(ox, oy) = rhs;
