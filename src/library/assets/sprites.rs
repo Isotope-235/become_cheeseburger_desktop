@@ -37,7 +37,7 @@ impl Default for Loader {
 
 impl Loader {
     pub fn new() -> Self {
-        Loader(HashMap::new())
+        Self(HashMap::new())
     }
     /// # Panics
     /// 

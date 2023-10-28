@@ -9,7 +9,7 @@ impl HitBox for Pos<Frag> {
     }
 }
 impl Frag {
-    pub fn new(pos: Vector2, vel: Vector2) -> Pos<Frag> {
+    pub fn new(pos: Vector2, vel: Vector2) -> Pos<Self> {
         Pos {
             pos,
             vel,
@@ -19,7 +19,7 @@ impl Frag {
 }
 impl Default for Frag {
     fn default() -> Self {
-        Frag { hp: 5.00 }
+        Self { hp: 5.00 }
     }
 }
 impl Pos<Frag> {
@@ -56,7 +56,7 @@ impl HitBox for Pos<Child> {
     }
 }
 impl Child {
-    pub fn new(pos: Vector2, vel: Vector2, acc: Vector2) -> Pos<Child> {
+    pub fn new(pos: Vector2, vel: Vector2, acc: Vector2) -> Pos<Self> {
         Pos {
             pos,
             vel,
@@ -67,7 +67,7 @@ impl Child {
 }
 impl Default for Child {
     fn default() -> Self {
-        Child { hp: 2.00 }
+        Self { hp: 2.00 }
     }
 }
 impl OnHit for Pos<Child> {

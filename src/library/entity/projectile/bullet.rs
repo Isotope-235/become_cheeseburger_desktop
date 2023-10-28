@@ -14,7 +14,7 @@ impl Bullet {
             vel,
             acc: Vector2::ZERO,
             age: -extra_lifetime,
-            bhv: Bullet { hp: 3.00 },
+            bhv: Self { hp: 3.00 },
         }
     }
 }

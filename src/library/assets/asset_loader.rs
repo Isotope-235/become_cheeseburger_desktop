@@ -20,7 +20,7 @@ impl Default for AssetLoader {
 
 impl AssetLoader {
     pub fn new() -> Self {
-        AssetLoader {
+        Self {
             sprites: sprites::Loader::new(),
             sounds: sound::Loader::new(),
         }

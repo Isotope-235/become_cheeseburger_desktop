@@ -77,7 +77,7 @@ pub struct Effect {
 
 impl Default for Effect {
     fn default() -> Self {
-        Effect { damage: 0.00 }
+        Self { damage: 0.00 }
     }
 }
 
@@ -90,7 +90,7 @@ pub struct StateEffect {
 
 impl Default for StateEffect {
     fn default() -> Self {
-        StateEffect {
+        Self {
             score: 0,
             freeze: 0.00,
             particles: Vec::new(),
@@ -99,9 +99,9 @@ impl Default for StateEffect {
     }
 }
 
-impl AddAssign<StateEffect> for StateEffect {
-    fn add_assign(&mut self, rhs: StateEffect) {
-        let StateEffect {
+impl AddAssign for StateEffect {
+    fn add_assign(&mut self, rhs: Self) {
+        let Self {
             score,
             freeze,
             particles,
@@ -114,9 +114,9 @@ impl AddAssign<StateEffect> for StateEffect {
     }
 }
 
-impl AddAssign<Effect> for Effect {
-    fn add_assign(&mut self, rhs: Effect) {
-        let Effect { damage } = rhs;
+impl AddAssign for Effect {
+    fn add_assign(&mut self, rhs: Self) {
+        let Self { damage } = rhs;
         self.damage += damage;
     }
 }
@@ -131,15 +131,15 @@ pub struct Circle {
 }
 
 impl Circle {
-    pub fn new(pos: Vector2, rad: f64) -> Circle {
-        Circle { pos, rad }
+    pub fn new(pos: Vector2, rad: f64) -> Self {
+        Self { pos, rad }
     }
-    pub fn _overlap(&self, other: &Circle) -> f64 {
+    pub fn _overlap(&self, other: &Self) -> f64 {
         let dist_between_centers = (self.pos - other.pos).len();
         let combined_radii = self.rad + other.rad;
         (combined_radii - dist_between_centers) / combined_radii
     }
-    pub fn is_hitting(&self, other: &Circle) -> bool {
+    pub fn is_hitting(&self, other: &Self) -> bool {
         (other.pos - self.pos).square_len() < (self.rad + other.rad).powi(2)
     }
 }
