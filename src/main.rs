@@ -57,37 +57,22 @@ async fn main() {
     // state init
     let mut state = State::reset();
 
-    // tests
-    let text_params = TextParams {
-        font: Some(&joystix),
-        ..SCORE_TEXT_PARAMS
-    };
-
     // main game loop
     loop {
         // get inputs for this frame
         let input = Input::get();
+
+        // update
         state.progress(&input, dt, &asset_loader);
         state.score += state.score_last_frame;
 
         // draw calls
         set_camera(&canvas.camera);
-        clear_background(if state.freeze > 0.00 {
-            BG_ON_DAMAGE
-        } else {
-            BG
-        });
+        clear_background(state.bg_color());
         state.draw(&asset_loader);
-        let score_text = fill_leading_zeroes(state.score);
-        let score_chars = score_text.chars();
-        for (i, c) in score_chars.enumerate() {
-            draw_text_ex(
-                &c.to_owned().to_string(),
-                (i as f32).mul_add(8.00, 1.00),
-                9.00,
-                text_params.clone(),
-            );
-        }
+
+        state.score.draw_as_score(&joystix);
+
         set_default_camera();
         canvas.draw();
 
@@ -96,9 +81,6 @@ async fn main() {
             state = State::reset();
         };
 
-        // present
-
-        // wait for the frame timer
         next_frame().await;
     }
 }
@@ -499,6 +481,13 @@ impl State {
         self.freeze += effect.freeze + effect.burger_damage.max(0.00);
         self.burger.bhv.hp -= effect.burger_damage;
         self.particles.extend(effect.particles);
+    }
+    fn bg_color(&self) -> Color {
+        if self.freeze > 0.00 {
+            BG_ON_DAMAGE
+        } else {
+            BG
+        }
     }
 }
 
