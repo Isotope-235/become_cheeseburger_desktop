@@ -195,11 +195,12 @@ mod tests {
     #[test]
     fn test_vector2() {
         let v = Vector2(1.00, 2.00);
-        assert_eq!(v.square_len(), 5.00);
-        assert_eq!(v.len(), 5.00f64.sqrt());
-        assert_eq!(v.angle(), 1.107_148_717_794_090_4);
-        assert_eq!(v.x(), 1.00);
-        assert_eq!(v.y(), 2.00);
+        let cmp = |a: f64, b: f64| (a - b).abs() < 1e-10;
+        assert!(cmp(v.square_len(), 5.00));
+        assert!(cmp(v.len(), 5.00f64.sqrt()));
+        assert!(cmp(v.angle(), 1.107_148_717_794_090_4));
+        assert!(cmp(v.x(), 1.00));
+        assert!(cmp(v.y(), 2.00));
         let mut v = Vector2(1.00, 2.00);
         v += Vector2(3.00, 4.00);
     }

@@ -42,8 +42,8 @@ impl Particle {
         let mut output = Vec::with_capacity(number);
         let random_offset = rand(TAU);
         for i in 0..number {
-            let angle = random_offset + TAU * (offset + i as f64 / (number as f64));
-            let vel = Vector2::from(angle) * (vel * 0.90 + rand(vel * 0.20));
+            let angle = TAU.mul_add(offset + i as f64 / (number as f64), random_offset);
+            let vel = Vector2::from(angle) * vel.mul_add(0.90, rand(vel * 0.20));
             let acc = Vector2::from(angle) * acc;
             output.push(Self::new(pos, vel, acc, fric, rand(lifetime), color));
         }

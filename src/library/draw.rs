@@ -21,8 +21,8 @@ pub fn copy_texture(texture: &Texture2D, pos: Vector2) {
     texture.set_filter(FilterMode::Nearest);
     draw_texture(
         texture,
-        pos.x() as f32 - texture.width() * 0.50,
-        pos.y() as f32 - texture.height() * 0.50,
+        texture.width().mul_add(-0.50, pos.x() as f32),
+        texture.height().mul_add(-0.50, pos.y() as f32),
         WHITE,
     );
 }
@@ -31,8 +31,8 @@ pub fn copy_with_rotation(texture: &Texture2D, pos: Vector2, rotation: f64) {
     texture.set_filter(FilterMode::Nearest);
     draw_texture_ex(
         texture,
-        pos.x() as f32 - texture.width() * 0.50,
-        pos.y() as f32 - texture.height() * 0.50,
+        texture.width().mul_add(-0.50, pos.x() as f32),
+        texture.height().mul_add(-0.50, pos.y() as f32),
         WHITE,
         DrawTextureParams {
             dest_size: None,

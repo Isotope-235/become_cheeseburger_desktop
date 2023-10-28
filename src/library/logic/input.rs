@@ -21,7 +21,7 @@ impl Input {
     }
     pub fn dir(&self) -> Vector2 {
 
-        let Input { w, a, s, d, .. } = *self;
+        let Self { w, a, s, d, .. } = *self;
         Vector2(
             f64::from(d) - f64::from(a),
             f64::from(s) - f64::from(w),
