@@ -25,7 +25,6 @@ impl AssetLoader {
             sounds: sound::Loader::new(),
         }
     }
-
     /// Loads a vector of sprite paths into this [`AssetLoader`],
     /// making the sprites loaded available for rendering the [`Texture2D`]s
     ///
@@ -49,7 +48,6 @@ impl AssetLoader {
         self.sprites.load_many(sprite_paths).await;
         self
     }
-
     /// Loads a vector of sound configurations into this [`AssetLoader`],
     /// making the sounds loaded available for playing.
     ///
@@ -87,7 +85,6 @@ impl AssetLoader {
         self.sounds.load_many(sound_configs).await;
         self
     }
-
     /// Plays a sound with a given ID.
     /// This function picks a random sound file from the folder with the given ID,
     /// and plays it
@@ -100,7 +97,6 @@ impl AssetLoader {
     pub fn play_sound(&self, id: &str) {
         self.sounds.play(id);
     }
-
     /// Returns a reference to the [`Texture2D`] for the given sprite ID.
     ///
     /// ## Example
@@ -111,8 +107,7 @@ impl AssetLoader {
     pub fn texture(&self, path: &str) -> &Texture2D {
         self.sprites.texture(path)
     }
-
-    /// Returns a reference to the [Color] for the given sprite ID.
+    /// Returns a reference to the [`Color`] for the given sprite ID.
     ///
     /// ## Example
     /// ```
