@@ -41,23 +41,3 @@ pub fn copy_with_rotation(texture: &Texture2D, pos: Vector2, rotation: f64) {
         },
     );
 }
-
-pub trait AsScore {
-    fn draw_as_score(&self, font: &Font);
-}
-
-impl AsScore for i32 {
-    fn draw_as_score(&self, font: &Font) {
-        for (i, c) in fill_leading_zeroes(*self).chars().enumerate() {
-            draw_text_ex(
-                &c.to_string(),
-                (i as f32).mul_add(8.00, 1.00),
-                9.00,
-                TextParams {
-                    font: Some(&font),
-                    ..SCORE_TEXT_PARAMS
-                },
-            );
-        }
-    }
-}
