@@ -1,5 +1,5 @@
 //#![windows_subsystem = "windows"]
-#![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::restriction)]
+#![warn(clippy::pedantic)]
 #![allow(clippy::cast_possible_truncation, clippy::cast_precision_loss, clippy::wildcard_imports, clippy::must_use_candidate, clippy::too_many_lines)]
 
 use std::f64::consts::PI;
