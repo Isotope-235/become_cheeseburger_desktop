@@ -12,7 +12,7 @@ pub struct Config {
 
 impl From<&'static str> for Config {
     fn from(value: &'static str) -> Self {
-        Self::from_name(value)
+        Config::from_name(value)
     }
 }
 
@@ -40,7 +40,7 @@ pub struct Loader(HashMap<String, Config>, HashMap<String, Vec<Sound>>);
 
 impl Loader {
     pub fn new() -> Self {
-        Self(HashMap::new(), HashMap::new())
+        Loader(HashMap::new(), HashMap::new())
     }
 
     pub async fn load_many<T: Into<Config>>(&mut self, sound_configs: Vec<T>) {

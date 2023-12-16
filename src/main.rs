@@ -1,6 +1,6 @@
 //#![windows_subsystem = "windows"]
 #![warn(clippy::all, clippy::pedantic, clippy::nursery)]
-#![allow(clippy::cast_possible_truncation, clippy::cast_precision_loss, clippy::wildcard_imports, clippy::must_use_candidate, clippy::too_many_lines, clippy::missing_const_for_fn, clippy::future_not_send, clippy::cognitive_complexity)]
+#![allow(clippy::cast_possible_truncation, clippy::cast_precision_loss, clippy::wildcard_imports, clippy::must_use_candidate, clippy::too_many_lines, clippy::missing_const_for_fn, clippy::future_not_send)]
 
 use std::f64::consts::FRAC_PI_2;
 
@@ -83,7 +83,7 @@ async fn main() {
         for (i, c) in score_chars.enumerate() {
             draw_text_ex(
                 &c.to_owned().to_string(),
-                (i as f32).mul_add(8.00, 1.00),
+                1.00 + i as f32 * 8.00,
                 9.00,
                 text_params.clone(),
             );
@@ -148,7 +148,7 @@ impl State {
             // spawn_logic
 
             // bullets
-            let times = self.bullet.counter.revolve(0.25f64.mul_add(diff_scale, 1.10), dt);
+            let times = self.bullet.counter.revolve(1.10 + 0.25 * diff_scale, dt);
 
             for _ in 0..times {
                 let side = rrange(4);
@@ -168,7 +168,7 @@ impl State {
                         self.bullet.s.push(bullet);
                     }
                 } else {
-                    for i in 0..(diff_scale.mul_add(2.00, 1.00) as i32) {
+                    for i in 0..((1.00 + diff_scale * 2.00) as i32) {
                         let delay = f64::from(i) * 10.00;
                         let (pos, vel) = spawn_pos_vel_from(side, 4.00 + delay, 4.00);
                         let bullet = Bullet::new(pos, vel * 1.25, delay);
@@ -180,7 +180,7 @@ impl State {
             // cheeses
 
             // slugs
-            let times = self.slug.counter.revolve(0.025f64.mul_add(diff_scale, 0.125), dt);
+            let times = self.slug.counter.revolve(0.125 + 0.025 * diff_scale, dt);
 
             for _ in 0..times {
                 let (pos, vel) = spawn_pos_vel(10.00, 10.00);
@@ -189,7 +189,7 @@ impl State {
             }
 
             // warnings
-            let times = self.warning.counter.revolve(0.10f64.mul_add(diff_scale, 0.15), dt);
+            let times = self.warning.counter.revolve(0.15 + 0.10 * diff_scale, dt);
 
             for i in 0..(times * diff_scale as i32) {
                 let (mut pos, dir) = spawn_pos_vel(-12.00, 12.00);
@@ -218,7 +218,7 @@ impl State {
             }
 
             // frag
-            let times = self.frag.counter.revolve(0.02f64.mul_add(diff_scale, 0.10), dt);
+            let times = self.frag.counter.revolve(0.10 + 0.02 * diff_scale, dt);
 
             for _ in 0..times {
                 let (pos, vel) = spawn_pos_vel(4.00, 4.00);
@@ -228,7 +228,7 @@ impl State {
 
             let times = self
                 .cross_counter
-                .revolve(0.135f64.mul_add(diff_scale, -0.25).max(0.00), dt);
+                .revolve((-0.25 + 0.135 * diff_scale).max(0.00), dt);
 
             for _ in 0..times {
                 for i in 0..4 {
