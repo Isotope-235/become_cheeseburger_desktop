@@ -19,7 +19,7 @@ impl HealthPack {
 }
 impl Default for HealthPack {
     fn default() -> Self {
-        Self { hp: 1.00 }
+        HealthPack { hp: 1.00 }
     }
 }
 impl OnHit for Pos<HealthPack> {

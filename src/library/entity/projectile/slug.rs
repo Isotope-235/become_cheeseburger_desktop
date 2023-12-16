@@ -9,7 +9,7 @@ impl HitBox for Pos<Slug> {
     }
 }
 impl Slug {
-    pub fn new(pos: Vector2, vel: Vector2) -> Pos<Self> {
+    pub fn new(pos: Vector2, vel: Vector2) -> Pos<Slug> {
         Pos {
             pos,
             vel,
@@ -19,7 +19,7 @@ impl Slug {
 }
 impl Default for Slug {
     fn default() -> Self {
-        Self { hp: 7.00 }
+        Slug { hp: 7.00 }
     }
 }
 impl OnHit for Pos<Slug> {

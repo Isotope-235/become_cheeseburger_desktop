@@ -28,7 +28,7 @@ impl Vector2 {
     /// ```
     /// assert_eq!(Vector2::ZERO, Vector2(0.00, 0.00));
     /// ```
-    pub const ZERO: Self = Self(0.00, 0.00);
+    pub const ZERO: Vector2 = Vector2(0.00, 0.00);
     /// Returns the length of the vector *before* applying the square root.
     ///
     /// ## Example
@@ -39,8 +39,8 @@ impl Vector2 {
     /// ```
     #[must_use]
     pub fn square_len(self) -> f64 {
-        let Self(x, y) = self;
-        x.mul_add(y, y.powi(2))
+        let Vector2(x, y) = self;
+        x.powi(2) + y.powi(2)
     }
     /// Returns the length of the vector. Equivalent to `self.square_len().sqrt()`.
     ///
@@ -56,13 +56,13 @@ impl Vector2 {
     }
     /// Returns the equivalent vector with a length of 1. Essentially performs `self / self.len()`.
     #[must_use]
-    pub fn normal(self) -> Self {
+    pub fn normal(self) -> Vector2 {
         let length = self.len();
-        let Self(x, y) = self;
+        let Vector2(x, y) = self;
         if length > 1e-10 {
-            Self(x / length, y / length)
+            Vector2(x / length, y / length)
         } else {
-            Self::ZERO
+            Vector2::ZERO
         }
     }
     /// Returns the angle of the vector in radians.
@@ -70,20 +70,20 @@ impl Vector2 {
     /// This method uses the `atan2` implementation, and will therefore always respect the signs of the components.
     #[must_use]
     pub fn angle(self) -> f64 {
-        let Self(x, y) = self;
+        let Vector2(x, y) = self;
         y.atan2(x)
     }
     /// Returns the negated vector. Equivalent to `self * -1.00`.
     #[must_use]
-    pub fn negate(self) -> Self {
-        let Self(x, y) = self;
-        Self(-x, -y)
+    pub fn negate(self) -> Vector2 {
+        let Vector2(x, y) = self;
+        Vector2(-x, -y)
     }
     /// Returns the vector with its component values swapped.
     #[must_use]
-    pub fn invert(self) -> Self {
-        let Self(x, y) = self;
-        Self(y, x)
+    pub fn invert(self) -> Vector2 {
+        let Vector2(x, y) = self;
+        Vector2(y, x)
     }
     /// Returns the vector rotated 90 degrees counter-clockwise.
     ///
@@ -94,9 +94,9 @@ impl Vector2 {
     /// assert_eq!(v.rotate_once(), Vector2(-1.00, 0.00));
     /// ```
     #[must_use]
-    pub fn rotate_once(self) -> Self {
-        let Self(x, y) = self;
-        Self(-y, x)
+    pub fn rotate_once(self) -> Vector2 {
+        let Vector2(x, y) = self;
+        Vector2(-y, x)
     }
     /// Returns the x component of the vector.
     ///
@@ -117,17 +117,17 @@ impl Vector2 {
     /// let v = Vector2(1.00, 2.00);
     /// assert_eq!(v.y(), 2.00);
     /// ```
-    pub const fn y(self) -> f64 {
+    pub fn y(self) -> f64 {
         self.1
     }
     /// Returns the vector with its x component set to the given value.
     #[must_use]
-    pub fn aligned(self) -> Self {
-        let Self(x, y) = self;
+    pub fn aligned(self) -> Vector2 {
+        let Vector2(x, y) = self;
         if x.abs() > y.abs() {
-            Self(x, 0.00)
+            Vector2(x, 0.00)
         } else {
-            Self(0.00, y)
+            Vector2(0.00, y)
         }
     }
     /// Returns the vector multiplied component-wise by the given vector.
@@ -142,16 +142,16 @@ impl Vector2 {
     /// assert_eq!(v1.mul_per(v2), Vector2(-1.00, 4.00));
     /// ```
     #[must_use]
-    pub fn mul_per(self, rhs: Self) -> Self {
-        let Self(x, y) = self;
-        let Self(ox, oy) = rhs;
-        Self(x * ox, y * oy)
+    pub fn mul_per(self, rhs: Vector2) -> Vector2 {
+        let Vector2(x, y) = self;
+        let Vector2(ox, oy) = rhs;
+        Vector2(x * ox, y * oy)
     }
 }
 
 impl AddAssign for Vector2 {
     fn add_assign(&mut self, rhs: Self) {
-        let Self(ox, oy) = rhs;
+        let Vector2(ox, oy) = rhs;
         self.0 += ox;
         self.1 += oy;
     }
@@ -165,18 +165,18 @@ impl MulAssign<f64> for Vector2 {
 impl Add for Vector2 {
     type Output = Self;
 
-    fn add(self, rhs: Self) -> Self::Output {
-        Self(self.0 + rhs.0, self.1 + rhs.1)
+    fn add(self, rhs: Vector2) -> Self::Output {
+        Vector2(self.0 + rhs.0, self.1 + rhs.1)
     }
 }
 
 impl Sub for Vector2 {
     type Output = Self;
 
-    fn sub(self, rhs: Self) -> Self::Output {
-        let Self(sx, sy) = self;
-        let Self(ox, oy) = rhs;
-        Self(sx - ox, sy - oy)
+    fn sub(self, rhs: Vector2) -> Self::Output {
+        let Vector2(sx, sy) = self;
+        let Vector2(ox, oy) = rhs;
+        Vector2(sx - ox, sy - oy)
     }
 }
 
@@ -184,7 +184,7 @@ impl Mul<f64> for Vector2 {
     type Output = Self;
 
     fn mul(self, rhs: f64) -> Self::Output {
-        Self(self.0 * rhs, self.1 * rhs)
+        Vector2(self.0 * rhs, self.1 * rhs)
     }
 }
 

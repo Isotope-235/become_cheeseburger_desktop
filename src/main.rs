@@ -1,8 +1,8 @@
 //#![windows_subsystem = "windows"]
-#![warn(clippy::all, clippy::pedantic, clippy::nursery)]
-#![allow(clippy::cast_possible_truncation, clippy::cast_precision_loss, clippy::wildcard_imports, clippy::must_use_candidate, clippy::too_many_lines, clippy::missing_const_for_fn, clippy::future_not_send)]
+#![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::restriction)]
+#![allow(clippy::cast_possible_truncation, clippy::cast_precision_loss, clippy::wildcard_imports, clippy::must_use_candidate, clippy::too_many_lines)]
 
-use std::f64::consts::FRAC_PI_2;
+use std::f64::consts::PI;
 
 use macroquad::{prelude::*, rand::ChooseRandom};
 use macroquad_canvas::Canvas2D;
@@ -109,7 +109,7 @@ pub struct Units<T> {
 }
 impl<T> Units<T> {
     fn new() -> Self {
-        Self {
+        Units {
             s: Vec::new(),
             counter: 0.00,
         }
@@ -207,7 +207,9 @@ impl State {
 
             // health packs
             let times = self.health_pack.counter.revolve(
-                0.10 * (self.burger.missing_hp() - (self.health_pack.s.len() * 2) as f64).clamp(0.00, 8.00),
+                0.10 * (self.burger.missing_hp() - (self.health_pack.s.len() * 2) as f64)
+                    .max(0.00)
+                    .min(8.00),
                 dt,
             );
 
@@ -295,7 +297,7 @@ impl State {
                 let burger = &mut self.burger;
                 burger.vel = input.dir().normal() * (0.55) * dt + burger.vel * 0.675f64.powf(dt);
                 burger.bhv.invuln = (burger.bhv.invuln - dt).max(0.00);
-                burger.bhv.dash_charge = (0.01f64.mul_add(dt, burger.bhv.dash_charge)).min(1.00);
+                burger.bhv.dash_charge = (burger.bhv.dash_charge + 0.01 * dt).min(1.00);
                 burger.bhv.hp = burger.bhv.hp.min(burger.max_hp());
                 if input.space.is_pressed() && burger.can_dash() && input.dir().len() > 0.00 {
                     burger.dash(input, asset_loader);
@@ -404,7 +406,7 @@ impl State {
             copy_with_rotation(
                 asset_loader.texture("slug"),
                 slug.pos,
-                slug.vel.angle() + FRAC_PI_2,
+                slug.vel.angle() + PI * 0.50,
             );
         }
         // warning.s
@@ -475,8 +477,8 @@ impl State {
     fn game_is_over(&self) -> bool {
         !self.burger.is_alive() && self.freeze.abs() < 1e-10
     }
-    fn reset() -> Self {
-        Self {
+    fn reset() -> State {
+        State {
             difficulty: 100.00,
             score: 0,
             score_last_frame: 0,

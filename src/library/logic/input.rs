@@ -10,8 +10,8 @@ pub struct Input {
     pub space: Button,
 }
 impl Input {
-    pub fn get() -> Self {
-        Self {
+    pub fn get() -> Input {
+        Input {
             w: is_key_down(KeyCode::W).into(),
             a: is_key_down(KeyCode::A).into(),
             s: is_key_down(KeyCode::S).into(),
@@ -37,15 +37,15 @@ pub enum Button {
 impl Button {
     pub fn is_pressed(&self) -> bool {
         match self {
-            Self::Pressed => true,
-            Self::Released => false,
+            Button::Pressed => true,
+            Button::Released => false,
         }
     }
 }
 
 impl From<bool> for Button {
     fn from(b: bool) -> Self {
-        if b { Self::Pressed } else { Self::Released }
+        if b { Button::Pressed } else { Button::Released }
     }
 }
 

@@ -11,7 +11,7 @@ impl HitBox for Pos<Laser> {
 }
 
 impl Laser {
-    pub fn new(pos: Vector2, vel: Vector2) -> Pos<Self> {
+    pub fn new(pos: Vector2, vel: Vector2) -> Pos<Laser> {
         Pos {
             pos,
             vel,
@@ -22,7 +22,7 @@ impl Laser {
 
 impl Default for Laser {
     fn default() -> Self {
-        Self { hp: 5.00 }
+        Laser { hp: 5.00 }
     }
 }
 

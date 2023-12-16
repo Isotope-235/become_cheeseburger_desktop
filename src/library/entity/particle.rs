@@ -14,13 +14,13 @@ impl Particle {
         fric: f64,
         lifetime: f64,
         color: Color,
-    ) -> Pos<Self> {
+    ) -> Pos<Particle> {
         Pos {
             pos,
             vel,
             acc,
             age: 0.00,
-            bhv: Self {
+            bhv: Particle {
                 lifetime,
                 friction: fric,
                 color,
@@ -38,14 +38,14 @@ impl Particle {
         fric: f64,
         lifetime: f64,
         color: Color,
-    ) -> Vec<Pos<Self>> {
+    ) -> Vec<Pos<Particle>> {
         let mut output = Vec::with_capacity(number);
         let random_offset = rand(TAU);
         for i in 0..number {
             let angle = random_offset + TAU * (offset + i as f64 / (number as f64));
             let vel = Vector2::from(angle) * (vel * 0.90 + rand(vel * 0.20));
             let acc = Vector2::from(angle) * acc;
-            output.push(Self::new(pos, vel, acc, fric, rand(lifetime), color));
+            output.push(Particle::new(pos, vel, acc, fric, rand(lifetime), color));
         }
         output
     }

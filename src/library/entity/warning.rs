@@ -6,17 +6,17 @@ pub struct Warning {
 }
 
 impl Warning {
-    pub fn new(pos: Vector2, dir: Vector2, delay: f64) -> Pos<Self> {
+    pub fn new(pos: Vector2, dir: Vector2, delay: f64) -> Pos<Warning> {
         Pos {
             pos,
-            bhv: Self { dir, delay },
+            bhv: Warning { dir, delay },
             ..Pos::default()
         }
     }
 }
 impl Default for Warning {
     fn default() -> Self {
-        Self{
+        Warning {
             dir: Vector2::ZERO,
             delay: 0.00,
         }

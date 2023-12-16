@@ -19,7 +19,7 @@ impl Player {
             vel: Vector2::ZERO,
             acc: Vector2::ZERO,
             age: 0.00,
-            bhv: Self {
+            bhv: Player {
                 hp: 8.00,
                 invuln: 0.00,
                 dash_charge: 1.00,
@@ -41,8 +41,8 @@ impl Pos<Player> {
         if y < 0.00 || y > bounds.1 {
             self.vel.1 *= -1.00;
         }
-        self.pos.0 = self.pos.0.clamp(0.00, bounds.0);
-        self.pos.1 = self.pos.1.clamp(0.00, bounds.1);
+        self.pos.0 = self.pos.0.max(0.00).min(bounds.0);
+        self.pos.1 = self.pos.1.max(0.00).min(bounds.1);
     }
     pub fn max_hp(&self) -> f64 {
         8.00
