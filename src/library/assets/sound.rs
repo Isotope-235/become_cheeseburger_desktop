@@ -43,9 +43,9 @@ impl Loader {
         Self(HashMap::new(), HashMap::new())
     }
 
-    pub async fn load_many<T: Into<Config>>(&mut self, configs: Vec<T>) {
-        for c in configs {
-            let sound_config = c.into();
+    pub async fn load_many<T: Into<Config>>(&mut self, sound_configs: Vec<T>) {
+        for sc in sound_configs {
+            let sound_config = sc.into();
             let paths =
                 fs::read_dir(format!("assets/sounds/{}", sound_config.id)).unwrap_or_else(|_err| {
                     panic!(
