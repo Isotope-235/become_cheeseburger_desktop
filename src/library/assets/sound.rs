@@ -16,6 +16,13 @@ impl From<&'static str> for Config {
     }
 }
 
+impl From<(f32, bool, &'static str)> for Config {
+    fn from(value: (f32, bool, &'static str)) -> Self {
+        let (volume, looped, id) = value;
+        Config { volume, looped, id }
+    }
+}
+
 impl Config {
     pub fn from_name(name: &'static str) -> Self {
         Self {
@@ -28,7 +35,7 @@ impl Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            volume: 0.25,
+            volume: 0.05,
             looped: false,
             id: "",
         }

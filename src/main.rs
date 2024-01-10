@@ -50,6 +50,8 @@ async fn main() {
             ("heart", Color::from_rgba(221, 16, 85, 255)),
         ]).await
         .load_sounds(vec!["explosion", "heal", "laser", "damage", "dash"])
+        .await
+        .load_sounds(vec![(0.15, true, "music1")])
         .await;
 
     let joystix = load_ttf_font("joystix.otf").await.unwrap();
@@ -62,6 +64,9 @@ async fn main() {
         font: Some(&joystix),
         ..SCORE_TEXT_PARAMS
     };
+
+    // music
+    asset_loader.play_sound("music1");
 
     // main game loop
     loop {
