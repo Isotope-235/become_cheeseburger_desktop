@@ -1,6 +1,6 @@
 use crate::*;
 /// # Panics
-/// 
+///
 /// This function panics if it does not find all of the following files in the `assets/sprites` folder:
 /// * `icon_s.png`
 /// * `icon_m.png`

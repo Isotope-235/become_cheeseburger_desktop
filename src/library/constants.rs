@@ -9,7 +9,7 @@ pub const SCORE_TEXT_PARAMS: TextParams = TextParams {
     font_scale: 0.125,
     font_scale_aspect: 1.00,
     color: YELLOW,
-    rotation: 0.00
+    rotation: 0.00,
 };
 
 // Colors

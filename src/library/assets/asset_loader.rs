@@ -31,7 +31,7 @@ impl AssetLoader {
     ///
     /// This function also allows assigning a color for each sprite, facilitating particle
     /// effects and such.
-    /// 
+    ///
     /// It returns a reference to itself to facilitate chain calls.
     ///
     /// ## Example
@@ -45,7 +45,10 @@ impl AssetLoader {
     ///
     /// asset_loader.texture("sprite_id"); // Returns a Texture2D
     /// ```
-    pub async fn load_sprites(&mut self, sprite_paths: Vec<impl sprites::IntoPathColor>) -> &mut Self {
+    pub async fn load_sprites(
+        &mut self,
+        sprite_paths: Vec<impl sprites::IntoPathColor>,
+    ) -> &mut Self {
         self.sprites.load_many(sprite_paths).await;
         self
     }

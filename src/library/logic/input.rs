@@ -20,19 +20,15 @@ impl Input {
         }
     }
     pub fn dir(&self) -> Vector2 {
-
         let Input { w, a, s, d, .. } = *self;
-        Vector2(
-            f64::from(d) - f64::from(a),
-            f64::from(s) - f64::from(w),
-        )
+        Vector2(f64::from(d) - f64::from(a), f64::from(s) - f64::from(w))
     }
 }
 
 #[derive(Clone, Copy)]
 pub enum Button {
     Pressed,
-    Released
+    Released,
 }
 impl Button {
     pub fn is_pressed(&self) -> bool {
@@ -45,7 +41,11 @@ impl Button {
 
 impl From<bool> for Button {
     fn from(b: bool) -> Self {
-        if b { Button::Pressed } else { Button::Released }
+        if b {
+            Button::Pressed
+        } else {
+            Button::Released
+        }
     }
 }
 

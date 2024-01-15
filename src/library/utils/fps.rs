@@ -1,7 +1,7 @@
 use crate::*;
 /// # Panics
-/// 
-/// 
+///
+///
 pub async fn find() -> i32 {
     let mut attempts = 0;
     'fps: loop {

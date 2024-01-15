@@ -1,8 +1,14 @@
 //#![windows_subsystem = "windows"]
 #![warn(clippy::pedantic)]
-#![allow(clippy::cast_possible_truncation, clippy::cast_precision_loss, clippy::wildcard_imports, clippy::must_use_candidate, clippy::too_many_lines)]
+#![allow(
+    clippy::cast_possible_truncation,
+    clippy::cast_precision_loss,
+    clippy::wildcard_imports,
+    clippy::must_use_candidate,
+    clippy::too_many_lines
+)]
 
-use std::f64::consts::PI;
+use std::{f64::consts::PI, ops::Not};
 
 use macroquad::{prelude::*, rand::ChooseRandom};
 use macroquad_canvas::Canvas2D;
@@ -13,21 +19,16 @@ pub mod library;
 
 #[macroquad::main(window())]
 async fn main() {
-    
     // get fps via cringe
     let fps = fps::find().await;
     println!("Targeted framerate: {fps}");
 
     // fps-based timestep
     let dt = DT * 60.00 / f64::from(fps);
-    
+
     // pixel perfection
-    let mut camera = Camera2D::from_display_rect(Rect::new(
-        0.00,
-        0.00,
-        SCREEN_X as f32,
-        SCREEN_Y as f32,
-    ));
+    let mut camera =
+        Camera2D::from_display_rect(Rect::new(0.00, 0.00, SCREEN_X as f32, SCREEN_Y as f32));
     camera.zoom = vec2(camera.zoom.x, camera.zoom.y * -1.00);
     set_camera(&camera);
 
@@ -44,11 +45,13 @@ async fn main() {
             "flak",
             "slug",
             "flak_child",
-        ]).await
+        ])
+        .await
         .load_sprites(vec![
             ("cheese", Color::from_rgba(255, 221, 86, 255)),
             ("heart", Color::from_rgba(221, 16, 85, 255)),
-        ]).await
+        ])
+        .await
         .load_sounds(vec!["explosion", "heal", "laser", "damage", "dash"])
         .await
         .load_sounds(vec![(0.15, true, "music1")])
@@ -58,6 +61,7 @@ async fn main() {
 
     // state init
     let mut state = State::reset();
+    let mut ended = false;
 
     // tests
     let text_params = TextParams {
@@ -72,8 +76,11 @@ async fn main() {
     loop {
         // get inputs for this frame
         let input = Input::get();
-        state.progress(&input, dt, &asset_loader);
-        state.score += state.score_last_frame;
+
+        if ended.not() {
+            state.progress(&input, dt, &asset_loader);
+            state.score += state.score_last_frame;
+        }
 
         // draw calls
         set_camera(&canvas.camera);
@@ -87,21 +94,39 @@ async fn main() {
         let score_chars = score_text.chars();
         for (i, c) in score_chars.enumerate() {
             draw_text_ex(
-                &c.to_owned().to_string(),
+                &(c.to_string())[..],
                 1.00 + i as f32 * 8.00,
                 9.00,
                 text_params.clone(),
             );
         }
+
+        if ended {
+            let game_over = "you did not become cheeseburger";
+            let options = TextParams {
+                font: Some(&joystix),
+                font_size: 80,
+                font_scale: 0.125,
+                ..SCORE_TEXT_PARAMS
+            };
+            draw_text_ex(
+                &game_over[..12],
+                35.00,
+                CENTER_Y as f32 - 20.00,
+                options.clone(),
+            );
+            draw_text_ex(&game_over[12..], 1.00, CENTER_Y as f32, options.clone());
+            draw_text_ex("restart: [r]", 30.00, CENTER_Y as f32 + 20.00, options);
+            if is_key_pressed(KeyCode::R) {
+                state = State::reset();
+            }
+        }
+
         set_default_camera();
         canvas.draw();
 
         // game should only end after freeze frames are rendered, so this goes after draw calls
-        if state.game_is_over() {
-            state = State::reset();
-        };
-
-        // present
+        ended = state.game_is_over();
 
         // wait for the frame timer
         next_frame().await;
@@ -353,14 +378,18 @@ impl State {
                         let number = 8;
                         for i in 0..number {
                             let dir = f64::from(i).as_radians() / f64::from(number);
-                            let child =
-                                frag::Child::new(frak.pos, Vector2::ZERO, Vector2::from(dir) * 0.01);
+                            let child = frag::Child::new(
+                                frak.pos,
+                                Vector2::ZERO,
+                                Vector2::from(dir) * 0.01,
+                            );
                             self.frag_children.push(child);
                         }
                     }
                 }
             };
-            { // frag children
+            {
+                // frag children
                 self.frag_children.shuffle();
             };
             {
@@ -508,7 +537,3 @@ impl State {
         self.particles.extend(effect.particles);
     }
 }
-
-
-
-
