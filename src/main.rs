@@ -163,6 +163,11 @@ struct State {
     cross_counter: f64,
 }
 
+/// Perform the frame update for the game-state.
+fn updated(state: State) -> State {
+
+}
+
 impl State {
     fn progress(&mut self, input: &Input, dt: f64, asset_loader: &AssetLoader) {
         let mut score = 0;
