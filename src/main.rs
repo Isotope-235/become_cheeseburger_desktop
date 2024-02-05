@@ -133,39 +133,43 @@ async fn main() {
     }
 }
 
-pub struct Units<T> {
-    pub instances: Vec<T>,
-    pub counter: f64,
+#[derive(Debug, Default)]
+pub struct Counters {
+    bullet: f64,
+    slug: f64,
+    warning: f64,
+    health_pack: f64,
+    frag: f64,
+    cross: f64
 }
-impl<T> Units<T> {
-    fn new() -> Self {
-        Units {
-            instances: Vec::new(),
-            counter: 0.00,
-        }
-    }
-}
+
 struct State {
     difficulty: f64,
     score: i32,
     score_last_frame: i32,
     freeze: f64,
+    counters: Counters,
+
+    // instances
     burger: Pos<Player>,
     cheese: Pos<Cheese>,
-    bullet: Units<Pos<Bullet>>,
-    slug: Units<Pos<Slug>>,
-    warning: Units<Pos<Warning>>,
+    bullets: Vec<Pos<Bullet>>,
+    slugs: Vec<Pos<Slug>>,
+    warnings: Vec<Pos<Warning>>,
     lasers: Vec<Pos<Laser>>,
-    health_pack: Units<Pos<HealthPack>>,
-    frag: Units<Pos<Frag>>,
+    health_packs: Vec<Pos<HealthPack>>,
+    frags: Vec<Pos<Frag>>,
     frag_children: Vec<Pos<frag::Child>>,
     particles: Vec<Pos<Particle>>,
-    cross_counter: f64,
 }
 
 /// Perform the frame update for the game-state.
-fn updated(state: State) -> State {
+fn updated(state: State, input: &Input, dt: f64, asset_loader: &AssetLoader) -> State {
+    let State { difficulty, score, score_last_frame, freeze, counters, burger, cheese, bullets, slugs, warnings, lasers, health_packs, frags, frag_children, particles }
 
+
+
+    State { difficulty, score, score_last_frame, freeze, counters, burger, cheese, bullets, slugs, warnings, lasers, health_packs, frags, frag_children, particles }
 }
 
 impl State {
@@ -183,7 +187,7 @@ impl State {
             // spawn_logic
 
             // bullets
-            let times = self.bullet.counter.revolve(1.10 + 0.25 * diff_scale, dt);
+            let times = self.counters.bullet.revolve(1.10 + 0.25 * diff_scale, dt);
 
             for _ in 0..times {
                 let side = rrange(4);
@@ -200,14 +204,14 @@ impl State {
                             (pos + shift, direction.negate())
                         };
                         let bullet = Bullet::new(pos, vel * 1.25, delay);
-                        self.bullet.instances.push(bullet);
+                        self.bullets.push(bullet);
                     }
                 } else {
                     for i in 0..((1.00 + diff_scale * 2.00) as i32) {
                         let delay = f64::from(i) * 10.00;
                         let (pos, vel) = spawn_pos_vel_from(side, 4.00 + delay, 4.00);
                         let bullet = Bullet::new(pos, vel * 1.25, delay);
-                        self.bullet.instances.push(bullet);
+                        self.bullets.push(bullet);
                     }
                 }
             }
@@ -215,16 +219,16 @@ impl State {
             // cheeses
 
             // slugs
-            let times = self.slug.counter.revolve(0.125 + 0.025 * diff_scale, dt);
+            let times = self.counters.slug.revolve(0.125 + 0.025 * diff_scale, dt);
 
             for _ in 0..times {
                 let (pos, vel) = spawn_pos_vel(10.00, 10.00);
                 let slug = Slug::new(pos, vel * 0.50);
-                self.slug.instances.push(slug);
+                self.slugs.push(slug);
             }
 
             // warnings
-            let times = self.warning.counter.revolve(0.15 + 0.10 * diff_scale, dt);
+            let times = self.counters.warning.revolve(0.15 + 0.10 * diff_scale, dt);
 
             for i in 0..(times * diff_scale as i32) {
                 let (mut pos, dir) = spawn_pos_vel(-12.00, 12.00);
@@ -235,14 +239,13 @@ impl State {
                 } else {
                     pos.1 = self.burger.pos.y() + shift;
                 }
-                self.warning
-                    .instances
+                self.warnings
                     .push(Warning::new(pos, dir, f64::from(i) * (15.00)));
             }
 
             // health packs
-            let times = self.health_pack.counter.revolve(
-                0.10 * (self.burger.missing_hp() - (self.health_pack.instances.len() * 2) as f64)
+            let times = self.counters.health_pack.revolve(
+                0.10 * (self.burger.missing_hp() - (self.health_packs.len() * 2) as f64)
                     .max(0.00)
                     .min(8.00),
                 dt,
@@ -251,20 +254,20 @@ impl State {
             for _ in 0..times {
                 let (pos, vel) = spawn_pos_vel(10.00, 12.00);
                 let health_pack = HealthPack::new(pos, vel * 0.30);
-                self.health_pack.instances.push(health_pack);
+                self.health_packs.push(health_pack);
             }
 
             // frag
-            let times = self.frag.counter.revolve(0.10 + 0.02 * diff_scale, dt);
+            let times = self.counters.frag.revolve(0.10 + 0.02 * diff_scale, dt);
 
             for _ in 0..times {
                 let (pos, vel) = spawn_pos_vel(4.00, 4.00);
                 let frag = Frag::new(pos, vel * 0.50);
-                self.frag.instances.push(frag);
+                self.frags.push(frag);
             }
 
             let times = self
-                .cross_counter
+                .counters.cross
                 .revolve((-0.25 + 0.135 * diff_scale).max(0.00), dt);
 
             for _ in 0..times {
@@ -273,7 +276,7 @@ impl State {
                     let direction = CENTER - starting_point;
                     let vel = direction.normal();
                     for ii in 0..3 {
-                        self.bullet.instances.push(Bullet::new(
+                        self.bullets.push(Bullet::new(
                             starting_point - vel * 10.00 * f64::from(ii),
                             vel * 1.75,
                             0.00,
@@ -286,12 +289,12 @@ impl State {
             self.burger.update_pos(dt);
             self.burger.stays_in_bounds();
             self.cheese.update_pos(dt);
-            pos::update_all(&mut self.bullet.instances, dt);
-            pos::update_all(&mut self.slug.instances, dt);
-            pos::update_all(&mut self.warning.instances, dt);
+            pos::update_all(&mut self.bullets, dt);
+            pos::update_all(&mut self.slugs, dt);
+            pos::update_all(&mut self.warnings, dt);
             pos::update_all(&mut self.lasers, dt);
-            pos::update_all(&mut self.health_pack.instances, dt);
-            pos::update_all(&mut self.frag.instances, dt);
+            pos::update_all(&mut self.health_packs, dt);
+            pos::update_all(&mut self.frags, dt);
             pos::update_all(&mut self.frag_children, dt);
             pos::update_all(&mut self.particles, dt);
 
@@ -308,12 +311,12 @@ impl State {
                 burger_circle: &burger_circle,
                 asset_loader,
             };
-            do_all_hits(&mut self.health_pack.instances, hit_info);
+            do_all_hits(&mut self.health_packs, hit_info);
             if self.burger.is_targetable() {
-                do_all_hits(&mut self.bullet.instances, hit_info);
-                do_all_hits(&mut self.slug.instances, hit_info);
+                do_all_hits(&mut self.bullets, hit_info);
+                do_all_hits(&mut self.slugs, hit_info);
                 do_all_hits(&mut self.lasers, hit_info);
-                do_all_hits(&mut self.frag.instances, hit_info);
+                do_all_hits(&mut self.frags, hit_info);
                 do_all_hits(&mut self.frag_children, hit_info);
             }
             if state_effect.burger_damage > 0.00 {
@@ -361,7 +364,7 @@ impl State {
             };
             {
                 // warning.s
-                for warning in &self.warning.instances {
+                for warning in &self.warnings {
                     if !warning.will_live() {
                         let dir = warning.dir();
                         let laser = Laser::new(warning.pos - dir * 40.00, dir * 7.00);
@@ -378,7 +381,7 @@ impl State {
             };
             {
                 // frags
-                for frak in &self.frag.instances {
+                for frak in &self.frags {
                     if !frak.will_live() {
                         let number = 8;
                         for i in 0..number {
@@ -405,16 +408,13 @@ impl State {
             };
 
             // remove elements
-            self.bullet.instances.retain(|b| b.age < 750.00 && b.bhv.hp > 1e-10);
-            self.slug.instances.retain(|s| s.age < 1500.00 && s.bhv.hp > 1e-10);
-            self.warning.instances.retain(Pos::<Warning>::will_live);
+            self.bullets.retain(|b| b.age < 750.00 && b.bhv.hp > 1e-10);
+            self.slugs.retain(|s| s.age < 1500.00 && s.bhv.hp > 1e-10);
+            self.warnings.retain(Pos::<Warning>::will_live);
             self.lasers.retain(|l| l.age < 500.00 && l.bhv.hp > 1e-10);
-            self.health_pack
-                .instances
-                .retain(|hp| hp.age < 500.00 && hp.bhv.hp > 1e-10);
-            self.frag.instances.retain(Pos::<Frag>::will_live);
-            self.frag_children
-                .retain(|c| c.age < 300.00 && c.bhv.hp > 1e-10);
+            self.health_packs.retain(|hp| hp.age < 500.00 && hp.bhv.hp > 1e-10);
+            self.frags.retain(Pos::<Frag>::will_live);
+            self.frag_children.retain(|c| c.age < 300.00 && c.bhv.hp > 1e-10);
             self.particles.retain(|p| p.age <= p.bhv.lifetime);
 
             // up difficulty
@@ -433,15 +433,15 @@ impl State {
         // cheese
         copy_texture(asset_loader.texture("cheese"), self.cheese.pos);
         // health packs
-        for health_pack in &self.health_pack.instances {
+        for health_pack in &self.health_packs {
             copy_texture(asset_loader.texture("heart"), health_pack.pos);
         }
         // bullets
-        for bullet in &self.bullet.instances {
+        for bullet in &self.bullets {
             copy_texture(asset_loader.texture("bullet"), bullet.pos);
         }
         // slugs
-        for slug in &self.slug.instances {
+        for slug in &self.slugs {
             copy_with_rotation(
                 asset_loader.texture("slug"),
                 slug.pos,
@@ -449,7 +449,7 @@ impl State {
             );
         }
         // warning.s
-        for warning in &self.warning.instances {
+        for warning in &self.warnings {
             if warning.is_visible() {
                 let dur = 6.00;
                 let clr = if warning.age % dur < dur * 0.50 {
@@ -470,7 +470,7 @@ impl State {
             draw::rec(laser.pos, w, h, Color::from_rgba(255, 55, 55, 255));
         }
         // flak
-        for flak in &self.frag.instances {
+        for flak in &self.frags {
             copy_texture(asset_loader.texture("flak"), flak.pos);
         }
         // flak children
@@ -524,15 +524,15 @@ impl State {
             freeze: 0.00,
             burger: Player::new(CENTER + Vector2(0.00, 12.00)),
             cheese: Cheese::new(CENTER - Vector2(0.00, 12.00)),
-            bullet: Units::new(),
-            slug: Units::new(),
-            warning: Units::new(),
+            bullets: Vec::new(),
+            slugs: Vec::new(),
+            warnings: Vec::new(),
             lasers: Vec::new(),
-            health_pack: Units::new(),
-            frag: Units::new(),
+            health_packs: Vec::new(),
+            frags: Vec::new(),
             frag_children: Vec::new(),
             particles: Vec::new(),
-            cross_counter: 0.00,
+            counters: Counters::default()
         }
     }
     fn takes_effect(&mut self, effect: StateEffect, score_accumulator: &mut i32) {
