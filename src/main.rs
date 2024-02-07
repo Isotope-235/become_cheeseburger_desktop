@@ -70,7 +70,7 @@ async fn main() {
         let input = Input::get();
 
         if ended.not() {
-            state = updated(state, &input, dt, &asset_loader);
+            state.progress(&input, dt, &asset_loader);
             state.score += state.score_last_frame;
         }
 
@@ -132,7 +132,7 @@ pub struct Counters {
     warning: f64,
     health_pack: f64,
     frag: f64,
-    cross: f64
+    cross: f64,
 }
 
 struct State {
@@ -249,7 +249,8 @@ impl State {
             }
 
             let times = self
-                .counters.cross
+                .counters
+                .cross
                 .revolve((-0.25 + 0.135 * diff_scale).max(0.00), dt);
 
             for _ in 0..times {
@@ -394,9 +395,11 @@ impl State {
             self.slugs.retain(|s| s.age < 1500.00 && s.bhv.hp > 1e-10);
             self.warnings.retain(Pos::<Warning>::will_live);
             self.lasers.retain(|l| l.age < 500.00 && l.bhv.hp > 1e-10);
-            self.health_packs.retain(|hp| hp.age < 500.00 && hp.bhv.hp > 1e-10);
+            self.health_packs
+                .retain(|hp| hp.age < 500.00 && hp.bhv.hp > 1e-10);
             self.frags.retain(Pos::<Frag>::will_live);
-            self.frag_children.retain(|c| c.age < 300.00 && c.bhv.hp > 1e-10);
+            self.frag_children
+                .retain(|c| c.age < 300.00 && c.bhv.hp > 1e-10);
             self.particles.retain(|p| p.age <= p.bhv.lifetime);
 
             // up difficulty
@@ -514,7 +517,7 @@ impl State {
             frags: Vec::new(),
             frag_children: Vec::new(),
             particles: Vec::new(),
-            counters: Counters::default()
+            counters: Counters::default(),
         }
     }
     fn takes_effect(&mut self, effect: StateEffect, score_accumulator: &mut i32) {
