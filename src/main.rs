@@ -364,13 +364,13 @@ impl State {
             };
             {
                 // frags
-                for frak in &self.frags {
-                    if !frak.will_live() {
+                for frag in &self.frags {
+                    if !frag.will_live() {
                         let number = 8;
                         for i in 0..number {
                             let dir = f64::from(i).as_radians() / f64::from(number);
                             let child = frag::Child::new(
-                                frak.pos,
+                                frag.pos,
                                 Vector2::ZERO,
                                 Vector2::from(dir) * 0.01,
                             );
