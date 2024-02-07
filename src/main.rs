@@ -169,7 +169,7 @@ impl State {
             // spawn_logic
 
             // bullets
-            let times = self.counters.bullet.revolve(1.10 + 0.25 * diff_scale, dt);
+            let times = self.counters.bullet.revolve(1.10 + 0.20 * diff_scale, dt);
 
             for _ in 0..times {
                 let side = rrange(4);
