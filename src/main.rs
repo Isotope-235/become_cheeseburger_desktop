@@ -155,15 +155,6 @@ struct State {
     particles: Vec<Pos<Particle>>,
 }
 
-/// Perform the frame update for the game-state.
-fn updated(state: State, input: &Input, dt: f64, asset_loader: &AssetLoader) -> State {
-    let State { difficulty, score, score_last_frame, freeze, counters, burger, cheese, bullets, slugs, warnings, lasers, health_packs, frags, frag_children, particles } = state;
-
-    let freeze = (freeze - dt).max(0.00);
-
-    State { difficulty: difficulty + 0.10 * dt, score, score_last_frame, freeze, counters, burger, cheese, bullets, slugs, warnings, lasers, health_packs, frags, frag_children, particles }
-}
-
 impl State {
     fn progress(&mut self, input: &Input, dt: f64, asset_loader: &AssetLoader) {
         let mut score = 0;
