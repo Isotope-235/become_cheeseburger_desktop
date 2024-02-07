@@ -1,12 +1,4 @@
 //#![windows_subsystem = "windows"]
-#![warn(clippy::pedantic)]
-#![allow(
-    clippy::cast_possible_truncation,
-    clippy::cast_precision_loss,
-    clippy::wildcard_imports,
-    clippy::must_use_candidate,
-    clippy::too_many_lines
-)]
 
 use std::{f64::consts::PI, ops::Not};
 
@@ -78,7 +70,7 @@ async fn main() {
         let input = Input::get();
 
         if ended.not() {
-            state.progress(&input, dt, &asset_loader);
+            state = updated(state, &input, dt, &asset_loader);
             state.score += state.score_last_frame;
         }
 
@@ -165,11 +157,11 @@ struct State {
 
 /// Perform the frame update for the game-state.
 fn updated(state: State, input: &Input, dt: f64, asset_loader: &AssetLoader) -> State {
-    let State { difficulty, score, score_last_frame, freeze, counters, burger, cheese, bullets, slugs, warnings, lasers, health_packs, frags, frag_children, particles }
+    let State { difficulty, score, score_last_frame, freeze, counters, burger, cheese, bullets, slugs, warnings, lasers, health_packs, frags, frag_children, particles } = state;
 
+    let freeze = (freeze - dt).max(0.00);
 
-
-    State { difficulty, score, score_last_frame, freeze, counters, burger, cheese, bullets, slugs, warnings, lasers, health_packs, frags, frag_children, particles }
+    State { difficulty: difficulty + 0.10 * dt, score, score_last_frame, freeze, counters, burger, cheese, bullets, slugs, warnings, lasers, health_packs, frags, frag_children, particles }
 }
 
 impl State {
@@ -182,7 +174,6 @@ impl State {
             }
             // data saved for perf
             let diff_scale = self.difficulty * 0.01;
-            //
 
             // spawn_logic
 
@@ -493,7 +484,7 @@ impl State {
         draw::rec_top_left(hp_pos, mw as i32, h, Color::from_rgba(155, 155, 155, 255));
         draw::rec_top_left(
             hp_pos,
-            w.max(0.00) as i32,
+            w.max(0.00) as _,
             h,
             Color::from_rgba(255, 105, 105, 255),
         );
@@ -508,7 +499,7 @@ impl State {
         };
         draw::rec_top_left(
             Vector2(2.00, window_height - f64::from(dash_from_bot)),
-            w as i32,
+            w as _,
             h,
             clr,
         );
