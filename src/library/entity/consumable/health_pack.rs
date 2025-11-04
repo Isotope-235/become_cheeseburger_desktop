@@ -39,7 +39,7 @@ impl OnHit for Pos<HealthPack> {
             *asset_loader.color("heart"),
         );
         StateEffect {
-            burger_damage: -2.00,
+            burger_damage: -4.00,
             particles,
             ..StateEffect::default()
         }
