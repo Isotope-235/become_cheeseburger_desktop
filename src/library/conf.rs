@@ -6,9 +6,9 @@ use crate::*;
 /// * `icon_m.png`
 /// * `icon_l.png`
 pub fn window() -> Conf {
-    let small_icon = image::open(r"assets\sprites\icon_s.png").unwrap();
-    let medium_icon = image::open(r"assets\sprites\icon_m.png").unwrap();
-    let large_icon = image::open(r"assets\sprites\icon_l.png").unwrap();
+    let small_icon = image::open(r"assets/sprites/icon_s.png").unwrap();
+    let medium_icon = image::open(r"assets/sprites/icon_m.png").unwrap();
+    let large_icon = image::open(r"assets/sprites/icon_l.png").unwrap();
     Conf {
         window_title: TITLE.to_string(),
         window_width: (CENTER_X * 2.00 * SCALE) as i32,
