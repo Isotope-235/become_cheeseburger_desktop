@@ -5,7 +5,7 @@ pub struct HealthPack {
 }
 impl HitBox for Pos<HealthPack> {
     fn hit_circle(&self) -> pos::Circle {
-        pos::Circle::new(self.pos, 5.00)
+        pos::Circle::new(self.pos, 7.00)
     }
 }
 impl HealthPack {
