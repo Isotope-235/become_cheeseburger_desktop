@@ -41,11 +41,7 @@ impl Button {
 
 impl From<bool> for Button {
     fn from(b: bool) -> Self {
-        if b {
-            Button::Pressed
-        } else {
-            Button::Released
-        }
+        if b { Button::Pressed } else { Button::Released }
     }
 }
 

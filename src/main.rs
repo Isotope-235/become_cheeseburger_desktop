@@ -327,17 +327,17 @@ impl State {
                 // cheese
                 let cheese = &mut self.cheese;
                 if cheese.bhv.hp < 1e-10 {
-                    let new_pos = cheese::create_next_pos(self.burger.pos);
+                    let new_pos = cheese::create_next_pos(cheese.bhv.next_pos);
                     cheese.pos = cheese.bhv.next_pos;
                     cheese.bhv.next_pos = new_pos;
                     cheese.bhv.hp = 1.00;
                 }
             };
             { // bullets
-                 // nothing for now
+                // nothing for now
             };
             { // slugs
-                 // nothing for now
+                // nothing for now
             };
             {
                 // warning.s
@@ -351,10 +351,10 @@ impl State {
                 }
             };
             { // lasers
-                 // nothing for now
+                // nothing for now
             };
             { // health packs
-                 // nothing for now
+                // nothing for now
             };
             {
                 // frags

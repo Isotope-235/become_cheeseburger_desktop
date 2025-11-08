@@ -1,4 +1,4 @@
-use macroquad::audio::{load_sound, play_sound, PlaySoundParams, Sound};
+use macroquad::audio::{PlaySoundParams, Sound, load_sound, play_sound};
 use rand::seq::SliceRandom;
 use std::collections::HashMap;
 use std::fs;

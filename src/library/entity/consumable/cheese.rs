@@ -50,11 +50,11 @@ impl TakeEffect for Pos<Cheese> {
     }
 }
 
-pub fn create_next_pos(burger_pos: Vector2) -> Vector2 {
+pub fn create_next_pos(last_pos: Vector2) -> Vector2 {
     let Vector2(x, y) = CENTER;
     loop {
         let maybe_pos = Vector2(rand(x), rand(y)) + CENTER * 0.50;
-        if (burger_pos - maybe_pos).len() > 24.00 {
+        if (last_pos - maybe_pos).len() > 24.00 {
             return maybe_pos;
         }
     }

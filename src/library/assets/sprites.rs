@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use macroquad::color::Color;
-use macroquad::prelude::{load_texture, Texture2D};
+use macroquad::prelude::{Texture2D, load_texture};
 
 #[derive(Debug)]
 pub struct Sprite {
