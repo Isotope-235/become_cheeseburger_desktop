@@ -21,7 +21,7 @@ async fn main() {
     // pixel perfection
     let mut camera =
         Camera2D::from_display_rect(Rect::new(0.00, 0.00, SCREEN_X as f32, SCREEN_Y as f32));
-    camera.zoom = vec2(camera.zoom.x, camera.zoom.y * -1.00);
+    camera.zoom = vec2(camera.zoom.x, -camera.zoom.y);
     set_camera(&camera);
 
     let mut canvas = Canvas2D::new(SCREEN_X as f32, SCREEN_Y as f32);
