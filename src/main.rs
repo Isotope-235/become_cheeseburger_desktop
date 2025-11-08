@@ -328,14 +328,9 @@ impl State {
                 // cheese
                 let cheese = &mut self.cheese;
                 if cheese.bhv.hp < 1e-10 {
-                    let Vector2(x, y) = CENTER;
-                    let new_pos = loop {
-                        let maybe_pos = Vector2(rand(x), rand(y)) + CENTER * 0.50;
-                        if (self.burger.pos - maybe_pos).len() > 16.00 {
-                            break maybe_pos;
-                        }
-                    };
-                    cheese.pos = new_pos;
+                    let new_pos = cheese::create_next_pos(self.burger.pos);
+                    cheese.pos = cheese.bhv.next_pos;
+                    cheese.bhv.next_pos = new_pos;
                     cheese.bhv.hp = 1.00;
                 }
             };
@@ -417,6 +412,9 @@ impl State {
         copy_texture(b_sprite, self.burger.pos);
         // cheese
         copy_texture(asset_loader.texture("cheese"), self.cheese.pos);
+        let cpos = self.cheese.pos;
+        let to_next = self.cheese.bhv.next_pos - cpos;
+        draw::rec(cpos + (to_next.normal() * 10.00), 2, 2, *asset_loader.color("cheese"));
         // health packs
         for health_pack in &self.health_packs {
             copy_texture(asset_loader.texture("heart"), health_pack.pos);
@@ -502,13 +500,15 @@ impl State {
         !self.burger.is_alive() && self.freeze.abs() < 1e-10
     }
     fn reset() -> State {
+        let burger_start = CENTER + Vector2(0.00, 12.00);
+        
         State {
             difficulty: 100.00,
             score: 0,
             score_last_frame: 0,
             freeze: 0.00,
-            burger: Player::new(CENTER + Vector2(0.00, 12.00)),
-            cheese: Cheese::new(CENTER - Vector2(0.00, 12.00)),
+            burger: Player::new(burger_start),
+            cheese: Cheese::new(CENTER - Vector2(0.00, 12.00), burger_start),
             bullets: Vec::new(),
             slugs: Vec::new(),
             warnings: Vec::new(),
