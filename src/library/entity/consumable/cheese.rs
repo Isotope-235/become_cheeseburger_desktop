@@ -57,5 +57,5 @@ pub fn create_next_pos(burger_pos: Vector2) -> Vector2 {
         if (burger_pos - maybe_pos).len() > 16.00 {
             return maybe_pos;
         }
-    };
+    }
 }

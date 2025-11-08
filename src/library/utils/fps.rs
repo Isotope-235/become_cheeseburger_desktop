@@ -10,13 +10,7 @@ pub async fn find() -> i32 {
         match mean {
             // accept number if it is close to a common refresh rate
             25..=34 | 55..=64 | 85..=94 | 115..=124 | 139..=148 | 235..=244 => break 'fps mean,
-            _ => {
-                if attempts > 3 {
-                    panic!("unable to find stable fps")
-                } else {
-                    continue;
-                }
-            }
+            _ => assert!(attempts <= 3, "unable to find stable fps"),
         }
     }
 }

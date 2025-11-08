@@ -228,8 +228,7 @@ impl State {
             // health packs
             let times = self.counters.health_pack.revolve(
                 0.10 * (self.burger.missing_hp() - (self.health_packs.len() * 2) as f64)
-                    .max(0.00)
-                    .min(8.00),
+                    .clamp(0.00, 8.00),
                 dt,
             );
 
@@ -288,7 +287,7 @@ impl State {
             if self.cheese.hit_circle().is_hitting(&burger_circle) {
                 self.cheese.takes_effect(&self.cheese.self_effect_on_hit());
                 state_effect += self.cheese.effect_on_hit(asset_loader);
-            };
+            }
             let hit_info = &mut HitInfo {
                 state_effect_accumulator: &mut state_effect,
                 burger_circle: &burger_circle,
@@ -414,7 +413,12 @@ impl State {
         copy_texture(asset_loader.texture("cheese"), self.cheese.pos);
         let cpos = self.cheese.pos;
         let to_next = self.cheese.bhv.next_pos - cpos;
-        draw::rec(cpos + (to_next.normal() * 10.00), 2, 2, *asset_loader.color("cheese"));
+        draw::rec(
+            cpos + (to_next.normal() * 10.00),
+            2,
+            2,
+            *asset_loader.color("cheese"),
+        );
         // health packs
         for health_pack in &self.health_packs {
             copy_texture(asset_loader.texture("heart"), health_pack.pos);
@@ -501,7 +505,7 @@ impl State {
     }
     fn reset() -> State {
         let burger_start = CENTER + Vector2(0.00, 12.00);
-        
+
         State {
             difficulty: 100.00,
             score: 0,
