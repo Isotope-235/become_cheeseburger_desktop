@@ -5,7 +5,7 @@ pub struct Slug {
 }
 impl HitBox for Pos<Slug> {
     fn hit_circle(&self) -> pos::Circle {
-        pos::Circle::new(self.pos, 10.00)
+        pos::Circle::new(self.pos, 8.00)
     }
 }
 impl Slug {
