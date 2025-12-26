@@ -2,10 +2,12 @@
 
 use std::{f64::consts::PI, ops::Not};
 
-use macroquad::{prelude::*, rand::ChooseRandom};
+use macroquad::prelude::*;
 use macroquad_canvas::Canvas2D;
 
 use library::*;
+
+use crate::library::component::Class;
 
 pub mod library;
 
@@ -71,7 +73,6 @@ async fn main() {
 
         if ended.not() {
             state.progress(&input, dt, &asset_loader);
-            state.score += state.score_last_frame;
         }
 
         // draw calls
@@ -135,29 +136,33 @@ pub struct Counters {
     cross: f64,
 }
 
-struct State {
+pub struct State {
     difficulty: f64,
     score: i32,
-    score_last_frame: i32,
     freeze: f64,
     counters: Counters,
 
+    entities: Vec<Entity>,
     // instances
-    burger: Pos<Player>,
-    cheese: Pos<Cheese>,
-    bullets: Vec<Pos<Bullet>>,
-    slugs: Vec<Pos<Slug>>,
-    warnings: Vec<Pos<Warning>>,
-    lasers: Vec<Pos<Laser>>,
-    health_packs: Vec<Pos<HealthPack>>,
-    frags: Vec<Pos<Frag>>,
-    frag_children: Vec<Pos<frag::Child>>,
-    particles: Vec<Pos<Particle>>,
+    burger: Player,
+    cheese: Cheese,
+    particles: Vec<Particle>,
 }
 
 impl State {
+    fn run_systems(&mut self, dt: f64, input: &Input, assets: &AssetLoader) {
+        sys::dash::run(self, dt, input, assets);
+        sys::pos::run(self, dt);
+        sys::bound_burger::run(self);
+        sys::age::run(self, dt);
+        sys::player_collide::run(self, assets);
+        sys::cheese_regen::run(self);
+
+        sys::destroy_old::run(self, assets);
+        sys::destroy_dead::run(&mut self.entities);
+    }
+
     fn progress(&mut self, input: &Input, dt: f64, asset_loader: &AssetLoader) {
-        let mut score = 0;
         for _ in 0..ITERATIONS {
             if self.freeze > 0.00 {
                 self.freeze = (self.freeze - dt).max(0.00);
@@ -185,15 +190,49 @@ impl State {
                             let pos = CENTER + direction.mul_per(CENTER) + buffer;
                             (pos + shift, direction.negate())
                         };
-                        let bullet = Bullet::new(pos, vel * 1.25, delay);
-                        self.bullets.push(bullet);
+                        self.entities.push(entity::Entity {
+                            pos,
+                            vel: vel * 1.25,
+                            lifespan: Some(component::Lifespan {
+                                time: 750. + delay,
+                                on_ended: None,
+                            }),
+                            hp: Some(3.00),
+                            collision: Some(component::Collision {
+                                dmg: 3.00,
+                                range: 3.00,
+                                sound: None,
+                            }),
+                            draw: Some(component::Draw::Sprite {
+                                name: "bullet",
+                                rotate: false,
+                            }),
+                            ..Default::default()
+                        });
                     }
                 } else {
                     for i in 0..((1.00 + diff_scale * 2.00) as i32) {
                         let delay = f64::from(i) * 10.00;
                         let (pos, vel) = spawn_pos_vel_from(side, 4.00 + delay, 4.00);
-                        let bullet = Bullet::new(pos, vel * 1.25, delay);
-                        self.bullets.push(bullet);
+                        self.entities.push(entity::Entity {
+                            pos,
+                            vel: vel * 1.25,
+                            lifespan: Some(component::Lifespan {
+                                time: 750. + delay,
+                                on_ended: None,
+                            }),
+                            hp: Some(3.00),
+                            collision: Some(component::Collision {
+                                dmg: 3.00,
+                                range: 3.00,
+                                sound: None,
+                            }),
+                            draw: Some(component::Draw::Sprite {
+                                name: "bullet",
+                                rotate: false,
+                            }),
+                            ..Default::default()
+                        });
                     }
                 }
             }
@@ -205,8 +244,25 @@ impl State {
 
             for _ in 0..times {
                 let (pos, vel) = spawn_pos_vel(10.00, 10.00);
-                let slug = Slug::new(pos, vel * 0.50);
-                self.slugs.push(slug);
+                self.entities.push(entity::Entity {
+                    pos,
+                    vel: vel * 0.50,
+                    lifespan: Some(component::Lifespan {
+                        time: 1500.,
+                        on_ended: None,
+                    }),
+                    hp: Some(7.00),
+                    collision: Some(component::Collision {
+                        dmg: 7.00,
+                        range: 8.00,
+                        sound: None,
+                    }),
+                    draw: Some(component::Draw::Sprite {
+                        name: "slug",
+                        rotate: true,
+                    }),
+                    ..Default::default()
+                });
             }
 
             // warnings
@@ -221,21 +277,52 @@ impl State {
                 } else {
                     pos.1 = self.burger.pos.y() + shift;
                 }
-                self.warnings
-                    .push(Warning::new(pos, dir, f64::from(i) * (15.00)));
+                self.entities.push(entity::Entity {
+                    pos,
+                    lifespan: Some(component::Lifespan {
+                        time: 60. + f64::from(i) * (15.00),
+                        on_ended: Some(component::EndedEffect::Warning { dir }),
+                    }),
+                    draw: Some(component::Draw::Warning {
+                        delay: f64::from(i) * (15.00),
+                    }),
+                    ..Default::default()
+                });
             }
 
             // health packs
+            let hp_count = self
+                .entities
+                .iter()
+                .filter(|e| e.class == Class::HealthPack)
+                .count();
             let times = self.counters.health_pack.revolve(
-                0.10 * (self.burger.missing_hp() - (self.health_packs.len() * 2) as f64)
-                    .clamp(0.00, 8.00),
+                0.10 * (self.burger.missing_hp() - (hp_count * 2) as f64).clamp(0.00, 8.00),
                 dt,
             );
 
             for _ in 0..times {
                 let (pos, vel) = spawn_pos_vel(10.00, 12.00);
-                let health_pack = HealthPack::new(pos, vel * 0.30);
-                self.health_packs.push(health_pack);
+                self.entities.push(entity::Entity {
+                    class: Class::HealthPack,
+                    pos,
+                    vel: vel * 0.30,
+                    lifespan: Some(component::Lifespan {
+                        time: 500.,
+                        on_ended: None,
+                    }),
+                    hp: Some(1.00),
+                    collision: Some(component::Collision {
+                        dmg: -4.00,
+                        range: 7.00,
+                        sound: Some("heal"),
+                    }),
+                    draw: Some(component::Draw::Sprite {
+                        name: "heart",
+                        rotate: false,
+                    }),
+                    ..Default::default()
+                });
             }
 
             // frag
@@ -243,8 +330,25 @@ impl State {
 
             for _ in 0..times {
                 let (pos, vel) = spawn_pos_vel(4.00, 4.00);
-                let frag = Frag::new(pos, vel * 0.50);
-                self.frags.push(frag);
+                self.entities.push(entity::Entity {
+                    pos,
+                    vel: vel * 0.50,
+                    lifespan: Some(component::Lifespan {
+                        time: 200.,
+                        on_ended: Some(component::EndedEffect::Flak),
+                    }),
+                    hp: Some(5.00),
+                    collision: Some(component::Collision {
+                        dmg: 5.00,
+                        range: 7.00,
+                        sound: None,
+                    }),
+                    draw: Some(component::Draw::Sprite {
+                        name: "flak",
+                        rotate: false,
+                    }),
+                    ..Default::default()
+                });
             }
 
             let times = self
@@ -258,53 +362,31 @@ impl State {
                     let direction = CENTER - starting_point;
                     let vel = direction.normal();
                     for ii in 0..3 {
-                        self.bullets.push(Bullet::new(
-                            starting_point - vel * 10.00 * f64::from(ii),
-                            vel * 1.75,
-                            0.00,
-                        ));
+                        self.entities.push(entity::Entity {
+                            pos: starting_point - vel * 10.00 * f64::from(ii),
+                            vel: vel * 1.75,
+                            lifespan: Some(component::Lifespan {
+                                time: 750.,
+                                on_ended: None,
+                            }),
+                            hp: Some(3.00),
+                            collision: Some(component::Collision {
+                                dmg: 3.00,
+                                range: 3.00,
+                                sound: None,
+                            }),
+                            draw: Some(component::Draw::Sprite {
+                                name: "bullet",
+                                rotate: false,
+                            }),
+                            ..Default::default()
+                        });
                     }
                 }
             }
 
             // movement logic
-            self.burger.update_pos(dt);
-            self.burger.stays_in_bounds();
-            self.cheese.update_pos(dt);
-            pos::update_all(&mut self.bullets, dt);
-            pos::update_all(&mut self.slugs, dt);
-            pos::update_all(&mut self.warnings, dt);
-            pos::update_all(&mut self.lasers, dt);
-            pos::update_all(&mut self.health_packs, dt);
-            pos::update_all(&mut self.frags, dt);
-            pos::update_all(&mut self.frag_children, dt);
-            pos::update_all(&mut self.particles, dt);
-
-            // inter-unitary logic
-            let burger_circle = self.burger.hit_circle();
-            let mut state_effect = StateEffect::default();
-
-            if self.cheese.hit_circle().is_hitting(&burger_circle) {
-                self.cheese.takes_effect(&self.cheese.self_effect_on_hit());
-                state_effect += self.cheese.effect_on_hit(asset_loader);
-            }
-            let hit_info = &mut HitInfo {
-                state_effect_accumulator: &mut state_effect,
-                burger_circle: &burger_circle,
-                asset_loader,
-            };
-            do_all_hits(&mut self.health_packs, hit_info);
-            if self.burger.is_targetable() {
-                do_all_hits(&mut self.bullets, hit_info);
-                do_all_hits(&mut self.slugs, hit_info);
-                do_all_hits(&mut self.lasers, hit_info);
-                do_all_hits(&mut self.frags, hit_info);
-                do_all_hits(&mut self.frag_children, hit_info);
-            }
-            if state_effect.burger_damage > 0.00 {
-                asset_loader.play_sound("damage");
-            }
-            self.takes_effect(state_effect, &mut score);
+            self.run_systems(dt, input, asset_loader);
             if self.freeze > 0.00 {
                 // making sure that the player sees the fatal projectile
                 self.freeze = (self.freeze - dt).max(0.00);
@@ -316,94 +398,27 @@ impl State {
                 // burger
                 let burger = &mut self.burger;
                 burger.vel = input.dir().normal() * (0.55) * dt + burger.vel * 0.675f64.powf(dt);
-                burger.bhv.invuln = (burger.bhv.invuln - dt).max(0.00);
-                burger.bhv.dash_charge = (burger.bhv.dash_charge + 0.01 * dt).min(1.00);
-                burger.bhv.hp = burger.bhv.hp.min(burger.max_hp());
+                burger.invuln = (burger.invuln - dt).max(0.00);
+                burger.dash_charge = (burger.dash_charge + 0.01 * dt).min(1.00);
+                burger.hp = burger.hp.min(burger.max_hp());
                 if input.space.is_pressed() && burger.can_dash() && input.dir().len() > 0.00 {
                     burger.dash(input, asset_loader);
                 }
             };
             {
-                // cheese
-                let cheese = &mut self.cheese;
-                if cheese.bhv.hp < 1e-10 {
-                    let new_pos = cheese::create_next_pos(cheese.bhv.next_pos);
-                    cheese.pos = cheese.bhv.next_pos;
-                    cheese.bhv.next_pos = new_pos;
-                    cheese.bhv.hp = 1.00;
-                }
-            };
-            { // bullets
-                // nothing for now
-            };
-            { // slugs
-                // nothing for now
-            };
-            {
-                // warning.s
-                for warning in &self.warnings {
-                    if !warning.will_live() {
-                        let dir = warning.dir();
-                        let laser = Laser::new(warning.pos - dir * 40.00, dir * 7.00);
-                        asset_loader.play_sound("laser");
-                        self.lasers.push(laser);
-                    }
-                }
-            };
-            { // lasers
-                // nothing for now
-            };
-            { // health packs
-                // nothing for now
-            };
-            {
-                // frags
-                for frag in &self.frags {
-                    if !frag.will_live() {
-                        let number = 8;
-                        for i in 0..number {
-                            let dir = f64::from(i).as_radians() / f64::from(number);
-                            let child = frag::Child::new(
-                                frag.pos,
-                                Vector2::ZERO,
-                                Vector2::from(dir) * 0.01,
-                            );
-                            self.frag_children.push(child);
-                        }
-                    }
-                }
-            };
-            {
-                // frag children
-                self.frag_children.shuffle();
-            };
-            {
                 // particles
                 for particle in &mut self.particles {
-                    particle.vel *= (1.00 - particle.bhv.friction).powf(dt);
+                    particle.vel *= (1.00 - particle.friction).powf(dt);
                 }
             };
-
-            // remove elements
-            self.bullets.retain(|b| b.age < 750.00 && b.bhv.hp > 1e-10);
-            self.slugs.retain(|s| s.age < 1500.00 && s.bhv.hp > 1e-10);
-            self.warnings.retain(Pos::<Warning>::will_live);
-            self.lasers.retain(|l| l.age < 500.00 && l.bhv.hp > 1e-10);
-            self.health_packs
-                .retain(|hp| hp.age < 500.00 && hp.bhv.hp > 1e-10);
-            self.frags.retain(Pos::<Frag>::will_live);
-            self.frag_children
-                .retain(|c| c.age < 300.00 && c.bhv.hp > 1e-10);
-            self.particles.retain(|p| p.age <= p.bhv.lifetime);
 
             // up difficulty
             self.difficulty += 0.10 * dt;
         }
-        self.score_last_frame = score;
     }
     fn draw(&self, asset_loader: &AssetLoader) {
         // burger
-        let b_sprite = if self.burger.bhv.invuln > 0.00 {
+        let b_sprite = if self.burger.invuln > 0.00 {
             asset_loader.texture("burger_invuln")
         } else {
             asset_loader.texture("burger")
@@ -412,67 +427,61 @@ impl State {
         // cheese
         copy_texture(asset_loader.texture("cheese"), self.cheese.pos);
         let cpos = self.cheese.pos;
-        let to_next = self.cheese.bhv.next_pos - cpos;
+        let to_next = self.cheese.next_pos - cpos;
         draw::rec(
             cpos + (to_next.normal() * 10.00),
             2,
             2,
             *asset_loader.color("cheese"),
         );
-        // health packs
-        for health_pack in &self.health_packs {
-            copy_texture(asset_loader.texture("heart"), health_pack.pos);
-        }
-        // bullets
-        for bullet in &self.bullets {
-            copy_texture(asset_loader.texture("bullet"), bullet.pos);
-        }
-        // slugs
-        for slug in &self.slugs {
-            copy_with_rotation(
-                asset_loader.texture("slug"),
-                slug.pos,
-                slug.vel.angle() + PI * 0.50,
-            );
-        }
-        // warning.s
-        for warning in &self.warnings {
-            if warning.is_visible() {
-                let dur = 6.00;
-                let clr = if warning.age % dur < dur * 0.50 {
-                    Color::from_rgba(255, 55, 55, 255)
-                } else {
-                    Color::from_rgba(255, 255, 55, 255)
-                };
-                draw::rec(warning.pos, 10, 10, clr);
-            }
-        }
-        // lasers
-        for laser in &self.lasers {
-            let (w, h) = if laser.vel.x().abs() > laser.vel.y().abs() {
-                (36, 6)
-            } else {
-                (6, 36)
-            };
-            draw::rec(laser.pos, w, h, Color::from_rgba(255, 55, 55, 255));
-        }
-        // flak
-        for flak in &self.frags {
-            copy_texture(asset_loader.texture("flak"), flak.pos);
-        }
-        // flak children
-        for flak_child in &self.frag_children {
-            copy_texture(asset_loader.texture("flak_child"), flak_child.pos);
-        }
+
         // particles
         for particle in &self.particles {
             let (w, h) = (2, 2);
-            draw::rec(particle.pos, w, h, particle.bhv.color);
+            draw::rec(particle.pos, w, h, particle.color);
         }
+
+        for e in &self.entities {
+            if let Some(ref draw_mode) = e.draw {
+                match *draw_mode {
+                    component::Draw::Sprite { name, rotate } => {
+                        if rotate {
+                            copy_with_rotation(
+                                asset_loader.texture(name),
+                                e.pos,
+                                e.vel.angle() + PI * 0.50,
+                            );
+                        } else {
+                            copy_texture(asset_loader.texture(name), e.pos);
+                        }
+                    }
+                    component::Draw::Warning { delay } => {
+                        if e.age >= delay {
+                            let dur = 6.00;
+                            let clr = if e.age % dur < dur * 0.50 {
+                                Color::from_rgba(255, 55, 55, 255)
+                            } else {
+                                Color::from_rgba(255, 255, 55, 255)
+                            };
+                            draw::rec(e.pos, 10, 10, clr);
+                        }
+                    }
+                    component::Draw::Laser => {
+                        let (w, h) = if e.vel.x().abs() > e.vel.y().abs() {
+                            (36, 6)
+                        } else {
+                            (6, 36)
+                        };
+                        draw::rec(e.pos, w, h, Color::from_rgba(255, 55, 55, 255));
+                    }
+                }
+            }
+        }
+
         // health bar
         let h = 4;
         let mhp = self.burger.max_hp();
-        let w = self.burger.bhv.hp * 8.00;
+        let w = self.burger.hp * 8.00;
         let from_bot = h + 2;
         let mw = mhp * 8.00;
         let window_height = CENTER_Y * 2.00;
@@ -486,7 +495,7 @@ impl State {
         );
         // dash bar
         let h = 2;
-        let w = self.burger.bhv.dash_charge * 8.00 * 8.00;
+        let w = self.burger.dash_charge * 8.00 * 8.00;
         let dash_from_bot = from_bot + h;
         let clr = if self.burger.can_dash() {
             Color::from_rgba(255, 255, 255, 255)
@@ -509,25 +518,12 @@ impl State {
         State {
             difficulty: 100.00,
             score: 0,
-            score_last_frame: 0,
             freeze: 0.00,
             burger: Player::new(burger_start),
             cheese: Cheese::new(CENTER - Vector2(0.00, 12.00), burger_start),
-            bullets: Vec::new(),
-            slugs: Vec::new(),
-            warnings: Vec::new(),
-            lasers: Vec::new(),
-            health_packs: Vec::new(),
-            frags: Vec::new(),
-            frag_children: Vec::new(),
             particles: Vec::new(),
             counters: Counters::default(),
+            entities: Vec::new(),
         }
-    }
-    fn takes_effect(&mut self, effect: StateEffect, score_accumulator: &mut i32) {
-        *score_accumulator += effect.score;
-        self.freeze += effect.freeze + effect.burger_damage.max(0.00);
-        self.burger.bhv.hp -= effect.burger_damage;
-        self.particles.extend(effect.particles);
     }
 }

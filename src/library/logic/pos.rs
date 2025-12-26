@@ -85,7 +85,7 @@ pub struct StateEffect {
     pub burger_damage: f64,
     pub score: i32,
     pub freeze: f64,
-    pub particles: Vec<Pos<Particle>>,
+    pub particles: Vec<Particle>,
 }
 
 impl Default for StateEffect {
