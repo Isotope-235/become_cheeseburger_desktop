@@ -7,3 +7,4 @@ pub mod destroy_old;
 pub mod friction;
 pub mod player_collide;
 pub mod pos;
+pub mod spawn;
