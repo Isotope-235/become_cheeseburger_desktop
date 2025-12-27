@@ -3,20 +3,20 @@ use macroquad::prelude::*;
 use crate::vector::Vector2;
 
 pub struct Input {
-    pub w: Button,
-    pub a: Button,
-    pub s: Button,
-    pub d: Button,
-    pub space: Button,
+    pub w:     Button,
+    pub a:     Button,
+    pub s:     Button,
+    pub d:     Button,
+    pub space: Button
 }
 impl Input {
     pub fn get() -> Input {
         Input {
-            w: is_key_down(KeyCode::W).into(),
-            a: is_key_down(KeyCode::A).into(),
-            s: is_key_down(KeyCode::S).into(),
-            d: is_key_down(KeyCode::D).into(),
-            space: is_key_down(KeyCode::Space).into(),
+            w:     is_key_down(KeyCode::W).into(),
+            a:     is_key_down(KeyCode::A).into(),
+            s:     is_key_down(KeyCode::S).into(),
+            d:     is_key_down(KeyCode::D).into(),
+            space: is_key_down(KeyCode::Space).into()
         }
     }
     pub fn dir(&self) -> Vector2 {
@@ -28,13 +28,13 @@ impl Input {
 #[derive(Clone, Copy)]
 pub enum Button {
     Pressed,
-    Released,
+    Released
 }
 impl Button {
     pub fn is_pressed(&self) -> bool {
         match self {
             Button::Pressed => true,
-            Button::Released => false,
+            Button::Released => false
         }
     }
 }
@@ -49,7 +49,7 @@ impl From<Button> for f64 {
     fn from(b: Button) -> Self {
         match b {
             Button::Pressed => 1.00,
-            Button::Released => 0.00,
+            Button::Released => 0.00
         }
     }
 }

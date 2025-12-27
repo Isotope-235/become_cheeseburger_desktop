@@ -6,7 +6,7 @@ pub fn num_to_corner(num: i32) -> Vector2 {
         2 => Vector2(1.00, 0.00),
         3 => Vector2(1.00, 1.00),
         0 => Vector2(0.00, 1.00),
-        _ => Vector2::ZERO,
+        _ => Vector2::ZERO
     }
 }
 
@@ -16,7 +16,7 @@ pub fn num_to_side(num: i32) -> Vector2 {
         2 => Vector2(-1.00, 0.00),
         3 => Vector2(0.00, 1.00),
         0 => Vector2(0.00, -1.00),
-        _ => Vector2::ZERO,
+        _ => Vector2::ZERO
     }
 }
 

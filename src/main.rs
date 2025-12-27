@@ -2,10 +2,9 @@
 
 use std::{f64::consts::PI, ops::Not};
 
+use library::*;
 use macroquad::prelude::*;
 use macroquad_canvas::Canvas2D;
-
-use library::*;
 
 use crate::library::component::Class;
 
@@ -90,7 +89,7 @@ async fn main() {
                 &(c.to_string())[..],
                 1.00 + i as f32 * 8.00,
                 9.00,
-                text_params.clone(),
+                text_params.clone()
             );
         }
 
@@ -106,7 +105,7 @@ async fn main() {
                 &game_over[..12],
                 35.00,
                 CENTER_Y as f32 - 20.00,
-                options.clone(),
+                options.clone()
             );
             draw_text_ex(&game_over[12..], 1.00, CENTER_Y as f32, options.clone());
             draw_text_ex("restart: [r]", 30.00, CENTER_Y as f32 + 20.00, options);
@@ -128,25 +127,25 @@ async fn main() {
 
 #[derive(Debug, Default)]
 pub struct Counters {
-    bullet: f64,
-    slug: f64,
-    warning: f64,
+    bullet:      f64,
+    slug:        f64,
+    warning:     f64,
     health_pack: f64,
-    frag: f64,
-    cross: f64,
+    frag:        f64,
+    cross:       f64
 }
 
 pub struct State {
     difficulty: f64,
-    score: i32,
-    freeze: f64,
-    counters: Counters,
+    score:      i32,
+    freeze:     f64,
+    counters:   Counters,
 
-    entities: Vec<Entity>,
+    entities:  Vec<Entity>,
     // instances
-    burger: Player,
-    cheese: Cheese,
-    particles: Vec<Particle>,
+    burger:    Player,
+    cheese:    Cheese,
+    particles: Vec<Particle>
 }
 
 impl State {
@@ -194,18 +193,18 @@ impl State {
                             pos,
                             vel: vel * 1.25,
                             lifespan: Some(component::Lifespan {
-                                time: 750. + delay,
-                                on_ended: None,
+                                time:     750. + delay,
+                                on_ended: None
                             }),
                             hp: Some(3.00),
                             collision: Some(component::Collision {
-                                dmg: 3.00,
+                                dmg:   3.00,
                                 range: 3.00,
-                                sound: None,
+                                sound: None
                             }),
                             draw: Some(component::Draw::Sprite {
-                                name: "bullet",
-                                rotate: false,
+                                name:   "bullet",
+                                rotate: false
                             }),
                             ..Default::default()
                         });
@@ -218,18 +217,18 @@ impl State {
                             pos,
                             vel: vel * 1.25,
                             lifespan: Some(component::Lifespan {
-                                time: 750. + delay,
-                                on_ended: None,
+                                time:     750. + delay,
+                                on_ended: None
                             }),
                             hp: Some(3.00),
                             collision: Some(component::Collision {
-                                dmg: 3.00,
+                                dmg:   3.00,
                                 range: 3.00,
-                                sound: None,
+                                sound: None
                             }),
                             draw: Some(component::Draw::Sprite {
-                                name: "bullet",
-                                rotate: false,
+                                name:   "bullet",
+                                rotate: false
                             }),
                             ..Default::default()
                         });
@@ -248,18 +247,18 @@ impl State {
                     pos,
                     vel: vel * 0.50,
                     lifespan: Some(component::Lifespan {
-                        time: 1500.,
-                        on_ended: None,
+                        time:     1500.,
+                        on_ended: None
                     }),
                     hp: Some(7.00),
                     collision: Some(component::Collision {
-                        dmg: 7.00,
+                        dmg:   7.00,
                         range: 8.00,
-                        sound: None,
+                        sound: None
                     }),
                     draw: Some(component::Draw::Sprite {
-                        name: "slug",
-                        rotate: true,
+                        name:   "slug",
+                        rotate: true
                     }),
                     ..Default::default()
                 });
@@ -280,11 +279,11 @@ impl State {
                 self.entities.push(entity::Entity {
                     pos,
                     lifespan: Some(component::Lifespan {
-                        time: 60. + f64::from(i) * (15.00),
-                        on_ended: Some(component::EndedEffect::Warning { dir }),
+                        time:     60. + f64::from(i) * (15.00),
+                        on_ended: Some(component::EndedEffect::Warning { dir })
                     }),
                     draw: Some(component::Draw::Warning {
-                        delay: f64::from(i) * (15.00),
+                        delay: f64::from(i) * (15.00)
                     }),
                     ..Default::default()
                 });
@@ -298,7 +297,7 @@ impl State {
                 .count();
             let times = self.counters.health_pack.revolve(
                 0.10 * (self.burger.missing_hp() - (hp_count * 2) as f64).clamp(0.00, 8.00),
-                dt,
+                dt
             );
 
             for _ in 0..times {
@@ -308,18 +307,18 @@ impl State {
                     pos,
                     vel: vel * 0.30,
                     lifespan: Some(component::Lifespan {
-                        time: 500.,
-                        on_ended: None,
+                        time:     500.,
+                        on_ended: None
                     }),
                     hp: Some(1.00),
                     collision: Some(component::Collision {
-                        dmg: -4.00,
+                        dmg:   -4.00,
                         range: 7.00,
-                        sound: Some("heal"),
+                        sound: Some("heal")
                     }),
                     draw: Some(component::Draw::Sprite {
-                        name: "heart",
-                        rotate: false,
+                        name:   "heart",
+                        rotate: false
                     }),
                     ..Default::default()
                 });
@@ -334,18 +333,18 @@ impl State {
                     pos,
                     vel: vel * 0.50,
                     lifespan: Some(component::Lifespan {
-                        time: 200.,
-                        on_ended: Some(component::EndedEffect::Flak),
+                        time:     200.,
+                        on_ended: Some(component::EndedEffect::Flak)
                     }),
                     hp: Some(5.00),
                     collision: Some(component::Collision {
-                        dmg: 5.00,
+                        dmg:   5.00,
                         range: 7.00,
-                        sound: None,
+                        sound: None
                     }),
                     draw: Some(component::Draw::Sprite {
-                        name: "flak",
-                        rotate: false,
+                        name:   "flak",
+                        rotate: false
                     }),
                     ..Default::default()
                 });
@@ -366,18 +365,18 @@ impl State {
                             pos: starting_point - vel * 10.00 * f64::from(ii),
                             vel: vel * 1.75,
                             lifespan: Some(component::Lifespan {
-                                time: 750.,
-                                on_ended: None,
+                                time:     750.,
+                                on_ended: None
                             }),
                             hp: Some(3.00),
                             collision: Some(component::Collision {
-                                dmg: 3.00,
+                                dmg:   3.00,
                                 range: 3.00,
-                                sound: None,
+                                sound: None
                             }),
                             draw: Some(component::Draw::Sprite {
-                                name: "bullet",
-                                rotate: false,
+                                name:   "bullet",
+                                rotate: false
                             }),
                             ..Default::default()
                         });
@@ -432,7 +431,7 @@ impl State {
             cpos + (to_next.normal() * 10.00),
             2,
             2,
-            *asset_loader.color("cheese"),
+            *asset_loader.color("cheese")
         );
 
         // particles
@@ -449,7 +448,7 @@ impl State {
                             copy_with_rotation(
                                 asset_loader.texture(name),
                                 e.pos,
-                                e.vel.angle() + PI * 0.50,
+                                e.vel.angle() + PI * 0.50
                             );
                         } else {
                             copy_texture(asset_loader.texture(name), e.pos);
@@ -491,7 +490,7 @@ impl State {
             hp_pos,
             w.max(0.00) as _,
             h,
-            Color::from_rgba(255, 105, 105, 255),
+            Color::from_rgba(255, 105, 105, 255)
         );
         // dash bar
         let h = 2;
@@ -506,7 +505,7 @@ impl State {
             Vector2(2.00, window_height - f64::from(dash_from_bot)),
             w as _,
             h,
-            clr,
+            clr
         );
     }
     fn game_is_over(&self) -> bool {
@@ -517,13 +516,13 @@ impl State {
 
         State {
             difficulty: 100.00,
-            score: 0,
-            freeze: 0.00,
-            burger: Player::new(burger_start),
-            cheese: Cheese::new(CENTER - Vector2(0.00, 12.00), burger_start),
-            particles: Vec::new(),
-            counters: Counters::default(),
-            entities: Vec::new(),
+            score:      0,
+            freeze:     0.00,
+            burger:     Player::new(burger_start),
+            cheese:     Cheese::new(CENTER - Vector2(0.00, 12.00), burger_start),
+            particles:  Vec::new(),
+            counters:   Counters::default(),
+            entities:   Vec::new()
         }
     }
 }

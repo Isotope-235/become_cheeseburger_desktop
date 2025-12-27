@@ -1,8 +1,4 @@
-use std::ops::Add;
-use std::ops::AddAssign;
-use std::ops::Mul;
-use std::ops::MulAssign;
-use std::ops::Sub;
+use std::ops::{Add, AddAssign, Mul, MulAssign, Sub};
 
 /// A 2D vector with `f64` components.
 #[allow(clippy::module_name_repetitions)]

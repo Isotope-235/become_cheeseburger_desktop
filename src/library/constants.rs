@@ -4,12 +4,12 @@ pub const TITLE: &str = "Limited Alpha v0.2.0 - Become Cheeseburger: Desktop Edi
 pub const ITERATIONS: i32 = 5;
 pub const DT: f64 = 1.00 / ITERATIONS as f64;
 pub const SCORE_TEXT_PARAMS: TextParams = TextParams {
-    font: None,
-    font_size: 80,
-    font_scale: 0.125,
+    font:              None,
+    font_size:         80,
+    font_scale:        0.125,
     font_scale_aspect: 1.00,
-    color: YELLOW,
-    rotation: 0.00,
+    color:             YELLOW,
+    rotation:          0.00
 };
 
 // Colors

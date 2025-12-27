@@ -1,12 +1,12 @@
 use crate::*;
 
 pub struct Player {
-    pub pos: Vector2,
-    pub vel: Vector2,
-    pub acc: Vector2,
-    pub hp: f64,
-    pub invuln: f64,
-    pub dash_charge: f64,
+    pub pos:         Vector2,
+    pub vel:         Vector2,
+    pub acc:         Vector2,
+    pub hp:          f64,
+    pub invuln:      f64,
+    pub dash_charge: f64
 }
 
 impl Player {
@@ -17,7 +17,7 @@ impl Player {
             acc: Vector2::ZERO,
             hp: 8.00,
             invuln: 0.00,
-            dash_charge: 1.00,
+            dash_charge: 1.00
         }
     }
 }

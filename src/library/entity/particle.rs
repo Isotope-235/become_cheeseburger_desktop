@@ -2,13 +2,13 @@ use std::f64::consts::TAU;
 
 use crate::{library::component::Lifespan, *};
 pub struct Particle {
-    pub pos: Vector2,
-    pub vel: Vector2,
-    pub acc: Vector2,
-    pub age: f64,
+    pub pos:      Vector2,
+    pub vel:      Vector2,
+    pub acc:      Vector2,
+    pub age:      f64,
     pub lifespan: Lifespan,
     pub friction: f64,
-    pub color: Color,
+    pub color:    Color
 }
 
 impl Particle {
@@ -18,7 +18,7 @@ impl Particle {
         acc: Vector2,
         fric: f64,
         lifetime: f64,
-        color: Color,
+        color: Color
     ) -> Particle {
         Self {
             pos,
@@ -26,11 +26,11 @@ impl Particle {
             acc,
             age: 0.00,
             lifespan: Lifespan {
-                time: lifetime,
-                on_ended: None,
+                time:     lifetime,
+                on_ended: None
             },
             friction: fric,
-            color,
+            color
         }
     }
     /// TODO: find a better way to do this
@@ -49,7 +49,7 @@ impl Particle {
                 Vector2::ZERO,
                 fric,
                 rand(20.),
-                color,
+                color
             ));
         }
         output

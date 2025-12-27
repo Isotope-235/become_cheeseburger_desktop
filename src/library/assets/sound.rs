@@ -1,13 +1,13 @@
+use std::{collections::HashMap, fs};
+
 use macroquad::audio::{PlaySoundParams, Sound, load_sound, play_sound};
 use rand::seq::SliceRandom;
-use std::collections::HashMap;
-use std::fs;
 
 #[derive(Debug)]
 pub struct Config {
     pub volume: f32,
     pub looped: bool,
-    pub id: &'static str,
+    pub id:     &'static str
 }
 
 impl From<&'static str> for Config {
@@ -37,7 +37,7 @@ impl Default for Config {
         Self {
             volume: 0.05,
             looped: false,
-            id: "",
+            id:     ""
         }
     }
 }
@@ -107,8 +107,8 @@ impl Loader {
             sound,
             PlaySoundParams {
                 looped: sound_config.looped,
-                volume: sound_config.volume,
-            },
+                volume: sound_config.volume
+            }
         );
     }
 }

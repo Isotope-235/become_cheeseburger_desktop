@@ -1,6 +1,6 @@
 use crate::{
     State,
-    library::{AssetLoader, component::Class},
+    library::{AssetLoader, component::Class}
 };
 
 const BURGER_SIZE: f64 = 2.00;
@@ -28,7 +28,7 @@ pub fn run(state: &mut State, assets: &AssetLoader) {
                         6,
                         e.pos,
                         0.20,
-                        *assets.color("heart"),
+                        *assets.color("heart")
                     );
                     state.particles.extend(particles);
                 }

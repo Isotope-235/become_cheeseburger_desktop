@@ -1,7 +1,7 @@
 use crate::*;
 pub struct Cheese {
-    pub pos: Vector2,
-    pub next_pos: Vector2,
+    pub pos:      Vector2,
+    pub next_pos: Vector2
 }
 impl Cheese {
     pub fn new(pos: Vector2, next_pos: Vector2) -> Self {

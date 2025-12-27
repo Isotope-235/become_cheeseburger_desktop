@@ -1,7 +1,6 @@
 use macroquad::{color::Color, texture::Texture2D};
 
-use super::sound;
-use super::sprites;
+use super::{sound, sprites};
 
 /// Helps loading all assets into the game with some handy util functions
 ///
@@ -9,7 +8,7 @@ use super::sprites;
 #[derive(Debug)]
 pub struct AssetLoader {
     sprites: sprites::Loader,
-    sounds: sound::Loader,
+    sounds:  sound::Loader
 }
 
 impl Default for AssetLoader {
@@ -22,7 +21,7 @@ impl AssetLoader {
     pub fn new() -> Self {
         AssetLoader {
             sprites: sprites::Loader::new(),
-            sounds: sound::Loader::new(),
+            sounds:  sound::Loader::new()
         }
     }
 
@@ -47,7 +46,7 @@ impl AssetLoader {
     /// ```
     pub async fn load_sprites(
         &mut self,
-        sprite_paths: Vec<impl sprites::IntoPathColor>,
+        sprite_paths: Vec<impl sprites::IntoPathColor>
     ) -> &mut Self {
         self.sprites.load_many(sprite_paths).await;
         self

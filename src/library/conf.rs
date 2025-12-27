@@ -16,9 +16,9 @@ pub fn window() -> Conf {
         sample_count: 0,
         window_resizable: false,
         icon: Some(miniquad::conf::Icon {
-            small: small_icon.into_bytes().try_into().unwrap(),
+            small:  small_icon.into_bytes().try_into().unwrap(),
             medium: medium_icon.into_bytes().try_into().unwrap(),
-            big: large_icon.into_bytes().try_into().unwrap(),
+            big:    large_icon.into_bytes().try_into().unwrap()
         }),
         ..Default::default()
     }

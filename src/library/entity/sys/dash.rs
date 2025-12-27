@@ -1,6 +1,6 @@
 use crate::{
     State,
-    library::{AssetLoader, Input},
+    library::{AssetLoader, Input}
 };
 
 pub fn run(state: &mut State, dt: f64, input: &Input, assets: &AssetLoader) {

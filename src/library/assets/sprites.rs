@@ -1,12 +1,14 @@
 use std::collections::HashMap;
 
-use macroquad::color::Color;
-use macroquad::prelude::{Texture2D, load_texture};
+use macroquad::{
+    color::Color,
+    prelude::{Texture2D, load_texture}
+};
 
 #[derive(Debug)]
 pub struct Sprite {
-    pub color: Color,
-    pub texture: Texture2D,
+    pub color:   Color,
+    pub texture: Texture2D
 }
 
 #[derive(Debug)]

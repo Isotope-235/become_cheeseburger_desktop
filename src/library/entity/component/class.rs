@@ -2,5 +2,5 @@
 pub enum Class {
     WhoCares,
     HealthPack,
-    Burger,
+    Burger
 }

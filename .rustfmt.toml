@@ -1,0 +1,5 @@
+hex_literal_case = "Preserve"
+imports_granularity = "Crate"
+group_imports = "StdExternalCrate"
+struct_field_align_threshold = 20
+trailing_comma = "Never"

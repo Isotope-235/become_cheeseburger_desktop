@@ -9,7 +9,7 @@ pub fn rec(pos: Vector2, w: i32, h: i32, color: Color) {
         pos.y() as f32 - half_h as f32,
         w as f32,
         h as f32,
-        color,
+        color
     );
 }
 
@@ -23,7 +23,7 @@ pub fn copy_texture(texture: &Texture2D, pos: Vector2) {
         texture,
         pos.x() as f32 - texture.width() * 0.50,
         pos.y() as f32 - texture.height() * 0.50,
-        WHITE,
+        WHITE
     );
 }
 
@@ -38,6 +38,6 @@ pub fn copy_with_rotation(texture: &Texture2D, pos: Vector2, rotation: f64) {
             dest_size: None,
             rotation: rotation as f32,
             ..Default::default()
-        },
+        }
     );
 }

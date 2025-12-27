@@ -1,6 +1,6 @@
 use crate::{
     State,
-    library::{CENTER, Vector2},
+    library::{CENTER, Vector2}
 };
 
 pub fn run(state: &mut State) {
