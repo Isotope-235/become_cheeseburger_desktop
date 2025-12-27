@@ -4,5 +4,6 @@ pub mod cheese;
 pub mod dash;
 pub mod destroy_dead;
 pub mod destroy_old;
+pub mod friction;
 pub mod player_collide;
 pub mod pos;

@@ -156,6 +156,7 @@ impl State {
         sys::age::run(self, dt);
         sys::player_collide::run(self, assets);
         sys::cheese::run(self, assets);
+        sys::friction::run(self, dt);
 
         sys::destroy_old::run(self, assets);
         sys::destroy_dead::run(&mut self.entities);
@@ -402,12 +403,6 @@ impl State {
                 burger.hp = burger.hp.min(burger.max_hp());
                 if input.space.is_pressed() && burger.can_dash() && input.dir().len() > 0.00 {
                     burger.dash(input, asset_loader);
-                }
-            };
-            {
-                // particles
-                for particle in &mut self.particles {
-                    particle.vel *= (1.00 - particle.friction).powf(dt);
                 }
             };
 
