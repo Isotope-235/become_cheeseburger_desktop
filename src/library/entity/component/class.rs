@@ -9,5 +9,5 @@ pub enum Class {
     HealthPack,
     Flak,
     FlakChild,
-    Warning { dir: Vector2 }
+    Warning { dir: Vector2, delay: f64 }
 }

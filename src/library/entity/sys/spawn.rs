@@ -76,10 +76,11 @@ pub fn run(state: &mut State, dt: f64) {
         } else {
             pos.1 = state.burger.pos.y() + shift;
         }
+        let delay = f64::from(i) * (15.00);
         state.entities.push(Entity {
-            class: Class::Warning { dir },
+            class: Class::Warning { dir, delay },
             pos,
-            lifespan: 60. + f64::from(i) * (15.00),
+            lifespan: 60. + delay,
             ..Default::default()
         });
     }

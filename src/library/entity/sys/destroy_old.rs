@@ -14,7 +14,7 @@ pub fn run(state: &mut State, assets: &AssetLoader) {
         if e.age >= e.lifespan {
             match e.class {
                 Class::Flak => flak.push(e.pos),
-                Class::Warning { dir } => lasers.push((e.pos, dir)),
+                Class::Warning { dir, delay: _ } => lasers.push((e.pos, dir)),
                 _ => ()
             }
             false

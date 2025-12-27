@@ -230,14 +230,16 @@ impl State {
                         e.vel.angle() + PI * 0.50
                     );
                 }
-                Class::Warning { .. } => {
-                    let dur = 6.00;
-                    let clr = if e.age % dur < dur * 0.50 {
-                        Color::from_rgba(255, 55, 55, 255)
-                    } else {
-                        Color::from_rgba(255, 255, 55, 255)
-                    };
-                    draw::rec(e.pos, 10, 10, clr);
+                Class::Warning { delay, dir: _ } => {
+                    if e.age >= delay {
+                        let dur = 6.00;
+                        let clr = if e.age % dur < dur * 0.50 {
+                            Color::from_rgba(255, 55, 55, 255)
+                        } else {
+                            Color::from_rgba(255, 255, 55, 255)
+                        };
+                        draw::rec(e.pos, 10, 10, clr);
+                    }
                 }
                 Class::Laser => {
                     let (w, h) = if e.vel.x().abs() > e.vel.y().abs() {
