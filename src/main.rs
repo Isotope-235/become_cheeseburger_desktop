@@ -71,7 +71,7 @@ async fn main() {
         let input = Input::get();
 
         if ended.not() {
-            state.progress(&input, dt, &asset_loader);
+            state.run_systems(dt, &input, &asset_loader);
         }
 
         // draw calls
@@ -161,11 +161,6 @@ impl State {
         sys::difficulty_up::run(self, dt);
     }
 
-    fn progress(&mut self, input: &Input, dt: f64, asset_loader: &AssetLoader) {
-        for _ in 0..ITERATIONS {
-            self.run_systems(dt, input, asset_loader);
-        }
-    }
     fn draw(&self, asset_loader: &AssetLoader) {
         // burger
         let b_sprite = if self.burger.invuln > 0.00 {

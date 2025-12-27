@@ -1,8 +1,7 @@
 use crate::*;
 
 pub const TITLE: &str = "Limited Alpha v0.2.0 - Become Cheeseburger: Desktop Edition";
-pub const ITERATIONS: i32 = 5;
-pub const DT: f64 = 1.00 / ITERATIONS as f64;
+pub const DT: f64 = 1.00;
 pub const SCORE_TEXT_PARAMS: TextParams = TextParams {
     font:              None,
     font_size:         80,
