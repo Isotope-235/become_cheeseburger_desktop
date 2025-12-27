@@ -1,4 +1,6 @@
-#[derive(PartialEq, Clone, Copy)]
+use crate::library::Vector2;
+
+#[derive(Clone, Copy)]
 pub enum Class {
     None,
     Bullet,
@@ -7,5 +9,5 @@ pub enum Class {
     HealthPack,
     Flak,
     FlakChild,
-    Warning
+    Warning { dir: Vector2 }
 }

@@ -194,10 +194,7 @@ impl State {
                             class: Class::Bullet,
                             pos,
                             vel: vel * 1.25,
-                            lifespan: Some(component::Lifespan {
-                                time:     750. + delay,
-                                on_ended: None
-                            }),
+                            lifespan: 750. + delay,
                             ..Default::default()
                         });
                     }
@@ -209,10 +206,7 @@ impl State {
                             class: Class::Bullet,
                             pos,
                             vel: vel * 1.25,
-                            lifespan: Some(component::Lifespan {
-                                time:     750. + delay,
-                                on_ended: None
-                            }),
+                            lifespan: 750. + delay,
                             ..Default::default()
                         });
                     }
@@ -230,10 +224,7 @@ impl State {
                     class: Class::Slug,
                     pos,
                     vel: vel * 0.50,
-                    lifespan: Some(component::Lifespan {
-                        time:     1500.,
-                        on_ended: None
-                    }),
+                    lifespan: 1500.,
                     ..Default::default()
                 });
             }
@@ -251,12 +242,9 @@ impl State {
                     pos.1 = self.burger.pos.y() + shift;
                 }
                 self.entities.push(entity::Entity {
-                    class: Class::Warning,
+                    class: Class::Warning { dir },
                     pos,
-                    lifespan: Some(component::Lifespan {
-                        time:     60. + f64::from(i) * (15.00),
-                        on_ended: Some(component::EndedEffect::Warning { dir })
-                    }),
+                    lifespan: 60. + f64::from(i) * (15.00),
                     ..Default::default()
                 });
             }
@@ -265,7 +253,7 @@ impl State {
             let hp_count = self
                 .entities
                 .iter()
-                .filter(|e| e.class == Class::HealthPack)
+                .filter(|e| matches!(e.class, Class::HealthPack))
                 .count();
             let times = self.counters.health_pack.revolve(
                 0.10 * f64::from(
@@ -280,10 +268,7 @@ impl State {
                     class: Class::HealthPack,
                     pos,
                     vel: vel * 0.30,
-                    lifespan: Some(component::Lifespan {
-                        time:     500.,
-                        on_ended: None
-                    }),
+                    lifespan: 500.,
                     ..Default::default()
                 });
             }
@@ -297,10 +282,7 @@ impl State {
                     class: Class::Flak,
                     pos,
                     vel: vel * 0.50,
-                    lifespan: Some(component::Lifespan {
-                        time:     200.,
-                        on_ended: Some(component::EndedEffect::Flak)
-                    }),
+                    lifespan: 200.,
                     ..Default::default()
                 });
             }
@@ -320,10 +302,7 @@ impl State {
                             class: Class::Bullet,
                             pos: starting_point - vel * 10.00 * f64::from(ii),
                             vel: vel * 1.75,
-                            lifespan: Some(component::Lifespan {
-                                time:     750.,
-                                on_ended: None
-                            }),
+                            lifespan: 750.,
                             ..Default::default()
                         });
                     }
@@ -389,7 +368,7 @@ impl State {
                         e.vel.angle() + PI * 0.50
                     );
                 }
-                Class::Warning => {
+                Class::Warning { .. } => {
                     let dur = 6.00;
                     let clr = if e.age % dur < dur * 0.50 {
                         Color::from_rgba(255, 55, 55, 255)

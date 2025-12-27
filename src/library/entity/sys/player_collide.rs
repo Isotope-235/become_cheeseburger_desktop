@@ -70,7 +70,7 @@ mod effect {
     pub fn of(class: Class) -> Option<Effect> {
         use Class as C;
         Some(match class {
-            C::None | C::Warning => return None,
+            C::None | C::Warning { .. } => return None,
             C::Bullet => basic(3, 3.00),
             C::Slug => basic(7, 8.00),
             C::Flak => basic(5, 7.00),

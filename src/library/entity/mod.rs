@@ -16,7 +16,7 @@ pub struct Entity {
     pub vel:      Vector2,
     pub acc:      Vector2,
     pub age:      f64,
-    pub lifespan: Option<component::Lifespan>,
+    pub lifespan: f64,
     pub alive:    bool
 }
 
@@ -28,7 +28,7 @@ impl Default for Entity {
             vel:      Vector2::ZERO,
             acc:      Vector2::ZERO,
             age:      0.00,
-            lifespan: None,
+            lifespan: 0.00,
             alive:    true
         }
     }

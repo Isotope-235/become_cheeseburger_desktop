@@ -1,28 +1,28 @@
 use crate::{
     State,
-    library::{AssetLoader, Entity, Radians, Vector2, component}
+    library::{
+        AssetLoader, Entity, Radians, Vector2,
+        component::{self, Class}
+    }
 };
 
 pub fn run(state: &mut State, assets: &AssetLoader) {
     let mut flak = Vec::new();
     let mut lasers = Vec::new();
 
-    state.entities.retain(|e| match e.lifespan {
-        Some(ref ls) => {
-            let retain = e.age < ls.time;
-            if let Some(ref effect) = ls.on_ended
-                && !retain
-            {
-                match *effect {
-                    component::EndedEffect::Flak => flak.push(e.pos),
-                    component::EndedEffect::Warning { dir } => lasers.push((e.pos, dir))
-                }
+    state.entities.retain(|e| {
+        if e.age >= e.lifespan {
+            match e.class {
+                Class::Flak => flak.push(e.pos),
+                Class::Warning { dir } => lasers.push((e.pos, dir)),
+                _ => ()
             }
-            retain
+            false
+        } else {
+            true
         }
-        None => true
     });
-    state.particles.retain(|p| p.age < p.lifespan.time);
+    state.particles.retain(|p| p.age < p.lifespan);
 
     let num = 8;
     for pos in flak {
@@ -32,10 +32,7 @@ pub fn run(state: &mut State, assets: &AssetLoader) {
                 class: component::Class::FlakChild,
                 pos,
                 acc: Vector2::from(dir) * 0.01,
-                lifespan: Some(component::Lifespan {
-                    time:     300.,
-                    on_ended: None
-                }),
+                lifespan: 300.,
                 ..Default::default()
             });
         }
@@ -47,10 +44,7 @@ pub fn run(state: &mut State, assets: &AssetLoader) {
             class: component::Class::Laser,
             pos: pos - dir * 40.00,
             vel: dir * 7.00,
-            lifespan: Some(component::Lifespan {
-                time:     500.,
-                on_ended: None
-            }),
+            lifespan: 500.,
             ..Default::default()
         });
     }
