@@ -162,6 +162,8 @@ impl State {
 
         sys::destroy_old::run(self, assets);
         sys::destroy_dead::run(&mut self.entities);
+
+        sys::difficulty_up::run(self, dt);
     }
 
     fn progress(&mut self, input: &Input, dt: f64, asset_loader: &AssetLoader) {
@@ -176,11 +178,7 @@ impl State {
             if self.freeze > 0.00 {
                 // making sure that the player sees the fatal projectile
                 self.freeze = (self.freeze - dt).max(0.00);
-                continue;
             }
-
-            // up difficulty
-            self.difficulty += 0.10 * dt;
         }
     }
     fn draw(&self, asset_loader: &AssetLoader) {
