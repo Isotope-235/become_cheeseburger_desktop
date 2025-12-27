@@ -1,8 +1,8 @@
 use crate::{
     State,
     library::{
-        CENTER, Counter, Entity, SCREEN, chance, component::Class, get_shift, num_to_corner,
-        num_to_side, rrange, spawn_pos_vel, spawn_pos_vel_from
+        CENTER, Counter, Entity, SCREEN, Vector2, chance, component::Class, get_shift,
+        num_to_corner, num_to_side, rrange, spawn_pos_vel, spawn_pos_vel_from
     }
 };
 
@@ -27,25 +27,13 @@ pub fn run(state: &mut State, dt: f64) {
                     let pos = CENTER + direction.mul_per(CENTER) + buffer;
                     (pos + shift, direction.negate())
                 };
-                state.entities.push(Entity {
-                    class: Class::Bullet,
-                    pos,
-                    vel: vel * 1.25,
-                    lifespan: 750. + delay,
-                    ..Default::default()
-                });
+                spawn(state, Class::Bullet, pos, vel * 1.25, 750. + delay);
             }
         } else {
             for i in 0..((1.00 + diff_scale * 2.00) as i32) {
                 let delay = f64::from(i) * 10.00;
                 let (pos, vel) = spawn_pos_vel_from(side, 4.00 + delay, 4.00);
-                state.entities.push(Entity {
-                    class: Class::Bullet,
-                    pos,
-                    vel: vel * 1.25,
-                    lifespan: 750. + delay,
-                    ..Default::default()
-                });
+                spawn(state, Class::Bullet, pos, vel * 1.25, 750. + delay);
             }
         }
     }
@@ -55,13 +43,7 @@ pub fn run(state: &mut State, dt: f64) {
 
     for _ in 0..times {
         let (pos, vel) = spawn_pos_vel(10.00, 10.00);
-        state.entities.push(Entity {
-            class: Class::Slug,
-            pos,
-            vel: vel * 0.50,
-            lifespan: 1500.,
-            ..Default::default()
-        });
+        spawn(state, Class::Slug, pos, vel * 0.50, 1500.);
     }
 
     // warnings
@@ -77,12 +59,13 @@ pub fn run(state: &mut State, dt: f64) {
             pos.1 = state.burger.pos.y() + shift;
         }
         let delay = f64::from(i) * (15.00);
-        state.entities.push(Entity {
-            class: Class::Warning { dir, delay },
+        spawn(
+            state,
+            Class::Warning { dir, delay },
             pos,
-            lifespan: 60. + delay,
-            ..Default::default()
-        });
+            Vector2::ZERO,
+            60. + delay
+        );
     }
 
     // health packs
@@ -100,13 +83,7 @@ pub fn run(state: &mut State, dt: f64) {
 
     for _ in 0..times {
         let (pos, vel) = spawn_pos_vel(10.00, 12.00);
-        state.entities.push(Entity {
-            class: Class::HealthPack,
-            pos,
-            vel: vel * 0.30,
-            lifespan: 500.,
-            ..Default::default()
-        });
+        spawn(state, Class::HealthPack, pos, vel * 0.30, 500.);
     }
 
     // frag
@@ -114,13 +91,7 @@ pub fn run(state: &mut State, dt: f64) {
 
     for _ in 0..times {
         let (pos, vel) = spawn_pos_vel(4.00, 4.00);
-        state.entities.push(Entity {
-            class: Class::Flak,
-            pos,
-            vel: vel * 0.50,
-            lifespan: 200.,
-            ..Default::default()
-        });
+        spawn(state, Class::Flak, pos, vel * 0.50, 200.);
     }
 
     let times = state
@@ -134,14 +105,19 @@ pub fn run(state: &mut State, dt: f64) {
             let direction = CENTER - starting_point;
             let vel = direction.normal();
             for ii in 0..3 {
-                state.entities.push(Entity {
-                    class: Class::Bullet,
-                    pos: starting_point - vel * 10.00 * f64::from(ii),
-                    vel: vel * 1.75,
-                    lifespan: 750.,
-                    ..Default::default()
-                });
+                let pos = starting_point - vel * 10.00 * f64::from(ii);
+                spawn(state, Class::Bullet, pos, vel * 1.75, 750.);
             }
         }
     }
+}
+
+fn spawn(state: &mut State, class: Class, pos: Vector2, vel: Vector2, lifespan: f64) {
+    state.entities.push(Entity {
+        class,
+        pos,
+        vel,
+        lifespan,
+        ..Default::default()
+    });
 }
