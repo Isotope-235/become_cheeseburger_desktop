@@ -1,16 +1,11 @@
 use crate::*;
 pub struct Cheese {
     pub pos: Vector2,
-    pub hp: f64,
     pub next_pos: Vector2,
 }
 impl Cheese {
     pub fn new(pos: Vector2, next_pos: Vector2) -> Self {
-        Self {
-            pos,
-            hp: 1.00,
-            next_pos,
-        }
+        Self { pos, next_pos }
     }
 }
 

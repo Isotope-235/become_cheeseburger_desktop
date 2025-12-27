@@ -156,7 +156,7 @@ impl State {
         sys::bound_burger::run(self);
         sys::age::run(self, dt);
         sys::player_collide::run(self, assets);
-        sys::cheese_regen::run(self);
+        sys::cheese::run(self, assets);
 
         sys::destroy_old::run(self, assets);
         sys::destroy_dead::run(&mut self.entities);
