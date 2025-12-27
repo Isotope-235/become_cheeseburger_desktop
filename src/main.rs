@@ -76,11 +76,7 @@ async fn main() {
 
         // draw calls
         set_camera(&canvas.camera);
-        clear_background(if state.freeze > 0.00 {
-            BG_ON_DAMAGE
-        } else {
-            BG
-        });
+        clear_background(BG);
         state.draw(&asset_loader);
         let score_text = fill_leading_zeroes(state.score);
         let score_chars = score_text.chars();
@@ -138,7 +134,6 @@ pub struct Counters {
 pub struct State {
     difficulty: f64,
     score:      i32,
-    freeze:     f64,
     counters:   Counters,
 
     entities:  Vec<Entity>,
@@ -168,17 +163,7 @@ impl State {
 
     fn progress(&mut self, input: &Input, dt: f64, asset_loader: &AssetLoader) {
         for _ in 0..ITERATIONS {
-            if self.freeze > 0.00 {
-                self.freeze = (self.freeze - dt).max(0.00);
-                continue;
-            }
-
-            // movement logic
             self.run_systems(dt, input, asset_loader);
-            if self.freeze > 0.00 {
-                // making sure that the player sees the fatal projectile
-                self.freeze = (self.freeze - dt).max(0.00);
-            }
         }
     }
     fn draw(&self, asset_loader: &AssetLoader) {
@@ -274,7 +259,7 @@ impl State {
         );
     }
     fn game_is_over(&self) -> bool {
-        !self.burger.is_alive() && self.freeze.abs() < 1e-10
+        !self.burger.is_alive()
     }
     fn reset() -> State {
         let burger_start = CENTER + Vector2(0.00, 12.00);
@@ -282,7 +267,6 @@ impl State {
         State {
             difficulty: 100.00,
             score:      0,
-            freeze:     0.00,
             burger:     Player::new(burger_start),
             cheese:     Cheese::new(CENTER - Vector2(0.00, 12.00), burger_start),
             particles:  Vec::new(),

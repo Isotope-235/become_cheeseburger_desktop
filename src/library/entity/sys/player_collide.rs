@@ -28,7 +28,6 @@ pub fn run(state: &mut State, assets: &AssetLoader) {
         }
         if dmg > 0 {
             assets.play_sound("damage");
-            state.freeze += f64::from(dmg);
         }
         state.burger.hp -= dmg;
     }
