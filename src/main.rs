@@ -268,9 +268,7 @@ impl State {
                         time:     60. + f64::from(i) * (15.00),
                         on_ended: Some(component::EndedEffect::Warning { dir })
                     }),
-                    draw: Some(component::Draw::Warning {
-                        delay: f64::from(i) * (15.00)
-                    }),
+                    draw: Some(component::Draw::Warning),
                     ..Default::default()
                 });
             }
@@ -420,16 +418,14 @@ impl State {
                             copy_texture(asset_loader.texture(name), e.pos);
                         }
                     }
-                    component::Draw::Warning { delay } => {
-                        if e.age >= delay {
-                            let dur = 6.00;
-                            let clr = if e.age % dur < dur * 0.50 {
-                                Color::from_rgba(255, 55, 55, 255)
-                            } else {
-                                Color::from_rgba(255, 255, 55, 255)
-                            };
-                            draw::rec(e.pos, 10, 10, clr);
-                        }
+                    component::Draw::Warning => {
+                        let dur = 6.00;
+                        let clr = if e.age % dur < dur * 0.50 {
+                            Color::from_rgba(255, 55, 55, 255)
+                        } else {
+                            Color::from_rgba(255, 255, 55, 255)
+                        };
+                        draw::rec(e.pos, 10, 10, clr);
                     }
                     component::Draw::Laser => {
                         let (w, h) = if e.vel.x().abs() > e.vel.y().abs() {
