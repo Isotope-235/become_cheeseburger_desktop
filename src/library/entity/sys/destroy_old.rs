@@ -29,6 +29,7 @@ pub fn run(state: &mut State, assets: &AssetLoader) {
         for i in 0..8 {
             let dir = f64::from(i).as_radians() / f64::from(num);
             state.entities.push(Entity {
+                class: component::Class::FlakChild,
                 pos,
                 acc: Vector2::from(dir) * 0.01,
                 lifespan: Some(component::Lifespan {
@@ -36,11 +37,6 @@ pub fn run(state: &mut State, assets: &AssetLoader) {
                     on_ended: None
                 }),
                 hp: Some(2.00),
-                collision: Some(component::Collision {
-                    dmg:   2.00,
-                    range: 4.00,
-                    sound: None
-                }),
                 draw: Some(component::Draw::Sprite {
                     name:   "flak_child",
                     rotate: false
@@ -53,6 +49,7 @@ pub fn run(state: &mut State, assets: &AssetLoader) {
     for (pos, dir) in lasers {
         assets.play_sound("laser");
         state.entities.push(Entity {
+            class: component::Class::Laser,
             pos: pos - dir * 40.00,
             vel: dir * 7.00,
             lifespan: Some(component::Lifespan {
@@ -60,11 +57,6 @@ pub fn run(state: &mut State, assets: &AssetLoader) {
                 on_ended: None
             }),
             hp: Some(5.00),
-            collision: Some(component::Collision {
-                dmg:   5.00,
-                range: 3.00,
-                sound: None
-            }),
             draw: Some(component::Draw::Laser),
             ..Default::default()
         });

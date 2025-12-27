@@ -1,6 +1,10 @@
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone, Copy)]
 pub enum Class {
-    WhoCares,
+    None,
+    Bullet,
+    Slug,
+    Laser,
     HealthPack,
-    Burger
+    Flak,
+    FlakChild
 }

@@ -191,6 +191,7 @@ impl State {
                             (pos + shift, direction.negate())
                         };
                         self.entities.push(entity::Entity {
+                            class: Class::Bullet,
                             pos,
                             vel: vel * 1.25,
                             lifespan: Some(component::Lifespan {
@@ -198,11 +199,6 @@ impl State {
                                 on_ended: None
                             }),
                             hp: Some(3.00),
-                            collision: Some(component::Collision {
-                                dmg:   3.00,
-                                range: 3.00,
-                                sound: None
-                            }),
                             draw: Some(component::Draw::Sprite {
                                 name:   "bullet",
                                 rotate: false
@@ -215,6 +211,7 @@ impl State {
                         let delay = f64::from(i) * 10.00;
                         let (pos, vel) = spawn_pos_vel_from(side, 4.00 + delay, 4.00);
                         self.entities.push(entity::Entity {
+                            class: Class::Bullet,
                             pos,
                             vel: vel * 1.25,
                             lifespan: Some(component::Lifespan {
@@ -222,11 +219,6 @@ impl State {
                                 on_ended: None
                             }),
                             hp: Some(3.00),
-                            collision: Some(component::Collision {
-                                dmg:   3.00,
-                                range: 3.00,
-                                sound: None
-                            }),
                             draw: Some(component::Draw::Sprite {
                                 name:   "bullet",
                                 rotate: false
@@ -245,6 +237,7 @@ impl State {
             for _ in 0..times {
                 let (pos, vel) = spawn_pos_vel(10.00, 10.00);
                 self.entities.push(entity::Entity {
+                    class: Class::Slug,
                     pos,
                     vel: vel * 0.50,
                     lifespan: Some(component::Lifespan {
@@ -252,11 +245,6 @@ impl State {
                         on_ended: None
                     }),
                     hp: Some(7.00),
-                    collision: Some(component::Collision {
-                        dmg:   7.00,
-                        range: 8.00,
-                        sound: None
-                    }),
                     draw: Some(component::Draw::Sprite {
                         name:   "slug",
                         rotate: true
@@ -312,11 +300,6 @@ impl State {
                         on_ended: None
                     }),
                     hp: Some(1.00),
-                    collision: Some(component::Collision {
-                        dmg:   -4.00,
-                        range: 7.00,
-                        sound: Some("heal")
-                    }),
                     draw: Some(component::Draw::Sprite {
                         name:   "heart",
                         rotate: false
@@ -331,6 +314,7 @@ impl State {
             for _ in 0..times {
                 let (pos, vel) = spawn_pos_vel(4.00, 4.00);
                 self.entities.push(entity::Entity {
+                    class: Class::Flak,
                     pos,
                     vel: vel * 0.50,
                     lifespan: Some(component::Lifespan {
@@ -338,11 +322,6 @@ impl State {
                         on_ended: Some(component::EndedEffect::Flak)
                     }),
                     hp: Some(5.00),
-                    collision: Some(component::Collision {
-                        dmg:   5.00,
-                        range: 7.00,
-                        sound: None
-                    }),
                     draw: Some(component::Draw::Sprite {
                         name:   "flak",
                         rotate: false
@@ -363,6 +342,7 @@ impl State {
                     let vel = direction.normal();
                     for ii in 0..3 {
                         self.entities.push(entity::Entity {
+                            class: Class::Bullet,
                             pos: starting_point - vel * 10.00 * f64::from(ii),
                             vel: vel * 1.75,
                             lifespan: Some(component::Lifespan {
@@ -370,11 +350,6 @@ impl State {
                                 on_ended: None
                             }),
                             hp: Some(3.00),
-                            collision: Some(component::Collision {
-                                dmg:   3.00,
-                                range: 3.00,
-                                sound: None
-                            }),
                             draw: Some(component::Draw::Sprite {
                                 name:   "bullet",
                                 rotate: false
