@@ -17,9 +17,7 @@ pub fn run(state: &mut State, assets: &AssetLoader) {
 
             if center_dist < (BURGER_SIZE + effect.range) {
                 dmg += effect.dmg;
-                if let Some(ref mut hp) = e.hp {
-                    *hp = 0.00;
-                }
+                e.alive = false;
                 if let Some(snd) = effect.sound {
                     assets.play_sound(snd);
                 }

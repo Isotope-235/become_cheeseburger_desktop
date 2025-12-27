@@ -17,7 +17,7 @@ pub struct Entity {
     pub acc:      Vector2,
     pub age:      f64,
     pub lifespan: Option<component::Lifespan>,
-    pub hp:       Option<f64>,
+    pub alive:    bool,
 
     pub draw: Option<component::Draw>
 }
@@ -31,7 +31,7 @@ impl Default for Entity {
             acc:      Vector2::ZERO,
             age:      0.00,
             lifespan: None,
-            hp:       None,
+            alive:    true,
 
             draw: None
         }

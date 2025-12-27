@@ -198,7 +198,6 @@ impl State {
                                 time:     750. + delay,
                                 on_ended: None
                             }),
-                            hp: Some(3.00),
                             draw: Some(component::Draw::Sprite {
                                 name:   "bullet",
                                 rotate: false
@@ -218,7 +217,6 @@ impl State {
                                 time:     750. + delay,
                                 on_ended: None
                             }),
-                            hp: Some(3.00),
                             draw: Some(component::Draw::Sprite {
                                 name:   "bullet",
                                 rotate: false
@@ -244,7 +242,6 @@ impl State {
                         time:     1500.,
                         on_ended: None
                     }),
-                    hp: Some(7.00),
                     draw: Some(component::Draw::Sprite {
                         name:   "slug",
                         rotate: true
@@ -301,7 +298,6 @@ impl State {
                         time:     500.,
                         on_ended: None
                     }),
-                    hp: Some(1.00),
                     draw: Some(component::Draw::Sprite {
                         name:   "heart",
                         rotate: false
@@ -323,7 +319,6 @@ impl State {
                         time:     200.,
                         on_ended: Some(component::EndedEffect::Flak)
                     }),
-                    hp: Some(5.00),
                     draw: Some(component::Draw::Sprite {
                         name:   "flak",
                         rotate: false
@@ -351,7 +346,6 @@ impl State {
                                 time:     750.,
                                 on_ended: None
                             }),
-                            hp: Some(3.00),
                             draw: Some(component::Draw::Sprite {
                                 name:   "bullet",
                                 rotate: false
