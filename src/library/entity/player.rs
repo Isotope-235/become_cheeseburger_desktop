@@ -4,7 +4,7 @@ pub struct Player {
     pub pos:         Vector2,
     pub vel:         Vector2,
     pub acc:         Vector2,
-    pub hp:          f64,
+    pub hp:          i32,
     pub invuln:      f64,
     pub dash_charge: f64
 }
@@ -15,7 +15,7 @@ impl Player {
             pos,
             vel: Vector2::ZERO,
             acc: Vector2::ZERO,
-            hp: 8.00,
+            hp: 8,
             invuln: 0.00,
             dash_charge: 1.00
         }
@@ -24,10 +24,10 @@ impl Player {
 
 impl Player {
     pub fn is_alive(&self) -> bool {
-        self.hp > 1e-10
+        self.hp > 0
     }
-    pub fn max_hp(&self) -> f64 {
-        8.00
+    pub fn max_hp(&self) -> i32 {
+        8
     }
     pub fn dash(&mut self, input: &Input, asset_loader: &AssetLoader) {
         asset_loader.play_sound("dash");
@@ -42,7 +42,7 @@ impl Player {
     pub fn is_targetable(&self) -> bool {
         self.invuln <= 0.00
     }
-    pub fn missing_hp(&self) -> f64 {
+    pub fn missing_hp(&self) -> i32 {
         self.max_hp() - self.hp
     }
 }

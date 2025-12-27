@@ -285,7 +285,9 @@ impl State {
                 .filter(|e| e.class == Class::HealthPack)
                 .count();
             let times = self.counters.health_pack.revolve(
-                0.10 * (self.burger.missing_hp() - (hp_count * 2) as f64).clamp(0.00, 8.00),
+                0.10 * f64::from(
+                    (self.burger.missing_hp() - i32::try_from(hp_count * 2).unwrap()).clamp(0, 8)
+                ),
                 dt
             );
 
@@ -450,15 +452,15 @@ impl State {
         // health bar
         let h = 4;
         let mhp = self.burger.max_hp();
-        let w = self.burger.hp * 8.00;
+        let w = self.burger.hp * 8;
         let from_bot = h + 2;
-        let mw = mhp * 8.00;
+        let mw = mhp * 8;
         let window_height = CENTER_Y * 2.00;
         let hp_pos = Vector2(2.00, window_height - f64::from(from_bot));
-        draw::rec_top_left(hp_pos, mw as i32, h, Color::from_rgba(155, 155, 155, 255));
+        draw::rec_top_left(hp_pos, mw, h, Color::from_rgba(155, 155, 155, 255));
         draw::rec_top_left(
             hp_pos,
-            w.max(0.00) as _,
+            w.max(0) as _,
             h,
             Color::from_rgba(255, 105, 105, 255)
         );

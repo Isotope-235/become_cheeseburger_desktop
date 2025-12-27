@@ -7,7 +7,7 @@ const BURGER_SIZE: f64 = 2.00;
 
 pub fn run(state: &mut State, assets: &AssetLoader) {
     if state.burger.is_targetable() {
-        let mut dmg = 0.00;
+        let mut dmg = 0;
         for e in &mut state.entities {
             let Some(effect) = effect::of(e.class) else {
                 continue;
@@ -28,9 +28,9 @@ pub fn run(state: &mut State, assets: &AssetLoader) {
                 }
             }
         }
-        if dmg > 0.00 {
+        if dmg > 0 {
             assets.play_sound("damage");
-            state.freeze += dmg;
+            state.freeze += f64::from(dmg);
         }
         state.burger.hp -= dmg;
     }
@@ -42,7 +42,7 @@ fn make_particles(pos: Vector2, particles: &mut Vec<Particle>, assets: &AssetLoa
 }
 
 struct Effect {
-    dmg:            f64,
+    dmg:            i32,
     range:          f64,
     sound:          Option<&'static str>,
     make_particles: bool
@@ -54,14 +54,14 @@ mod effect {
 
     fn zero() -> Effect {
         Effect {
-            dmg:            0.00,
+            dmg:            0,
             range:          0.00,
             sound:          None,
             make_particles: false
         }
     }
 
-    fn basic(dmg: f64, range: f64) -> Effect {
+    fn basic(dmg: i32, range: f64) -> Effect {
         Effect {
             dmg,
             range,
@@ -73,17 +73,17 @@ mod effect {
         use Class as C;
         Some(match class {
             C::None => return None,
-            C::Bullet => basic(3.00, 3.00),
-            C::Slug => basic(7.00, 8.00),
-            C::Flak => basic(5.00, 7.00),
+            C::Bullet => basic(3, 3.00),
+            C::Slug => basic(7, 8.00),
+            C::Flak => basic(5, 7.00),
             C::HealthPack => Effect {
-                dmg:            -4.00,
+                dmg:            -4,
                 range:          7.00,
                 sound:          Some("heal"),
                 make_particles: true
             },
-            C::FlakChild => basic(2.00, 4.00),
-            C::Laser => basic(5.00, 3.00)
+            C::FlakChild => basic(2, 4.00),
+            C::Laser => basic(5, 3.00)
         })
     }
 }
