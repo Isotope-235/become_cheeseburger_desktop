@@ -6,5 +6,6 @@ pub enum Class {
     Laser,
     HealthPack,
     Flak,
-    FlakChild
+    FlakChild,
+    Warning
 }

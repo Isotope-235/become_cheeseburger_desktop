@@ -36,10 +36,6 @@ pub fn run(state: &mut State, assets: &AssetLoader) {
                     time:     300.,
                     on_ended: None
                 }),
-                draw: Some(component::Draw::Sprite {
-                    name:   "flak_child",
-                    rotate: false
-                }),
                 ..Default::default()
             });
         }
@@ -55,7 +51,6 @@ pub fn run(state: &mut State, assets: &AssetLoader) {
                 time:     500.,
                 on_ended: None
             }),
-            draw: Some(component::Draw::Laser),
             ..Default::default()
         });
     }

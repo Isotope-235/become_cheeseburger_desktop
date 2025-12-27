@@ -198,10 +198,6 @@ impl State {
                                 time:     750. + delay,
                                 on_ended: None
                             }),
-                            draw: Some(component::Draw::Sprite {
-                                name:   "bullet",
-                                rotate: false
-                            }),
                             ..Default::default()
                         });
                     }
@@ -216,10 +212,6 @@ impl State {
                             lifespan: Some(component::Lifespan {
                                 time:     750. + delay,
                                 on_ended: None
-                            }),
-                            draw: Some(component::Draw::Sprite {
-                                name:   "bullet",
-                                rotate: false
                             }),
                             ..Default::default()
                         });
@@ -242,10 +234,6 @@ impl State {
                         time:     1500.,
                         on_ended: None
                     }),
-                    draw: Some(component::Draw::Sprite {
-                        name:   "slug",
-                        rotate: true
-                    }),
                     ..Default::default()
                 });
             }
@@ -263,12 +251,12 @@ impl State {
                     pos.1 = self.burger.pos.y() + shift;
                 }
                 self.entities.push(entity::Entity {
+                    class: Class::Warning,
                     pos,
                     lifespan: Some(component::Lifespan {
                         time:     60. + f64::from(i) * (15.00),
                         on_ended: Some(component::EndedEffect::Warning { dir })
                     }),
-                    draw: Some(component::Draw::Warning),
                     ..Default::default()
                 });
             }
@@ -296,10 +284,6 @@ impl State {
                         time:     500.,
                         on_ended: None
                     }),
-                    draw: Some(component::Draw::Sprite {
-                        name:   "heart",
-                        rotate: false
-                    }),
                     ..Default::default()
                 });
             }
@@ -316,10 +300,6 @@ impl State {
                     lifespan: Some(component::Lifespan {
                         time:     200.,
                         on_ended: Some(component::EndedEffect::Flak)
-                    }),
-                    draw: Some(component::Draw::Sprite {
-                        name:   "flak",
-                        rotate: false
                     }),
                     ..Default::default()
                 });
@@ -343,10 +323,6 @@ impl State {
                             lifespan: Some(component::Lifespan {
                                 time:     750.,
                                 on_ended: None
-                            }),
-                            draw: Some(component::Draw::Sprite {
-                                name:   "bullet",
-                                rotate: false
                             }),
                             ..Default::default()
                         });
@@ -405,37 +381,36 @@ impl State {
         }
 
         for e in &self.entities {
-            if let Some(ref draw_mode) = e.draw {
-                match *draw_mode {
-                    component::Draw::Sprite { name, rotate } => {
-                        if rotate {
-                            copy_with_rotation(
-                                asset_loader.texture(name),
-                                e.pos,
-                                e.vel.angle() + PI * 0.50
-                            );
-                        } else {
-                            copy_texture(asset_loader.texture(name), e.pos);
-                        }
-                    }
-                    component::Draw::Warning => {
-                        let dur = 6.00;
-                        let clr = if e.age % dur < dur * 0.50 {
-                            Color::from_rgba(255, 55, 55, 255)
-                        } else {
-                            Color::from_rgba(255, 255, 55, 255)
-                        };
-                        draw::rec(e.pos, 10, 10, clr);
-                    }
-                    component::Draw::Laser => {
-                        let (w, h) = if e.vel.x().abs() > e.vel.y().abs() {
-                            (36, 6)
-                        } else {
-                            (6, 36)
-                        };
-                        draw::rec(e.pos, w, h, Color::from_rgba(255, 55, 55, 255));
-                    }
+            match e.class {
+                Class::Slug => {
+                    copy_with_rotation(
+                        asset_loader.texture("slug"),
+                        e.pos,
+                        e.vel.angle() + PI * 0.50
+                    );
                 }
+                Class::Warning => {
+                    let dur = 6.00;
+                    let clr = if e.age % dur < dur * 0.50 {
+                        Color::from_rgba(255, 55, 55, 255)
+                    } else {
+                        Color::from_rgba(255, 255, 55, 255)
+                    };
+                    draw::rec(e.pos, 10, 10, clr);
+                }
+                Class::Laser => {
+                    let (w, h) = if e.vel.x().abs() > e.vel.y().abs() {
+                        (36, 6)
+                    } else {
+                        (6, 36)
+                    };
+                    draw::rec(e.pos, w, h, Color::from_rgba(255, 55, 55, 255));
+                }
+                Class::Bullet => copy_texture(asset_loader.texture("bullet"), e.pos),
+                Class::HealthPack => copy_texture(asset_loader.texture("heart"), e.pos),
+                Class::Flak => copy_texture(asset_loader.texture("flak"), e.pos),
+                Class::FlakChild => copy_texture(asset_loader.texture("flak_child"), e.pos),
+                Class::None => ()
             }
         }
 
