@@ -1,4 +1,5 @@
 //#![windows_subsystem = "windows"]
+#![allow(clippy::missing_panics_doc)]
 
 use std::{f64::consts::PI, ops::Not};
 

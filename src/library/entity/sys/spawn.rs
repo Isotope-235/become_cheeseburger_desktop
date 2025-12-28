@@ -6,7 +6,6 @@ use crate::{
     }
 };
 
-#[allow(clippy::missing_panics_doc)]
 pub fn run(state: &mut State, dt: f64) {
     let diff_scale = state.difficulty * 0.01;
 
