@@ -153,11 +153,12 @@ impl State {
 
         sys::dash::run(self, dt, input, assets);
         sys::pos::run(self, dt);
-        sys::bound_burger::run(self);
         sys::age::run(self, dt);
         sys::player_collide::run(self, assets);
         sys::cheese::run(self, assets);
         sys::friction::run(self, dt);
+        sys::bound_burger::run(self);
+        sys::bound_stats::run(self);
 
         sys::destroy_old::run(self, assets);
         sys::destroy_dead::run(&mut self.entities);

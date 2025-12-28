@@ -1,5 +1,6 @@
 pub mod age;
 pub mod bound_burger;
+pub mod bound_stats;
 pub mod cheese;
 pub mod dash;
 pub mod destroy_dead;
