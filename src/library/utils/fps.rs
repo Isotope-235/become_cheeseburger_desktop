@@ -2,7 +2,7 @@ use crate::*;
 /// # Panics
 ///
 ///
-pub async fn find() -> i32 {
+pub async fn find() -> u32 {
     let mut attempts = 0;
     'fps: loop {
         attempts += 1;
@@ -15,13 +15,13 @@ pub async fn find() -> i32 {
     }
 }
 
-async fn try_find_fps() -> i32 {
+async fn try_find_fps() -> u32 {
     let mut frames = Vec::new();
     for _ in 0..24 {
         // get fps numbers from the first 16 frames
         clear_background(BG);
         next_frame().await;
-        frames.push(get_fps());
+        frames.push(u32::try_from(get_fps()).unwrap());
     }
     let mut adjusted: Vec<_> = frames.iter().skip(8).collect(); // early fps numbers are unreliable
     adjusted.sort_unstable();

@@ -18,6 +18,7 @@ async fn main() {
 
     // fps-based timestep
     let dt = DT * 60.00 / f64::from(fps);
+    let freeze_decay = 10000 / fps;
 
     // pixel perfection
     let mut camera =
@@ -70,13 +71,13 @@ async fn main() {
         // get inputs for this frame
         let input = Input::get();
 
-        if ended.not() {
+        if ended.not() && state.frozen_time == 0 {
             state.run_systems(dt, &input, &asset_loader);
         }
+        state.frozen_time -= std::cmp::min(freeze_decay, state.frozen_time);
 
         // draw calls
         set_camera(&canvas.camera);
-        clear_background(BG);
         state.draw(&asset_loader);
         let score_text = fill_leading_zeroes(state.score);
         let score_chars = score_text.chars();
@@ -132,6 +133,8 @@ pub struct Counters {
 }
 
 pub struct State {
+    frozen_time: u32,
+
     difficulty: f64,
     score:      i32,
     counters:   Counters,
@@ -162,6 +165,12 @@ impl State {
     }
 
     fn draw(&self, asset_loader: &AssetLoader) {
+        let bg = if self.frozen_time == 0 {
+            BG
+        } else {
+            BG_ON_DAMAGE
+        };
+        clear_background(bg);
         // burger
         let b_sprite = if self.burger.invuln > 0.00 {
             asset_loader.texture("burger_invuln")
@@ -260,13 +269,14 @@ impl State {
         let burger_start = CENTER + Vector2(0.00, 12.00);
 
         State {
-            difficulty: 100.00,
-            score:      0,
-            burger:     Player::new(burger_start),
-            cheese:     Cheese::new(CENTER - Vector2(0.00, 12.00), burger_start),
-            particles:  Vec::new(),
-            counters:   Counters::default(),
-            entities:   Vec::new()
+            frozen_time: 0,
+            difficulty:  100.00,
+            score:       0,
+            burger:      Player::new(burger_start),
+            cheese:      Cheese::new(CENTER - Vector2(0.00, 12.00), burger_start),
+            particles:   Vec::new(),
+            counters:    Counters::default(),
+            entities:    Vec::new()
         }
     }
 }

@@ -28,6 +28,7 @@ pub fn run(state: &mut State, assets: &AssetLoader) {
         }
         if dmg > 0 {
             assets.play_sound("damage");
+            state.frozen_time += u32::try_from(dmg).expect("dmg > 0 has been checked") * 400;
         }
         state.burger.hp -= dmg;
     }
