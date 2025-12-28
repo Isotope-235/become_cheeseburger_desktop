@@ -31,7 +31,7 @@ pub enum Button {
     Released
 }
 impl Button {
-    pub fn is_pressed(&self) -> bool {
+    pub fn is_pressed(self) -> bool {
         match self {
             Button::Pressed => true,
             Button::Released => false

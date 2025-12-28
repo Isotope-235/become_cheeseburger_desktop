@@ -235,7 +235,7 @@ impl State {
 
         // health bar
         let h = 4;
-        let mhp = self.burger.max_hp();
+        let mhp = Player::max_hp();
         let w = self.burger.hp * 8;
         let from_bot = h + 2;
         let mw = mhp * 8;

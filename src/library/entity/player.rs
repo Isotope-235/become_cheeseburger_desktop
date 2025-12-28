@@ -26,7 +26,7 @@ impl Player {
     pub fn is_alive(&self) -> bool {
         self.hp > 0
     }
-    pub fn max_hp(&self) -> i32 {
+    pub fn max_hp() -> i32 {
         8
     }
     pub fn dash(&mut self, input: &Input, asset_loader: &AssetLoader) {
@@ -43,6 +43,6 @@ impl Player {
         self.invuln <= 0.00
     }
     pub fn missing_hp(&self) -> i32 {
-        self.max_hp() - self.hp
+        Self::max_hp() - self.hp
     }
 }

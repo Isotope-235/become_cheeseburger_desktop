@@ -75,12 +75,6 @@ impl Vector2 {
         let Vector2(x, y) = self;
         Vector2(-x, -y)
     }
-    /// Returns the vector with its component values swapped.
-    #[must_use]
-    pub fn invert(self) -> Vector2 {
-        let Vector2(x, y) = self;
-        Vector2(y, x)
-    }
     /// Returns the vector rotated 90 degrees counter-clockwise.
     ///
     /// ## Example
@@ -115,16 +109,6 @@ impl Vector2 {
     /// ```
     pub fn y(self) -> f64 {
         self.1
-    }
-    /// Returns the vector with its x component set to the given value.
-    #[must_use]
-    pub fn aligned(self) -> Vector2 {
-        let Vector2(x, y) = self;
-        if x.abs() > y.abs() {
-            Vector2(x, 0.00)
-        } else {
-            Vector2(0.00, y)
-        }
     }
     /// Returns the vector multiplied component-wise by the given vector.
     ///
