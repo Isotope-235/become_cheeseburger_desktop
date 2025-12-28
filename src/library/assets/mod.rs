@@ -1,4 +1,4 @@
+mod asset_loader;
 mod sound;
 pub mod sprites;
-mod asset_loader;
 pub use asset_loader::*;
