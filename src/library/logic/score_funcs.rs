@@ -1,12 +1,14 @@
+use std::fmt::Write;
+
 use crate::*;
 
-/// Returns a string with the number of leading zeroes needed to make the number 5 digits long.
-pub fn fill_leading_zeroes(num: i32) -> String {
+/// Fills a string with the number of leading zeroes needed to make the number 5 digits long.
+pub fn fill_leading_zeroes(text: &mut String, num: i32) {
     let missing_zeroes = 5 - num.checked_ilog10().unwrap_or(0) - 1;
-    let lead = "0".repeat(missing_zeroes as usize);
-    let mut output = num.to_string();
-    output.insert_str(0, &lead);
-    output
+    for _ in 0..missing_zeroes {
+        text.push('0');
+    }
+    write!(text, "{num}").expect("string write cannot fail");
 }
 
 #[cfg(test)]

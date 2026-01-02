@@ -68,11 +68,14 @@ async fn main() {
     // music
     asset_loader.play_sound("music1");
 
+    let mut score_text = String::with_capacity(5);
+    fill_leading_zeroes(&mut score_text, state.score);
     // main game loop
     loop {
         // get inputs for this frame
         let input = Input::get();
 
+        let last_score = state.score;
         if ended.not() && state.frozen_time == 0 {
             state.run_systems(dt, &input, &asset_loader);
         }
@@ -81,7 +84,11 @@ async fn main() {
         // draw calls
         set_camera(&canvas.camera);
         state.draw(&asset_loader);
-        let score_text = fill_leading_zeroes(state.score);
+
+        if last_score != state.score {
+            score_text.clear();
+            fill_leading_zeroes(&mut score_text, state.score);
+        }
         draw_text_ex(&score_text, 1.00, 9.00, text_params.clone());
 
         if ended {
