@@ -5,7 +5,7 @@ pub const DT: f64 = 1.00;
 pub const SCORE_TEXT_PARAMS: TextParams = TextParams {
     font:              None,
     font_size:         40,
-    font_scale:        0.251,
+    font_scale:        0.250,
     font_scale_aspect: 1.00,
     color:             YELLOW,
     rotation:          0.00
