@@ -1,7 +1,7 @@
 use std::{collections::HashMap, fs};
 
 use macroquad::audio::{PlaySoundParams, Sound, load_sound, play_sound};
-use rand::seq::SliceRandom;
+use macroquad::rand::ChooseRandom;
 
 #[derive(Debug)]
 pub struct Config {
@@ -100,7 +100,7 @@ impl Loader {
         let sound_variations = self.1.get(id).expect(&error_msg);
 
         let sound = sound_variations
-            .choose(&mut rand::thread_rng())
+            .choose()
             .expect("Expected non-empty sound variations.");
 
         play_sound(

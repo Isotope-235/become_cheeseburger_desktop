@@ -9,7 +9,6 @@ edition = "2024"
 image = "0.24.7"
 macroquad = { version = "0.4.4", features = ["audio"] }
 macroquad-canvas = "0.4.1"
-rand = "0.8.5"
 
 
 [lints.clippy]
@@ -19,3 +18,6 @@ cast_possible_truncation = "allow"
 cast_precision_loss = "allow"
 wildcard_imports = "allow"
 must_use_candidate = "allow"
+
+[profile.release]
+debug = true
