@@ -1,7 +1,9 @@
 use std::{collections::HashMap, fs};
 
-use macroquad::audio::{PlaySoundParams, Sound, load_sound, play_sound};
-use macroquad::rand::ChooseRandom;
+use macroquad::{
+    audio::{PlaySoundParams, Sound, load_sound, play_sound},
+    rand::ChooseRandom
+};
 
 #[derive(Debug)]
 pub struct Config {
