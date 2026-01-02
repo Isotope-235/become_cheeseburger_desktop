@@ -52,7 +52,8 @@ async fn main() {
         .load_sounds(vec![(0.15, true, "music1")])
         .await;
 
-    let joystix = load_ttf_font("joystix.otf").await.unwrap();
+    let mut joystix = load_ttf_font("joystix.otf").await.unwrap();
+    joystix.set_filter(FilterMode::Nearest);
 
     // state init
     let mut state = State::reset();
@@ -81,32 +82,23 @@ async fn main() {
         set_camera(&canvas.camera);
         state.draw(&asset_loader);
         let score_text = fill_leading_zeroes(state.score);
-        let score_chars = score_text.chars();
-        for (i, c) in score_chars.enumerate() {
-            draw_text_ex(
-                &(c.to_string())[..],
-                1.00 + i as f32 * 8.00,
-                9.00,
-                text_params.clone()
-            );
-        }
+        draw_text_ex(&score_text, 1.00, 9.00, text_params.clone());
 
         if ended {
             let game_over = "you did not become cheeseburger";
-            let options = TextParams {
-                font: Some(&joystix),
-                font_size: 80,
-                font_scale: 0.125,
-                ..SCORE_TEXT_PARAMS
-            };
             draw_text_ex(
                 &game_over[..12],
                 35.00,
                 CENTER_Y as f32 - 20.00,
-                options.clone()
+                text_params.clone()
             );
-            draw_text_ex(&game_over[12..], 1.00, CENTER_Y as f32, options.clone());
-            draw_text_ex("restart: [r]", 30.00, CENTER_Y as f32 + 20.00, options);
+            draw_text_ex(&game_over[12..], 1.00, CENTER_Y as f32, text_params.clone());
+            draw_text_ex(
+                "restart: [r]",
+                30.00,
+                CENTER_Y as f32 + 20.00,
+                text_params.clone()
+            );
             if is_key_pressed(KeyCode::R) {
                 state = State::reset();
             }
